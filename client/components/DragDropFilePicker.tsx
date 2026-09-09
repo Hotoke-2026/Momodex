@@ -53,6 +53,7 @@ export default function DragDropFilePicker() {
           type="file"
           accept="image/png,image/jpeg"
           onChange={handleInputChange}
+          data-testid="file-input"
         />
 
         {/* display the preview image if there is one */}
