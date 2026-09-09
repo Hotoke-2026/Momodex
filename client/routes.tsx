@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key */
 import { createRoutesFromElements, Route } from 'react-router'
-import App from './components/App'
+import App from './Pages/App'
 
 const routes = createRoutesFromElements(<Route index element={<App />} />)
 
