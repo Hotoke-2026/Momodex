@@ -1,13 +1,194 @@
 /**
  * @param { import("knex").Knex } knex
- * @returns { Promise<void> } 
+ * @returns { Promise<void> }
  */
-exports.seed = async function(knex) {
-  // Deletes ALL existing entries
-  await knex('table_name').del()
-  await knex('table_name').insert([
-    {id: 1, colName: 'rowValue1'},
-    {id: 2, colName: 'rowValue2'},
-    {id: 3, colName: 'rowValue3'}
-  ]);
-};
+
+export async function seed(knex) {
+  await knex('species').del()
+
+  await knex('species').insert([
+    // --- Native ---
+    {
+      id: 'kiwi',
+      name: 'Kiwi',
+      type: 'bird',
+      hp: 45,
+      attack: 10,
+      rarity: 'rare',
+      status: 'native',
+    },
+    {
+      id: 'tui',
+      name: 'Tūī',
+      type: 'bird',
+      hp: 30,
+      attack: 14,
+      rarity: 'common',
+      status: 'native',
+    },
+    {
+      id: 'kea',
+      name: 'Kea',
+      type: 'bird',
+      hp: 35,
+      attack: 18,
+      rarity: 'rare',
+      status: 'native',
+    },
+    {
+      id: 'kakapo',
+      name: 'Kākāpō',
+      type: 'bird',
+      hp: 50,
+      attack: 8,
+      rarity: 'legendary',
+      status: 'native',
+    },
+    {
+      id: 'takahe',
+      name: 'Takahē',
+      type: 'bird',
+      hp: 48,
+      attack: 12,
+      rarity: 'legendary',
+      status: 'native',
+    },
+    {
+      id: 'weta',
+      name: 'Wētā',
+      type: 'insect',
+      hp: 20,
+      attack: 16,
+      rarity: 'common',
+      status: 'native',
+    },
+    {
+      id: 'monarch-butterfly-nz',
+      name: 'Monarch Butterfly',
+      type: 'insect',
+      hp: 10,
+      attack: 4,
+      rarity: 'common',
+      status: 'native',
+    },
+    {
+      id: 'tuatara',
+      name: 'Tuatara',
+      type: 'reptile',
+      hp: 38,
+      attack: 15,
+      rarity: 'rare',
+      status: 'native',
+    },
+    {
+      id: 'silver-fern',
+      name: 'Silver Fern',
+      type: 'plant',
+      hp: 25,
+      attack: 2,
+      rarity: 'common',
+      status: 'native',
+    },
+    {
+      id: 'kauri',
+      name: 'Kauri',
+      type: 'plant',
+      hp: 60,
+      attack: 3,
+      rarity: 'legendary',
+      status: 'native',
+    },
+    {
+      id: 'pohutukawa',
+      name: 'Pōhutukawa',
+      type: 'plant',
+      hp: 42,
+      attack: 5,
+      rarity: 'rare',
+      status: 'native',
+    },
+
+    // --- Invasive ---
+    {
+      id: 'possum',
+      name: 'Common Brushtail Possum',
+      type: 'mammal',
+      hp: 32,
+      attack: 17,
+      rarity: 'common',
+      status: 'invasive',
+    },
+    {
+      id: 'stoat',
+      name: 'Stoat',
+      type: 'mammal',
+      hp: 22,
+      attack: 22,
+      rarity: 'rare',
+      status: 'invasive',
+    },
+    {
+      id: 'rainbow-trout',
+      name: 'Rainbow Trout',
+      type: 'fish',
+      hp: 28,
+      attack: 13,
+      rarity: 'common',
+      status: 'invasive',
+    },
+    {
+      id: 'wasp-german',
+      name: 'German Wasp',
+      type: 'insect',
+      hp: 12,
+      attack: 20,
+      rarity: 'common',
+      status: 'invasive',
+    },
+    {
+      id: 'rabbit',
+      name: 'European Rabbit',
+      type: 'mammal',
+      hp: 18,
+      attack: 6,
+      rarity: 'common',
+      status: 'invasive',
+    },
+    {
+      id: 'gorse',
+      name: 'Gorse',
+      type: 'plant',
+      hp: 34,
+      attack: 9,
+      rarity: 'common',
+      status: 'invasive',
+    },
+    {
+      id: 'old-mans-beard',
+      name: "Old Man's Beard",
+      type: 'plant',
+      hp: 30,
+      attack: 7,
+      rarity: 'common',
+      status: 'invasive',
+    },
+    {
+      id: 'rainbow-lorikeet',
+      name: 'Rainbow Lorikeet',
+      type: 'bird',
+      hp: 24,
+      attack: 11,
+      rarity: 'rare',
+      status: 'invasive',
+    },
+    {
+      id: 'argentine-ant',
+      name: 'Argentine Ant',
+      type: 'insect',
+      hp: 8,
+      attack: 6,
+      rarity: 'common',
+      status: 'invasive',
+    },
+  ])
+}
