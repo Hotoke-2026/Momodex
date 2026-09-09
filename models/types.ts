@@ -13,6 +13,7 @@ export interface Species {
   attack: number
   rarity: string // 'common' | 'rare' | 'legendary'
   status: string // 'native' | 'invasive'
+  description: string
 }
 
 export interface Card {
