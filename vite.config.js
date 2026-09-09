@@ -10,4 +10,11 @@ export default defineConfig({
       '/api': 'http://localhost:3000',
     },
   },
+  test: {
+    environment: 'jsdom',
+    environmentMatchGlobs: [['server/**', 'node']],
+    env: {
+      NODE_ENV: 'test',
+    },
+  },
 })
