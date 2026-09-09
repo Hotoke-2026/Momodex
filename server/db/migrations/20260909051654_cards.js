@@ -11,7 +11,7 @@ export async function up(knex) {
     table.string('species_id').notNullable()
     table.string('image_url').notNullable()
     table.string('location')
-    table.timestamp('created_at').defaultTo(knex.fn.now())
+    table.timestamp('created_at').defaultTo(knex.fn.now()) // default time created to 'now'
 
     table.foreign('user_id').references('id').inTable('users')
     table.foreign('species_id').references('id').inTable('species')
