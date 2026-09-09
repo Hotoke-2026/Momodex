@@ -27,10 +27,12 @@
     ]
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "express": "^4.22.1",
     "knex": "^2.5.1",
     "sqlite3": "^5.1.7",
-    "superagent": "^10.2.2"
+    "superagent": "^10.2.2",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@devacademy/eslint-config": "^1.10.2",
