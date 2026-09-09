@@ -27,7 +27,9 @@
     ]
   },
   "dependencies": {
+    "@google/genai": "^2.21.0",
     "@tailwindcss/vite": "^4.3.3",
+    "dotenv": "^17.4.2",
     "express": "^4.22.1",
     "knex": "^2.5.1",
     "sqlite3": "^5.1.7",
@@ -79,5 +81,11 @@
     "semi": false,
     "singleQuote": true
   },
-  "browserslist": "> 2%, not dead"
+  "browserslist": "> 2%, not dead",
+  "allowScripts": {
+    "esbuild@0.27.7": true,
+    "esbuild@0.28.2": true,
+    "@parcel/watcher@2.6.0": true,
+    "sqlite3@5.1.7": true
+  }
 }
