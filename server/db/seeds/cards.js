@@ -8,37 +8,37 @@ export async function seed(knex) {
 
   await knex('cards').insert([
     {
-      user_id: 'auth0|user1',
+      user_id: 'user1',
       species_id: 'tui',
       image_url: 'https://placehold.co/400x400?text=Tui',
       location: 'Waitakere Ranges',
     },
     {
-      user_id: 'auth0|user1',
+      user_id: 'user1',
       species_id: 'possum',
       image_url: 'https://placehold.co/400x400?text=Possum',
       location: 'Backyard, Auckland',
     },
     {
-      user_id: 'auth0|user1',
+      user_id: 'user1',
       species_id: 'kea',
       image_url: 'https://placehold.co/400x400?text=Kea',
       location: "Arthur's Pass",
     },
     {
-      user_id: 'auth0|user1',
+      user_id: 'user1',
       species_id: 'weta',
       image_url: 'https://placehold.co/400x400?text=Weta',
       location: 'Backyard, Wellington',
     },
     {
-      user_id: 'auth0|user1',
+      user_id: 'user1',
       species_id: 'stoat',
       image_url: 'https://placehold.co/400x400?text=Stoat',
       location: 'Fiordland',
     },
     {
-      user_id: 'auth0|user1',
+      user_id: 'user1',
       species_id: 'gorse',
       image_url: 'https://placehold.co/400x400?text=Gorse',
       location: 'Rural roadside',
