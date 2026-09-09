@@ -63,7 +63,7 @@ export async function seed(knex) {
       status: 'native',
     },
     {
-      id: 'monarch-butterfly-nz',
+      id: 'monarch-butterfly',
       name: 'Monarch Butterfly',
       type: 'insect',
       hp: 10,
