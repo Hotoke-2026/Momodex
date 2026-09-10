@@ -53,5 +53,3 @@ export interface CreateGalleryImageDTO {
   image_url: string
   caption?: string
 }
-
-export type NewCardPayload = Omit<Card, 'id' | 'user_id'>
