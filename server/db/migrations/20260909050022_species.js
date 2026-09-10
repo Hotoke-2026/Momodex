@@ -13,6 +13,7 @@ export async function up(knex) {
     table.integer('attack').notNullable()
     table.string('rarity').notNullable()
     table.string('status').notNullable() // native / invasive
+    table.string('description').notNullable()
   })
 }
 

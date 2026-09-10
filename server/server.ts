@@ -1,6 +1,7 @@
 import express from 'express'
 import * as Path from 'node:path'
 import galleryRoutes from './routes/gallery.ts'
+
 import fruitRoutes from './routes/fruits.ts'
 import identifyRoutes from './routes/identify.ts'
 import speciesRoutes from './routes/species.ts'

@@ -16,6 +16,7 @@ export async function seed(knex) {
       attack: 10,
       rarity: 'rare',
       status: 'native',
+      description: 'A flightless, nocturnal icon of New Zealand known for its keen sense of smell and strong burrowing legs.',
     },
     {
       id: 'tui',
@@ -25,6 +26,7 @@ export async function seed(knex) {
       attack: 14,
       rarity: 'common',
       status: 'native',
+      description: 'A energetic honeyeater with distinctive white throat plumes and an exceptionally loud, complex song.',
     },
     {
       id: 'kea',
@@ -34,6 +36,7 @@ export async function seed(knex) {
       attack: 18,
       rarity: 'rare',
       status: 'native',
+      description: 'The world’s only alpine parrot, famous for its sharp intelligence, curiosity, and mischievous behavior.',
     },
     {
       id: 'kakapo',
@@ -43,6 +46,7 @@ export async function seed(knex) {
       attack: 8,
       rarity: 'legendary',
       status: 'native',
+      description: 'A giant, critically endangered, flightless parrot with moss-green feathers and a gentle demeanor.',
     },
     {
       id: 'takahe',
@@ -52,6 +56,7 @@ export async function seed(knex) {
       attack: 12,
       rarity: 'legendary',
       status: 'native',
+      description: 'A large, flightless alpine bird with vibrant blue and green plumage and a powerful red beak.',
     },
     {
       id: 'weta',
@@ -61,6 +66,7 @@ export async function seed(knex) {
       attack: 16,
       rarity: 'common',
       status: 'native',
+      description: 'An ancient, armored flightless insect native to New Zealand, known for its formidable appearance.',
     },
     {
       id: 'monarch-butterfly',
@@ -70,6 +76,7 @@ export async function seed(knex) {
       attack: 4,
       rarity: 'common',
       status: 'native',
+      description: 'A bright orange and black butterfly commonly spotted fluttering around swan plants.',
     },
     {
       id: 'tuatara',
@@ -79,6 +86,7 @@ export async function seed(knex) {
       attack: 15,
       rarity: 'rare',
       status: 'native',
+      description: 'A prehistoric reptile surviving from the age of the dinosaurs, featuring a unique "third eye".',
     },
     {
       id: 'silver-fern',
@@ -88,6 +96,7 @@ export async function seed(knex) {
       attack: 2,
       rarity: 'common',
       status: 'native',
+      description: 'An iconic tree fern recognizable by the striking silver color on the underside of its fronds.',
     },
     {
       id: 'kauri',
@@ -97,6 +106,7 @@ export async function seed(knex) {
       attack: 3,
       rarity: 'legendary',
       status: 'native',
+      description: 'A majestic, ancient forest giant that can live for over a thousand years.',
     },
     {
       id: 'pohutukawa',
@@ -106,6 +116,7 @@ export async function seed(knex) {
       attack: 5,
       rarity: 'rare',
       status: 'native',
+      description: 'New Zealand’s Christmas tree, famous for blooming bright crimson flowers along coastal cliffs.',
     },
 
     // --- Invasive ---
@@ -117,6 +128,7 @@ export async function seed(knex) {
       attack: 17,
       rarity: 'common',
       status: 'invasive',
+      description: 'Introduced nocturnal pest that defoliates native trees and preys on native bird eggs.',
     },
     {
       id: 'stoat',
@@ -126,6 +138,7 @@ export async function seed(knex) {
       attack: 22,
       rarity: 'rare',
       status: 'invasive',
+      description: 'A fierce predator introduced to control rabbits that now threatens native wildlife populations.',
     },
     {
       id: 'rainbow-trout',
@@ -135,6 +148,7 @@ export async function seed(knex) {
       attack: 13,
       rarity: 'common',
       status: 'invasive',
+      description: 'A popular freshwater sport fish that competes with native galaxiid fish species for food and habitat.',
     },
     {
       id: 'wasp-german',
@@ -144,6 +158,7 @@ export async function seed(knex) {
       attack: 20,
       rarity: 'common',
       status: 'invasive',
+      description: 'An aggressive pest that competes heavily with native birds and insects for honeydew.',
     },
     {
       id: 'rabbit',
@@ -153,6 +168,7 @@ export async function seed(knex) {
       attack: 6,
       rarity: 'common',
       status: 'invasive',
+      description: 'A fast-breeding herbivore that causes extensive pasture damage and soil erosion.',
     },
     {
       id: 'gorse',
@@ -162,6 +178,7 @@ export async function seed(knex) {
       attack: 9,
       rarity: 'common',
       status: 'invasive',
+      description: 'A prickly, fast-spreading shrub that overtakes farmland and native vegetation.',
     },
     {
       id: 'old-mans-beard',
@@ -171,6 +188,7 @@ export async function seed(knex) {
       attack: 7,
       rarity: 'common',
       status: 'invasive',
+      description: 'A fast-growing climbing vine that smothers native forest canopies.',
     },
     {
       id: 'rainbow-lorikeet',
@@ -180,6 +198,7 @@ export async function seed(knex) {
       attack: 11,
       rarity: 'rare',
       status: 'invasive',
+      description: 'A colorful Australian parrot that competes aggressively with native honeyeaters for food and nest hollows.',
     },
     {
       id: 'argentine-ant',
@@ -189,6 +208,7 @@ export async function seed(knex) {
       attack: 6,
       rarity: 'common',
       status: 'invasive',
+      description: 'An invasive ant species that forms massive supercolonies and displaces native invertebrates.',
     },
   ])
 }
