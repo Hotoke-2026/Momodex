@@ -30,6 +30,7 @@ const possum: Species = {
 
 const placeholderCard: Card = {
   id: 0,
+  card_name: 'Placeholder Card',
   user_id: 'test',
   species_id: '',
   image_url: '',

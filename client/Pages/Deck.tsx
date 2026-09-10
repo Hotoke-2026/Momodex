@@ -1,12 +1,14 @@
-// src/pages/Deck.tsx
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { CardFrame } from '../components/CardFrame.tsx'
 import { getCardsByUserId } from '../apis/cards.ts'
-import '../styles/deck.scss'
+import '../styles/index.css'
 
-const CURRENT_USER_ID = 'user1' // hardcoded for now — swap for real auth later
+const CURRENT_USER_ID = 'user1'
 
 export function Deck() {
+  const [typeFilter, setTypeFilter] = useState('all')
+
   const {
     data: cards,
     isLoading,
@@ -17,17 +19,96 @@ export function Deck() {
     queryFn: () => getCardsByUserId(CURRENT_USER_ID),
   })
 
-  if (isLoading) return <p>Loading your deck...</p>
-  if (isError) return <p style={{ color: 'red' }}>{error.message}</p>
-  if (!cards || cards.length === 0) {
-    return <p>No cards caught yet — go identify some species!</p>
-  }
+  const types = useMemo(
+    () => Array.from(new Set(cards?.map((c) => c.species.type) ?? [])),
+    [cards],
+  )
+
+  const filteredCards = useMemo(() => {
+    if (!cards) return []
+    return typeFilter === 'all'
+      ? cards
+      : cards.filter((c) => c.species.type === typeFilter)
+  }, [cards, typeFilter])
+
+  const nativeCount =
+    cards?.filter((c) => c.species.status.toLowerCase() === 'native').length ??
+    0
+  const invasiveCount =
+    cards?.filter((c) => c.species.status.toLowerCase() === 'invasive')
+      .length ?? 0
+
+  if (isLoading)
+    return (
+      <p className="p-6 text-[color:var(--color-ink-500)]">
+        Loading your deck...
+      </p>
+    )
+  if (isError)
+    return (
+      <p className="p-6 text-[color:var(--color-defeat)]">{error.message}</p>
+    )
 
   return (
-    <div className="deck-grid">
-      {cards.map(({ card, species }) => (
-        <CardFrame key={card.id} card={card} species={species} />
-      ))}
+    <div className="min-h-screen">
+      <nav className="top-nav">
+        <a href="/" className="top-nav__item">
+          🏠<span>Home</span>
+        </a>
+        <a href="/deck" className="top-nav__item top-nav__item--active">
+          🗂️<span>Gallery</span>
+        </a>
+        <a href="/battle" className="top-nav__item">
+          ⚔️<span>Battle</span>
+        </a>
+        <a href="/map" className="top-nav__item">
+          📍<span>Map</span>
+        </a>
+      </nav>
+
+      <header className="app-header">
+        <h1 className="text-xl font-bold">Your Collection</h1>
+        <p className="mt-1 text-sm">
+          <span className="font-semibold text-[color:var(--color-native)]">
+            {nativeCount} native
+          </span>
+          {'  ·  '}
+          <span className="font-semibold text-[color:var(--color-invasive)]">
+            {invasiveCount} invasive
+          </span>
+          {'  ·  '}
+          {cards?.length ?? 0} total
+        </p>
+      </header>
+
+      <div className="mx-auto max-w-6xl px-4">
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="mt-4 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-1.5 text-sm capitalize shadow-[var(--shadow-card)]"
+        >
+          <option value="all">All types</option>
+          {types.map((t) => (
+            <option key={t} value={t} className="capitalize">
+              {t}
+            </option>
+          ))}
+        </select>
+
+        <main className="mt-6 pb-12">
+          {filteredCards.length === 0 ? (
+            <p className="text-[color:var(--color-ink-500)]">
+              No cards caught yet — go identify some species!
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredCards.map(({ card, species }) => (
+                <CardFrame key={card.id} card={card} species={species} />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }
