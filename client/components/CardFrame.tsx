@@ -1,15 +1,15 @@
-import React from 'react';
-import { Card, Species } from '../../models/types';
-import { StatusBadge } from './StatusBadge';
-import '../styles/index.scss';
+import React from 'react'
+import { Card, Species } from '../../models/types'
+import { StatusBadge } from './StatusBadge'
+import '../styles/index.scss'
 
 export interface CardFrameProps {
-  card: Card;
-  species: Species;
+  card: Card
+  species: Species
 }
 
 export const CardFrame: React.FC<CardFrameProps> = ({ card, species }) => {
-  const isNative = species.status.toLowerCase() === 'native';
+  const isNative = species.status.toLowerCase() === 'native'
 
   return (
     <div className="card-frame">
@@ -24,7 +24,11 @@ export const CardFrame: React.FC<CardFrameProps> = ({ card, species }) => {
 
       {/* Card Image */}
       <div className="card-frame__image-container">
-        <img src={card.image_url} alt={species.name} className="card-frame__image" />
+        <img
+          src={card.image_url}
+          alt={species.name}
+          className="card-frame__image"
+        />
       </div>
 
       {/* Type & Status Badges */}
@@ -51,5 +55,5 @@ export const CardFrame: React.FC<CardFrameProps> = ({ card, species }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
