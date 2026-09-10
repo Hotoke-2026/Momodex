@@ -13,6 +13,7 @@ server.use(express.json())
 server.use('/api/v1/gallery', galleryRoutes)
 
 server.use('/api/cards', cardRoutes)
+server.use('/api/v1/fruits', fruitRoutes)
 server.use('/api/v1/identify', identifyRoutes)
 server.use('/api/v1/species', speciesRoutes)
 
