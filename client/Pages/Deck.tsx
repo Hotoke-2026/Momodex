@@ -38,16 +38,16 @@ export function Deck() {
     cards?.filter((c) => c.species.status.toLowerCase() === 'invasive')
       .length ?? 0
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <p className="p-6 text-[color:var(--color-ink-500)]">
+      <p className="p-6 font-[family-name:var(--font-body)] text-[color:var(--colour-text-soft)]">
         Loading your deck...
       </p>
     )
-  if (isError)
-    return (
-      <p className="p-6 text-[color:var(--color-defeat)]">{error.message}</p>
-    )
+  }
+  if (isError) {
+    return <p className="p-6 text-[color:var(--colour-red)]">{error.message}</p>
+  }
 
   return (
     <div className="min-h-screen">
@@ -67,13 +67,15 @@ export function Deck() {
       </nav>
 
       <header className="app-header">
-        <h1 className="text-xl font-bold">Your Collection</h1>
-        <p className="mt-1 text-sm">
-          <span className="font-semibold text-[color:var(--color-native)]">
+        <h1 className="font-[family-name:var(--font-display)] text-[length:var(--text-heading-md)] font-[900] text-[color:var(--colour-text)]">
+          Your Card Deck
+        </h1>
+        <p className="mt-1 text-[length:var(--text-body-md)]">
+          <span className="font-[700] text-[color:var(--colour-green)]">
             {nativeCount} native
           </span>
           {'  ·  '}
-          <span className="font-semibold text-[color:var(--color-invasive)]">
+          <span className="font-[700] text-[color:var(--colour-red)]">
             {invasiveCount} invasive
           </span>
           {'  ·  '}
@@ -85,7 +87,11 @@ export function Deck() {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="mt-4 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-1.5 text-sm capitalize shadow-[var(--shadow-card)]"
+          className="mt-4 rounded-lg border px-3 py-1.5 text-[length:var(--text-body-md)] capitalize"
+          style={{
+            borderColor: 'var(--colour-tan)',
+            backgroundColor: 'var(--colour-surface)',
+          }}
         >
           <option value="all">All types</option>
           {types.map((t) => (
@@ -97,11 +103,11 @@ export function Deck() {
 
         <main className="mt-6 pb-12">
           {filteredCards.length === 0 ? (
-            <p className="text-[color:var(--color-ink-500)]">
+            <p className="text-[color:var(--colour-text-soft)]">
               No cards caught yet — go identify some species!
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-15 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredCards.map(({ card, species }) => (
                 <CardFrame key={card.id} card={card} species={species} />
               ))}
