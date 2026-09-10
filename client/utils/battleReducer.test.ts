@@ -82,4 +82,32 @@ describe('battleReducer', () => {
     expect(newState.isGameOver).toBe(false)
     expect(newState.winner).toBe(null)
   })
+  it('should not mutate the original state object when ATTACK is dispatched', () => {
+    // take a snapshot of the original values before dispatching
+    const originalAiHp = initialState.ai.currentHp
+    const originalLogLength = initialState.log.length
+    const originalTurn = initialState.turn
+
+    const action: BattleAction = { type: 'ATTACK' }
+    battleReducer(initialState, action)
+
+    // the ORIGINAL object should be completely untouched after the call
+    expect(initialState.ai.currentHp).toBe(originalAiHp)
+    expect(initialState.log.length).toBe(originalLogLength)
+    expect(initialState.turn).toBe(originalTurn)
+  })
+
+  it('should set isGameOver and winner when an attack brings HP to exactly 0', () => {
+    const lowHpState: BattleState = {
+      ...initialState,
+      ai: { species: aiSpecies, currentHp: 20 }, // exactly equal to player's attack (20)
+    }
+
+    const action: BattleAction = { type: 'ATTACK' }
+    const newState = battleReducer(lowHpState, action)
+
+    expect(newState.ai.currentHp).toBe(0)
+    expect(newState.isGameOver).toBe(true)
+    expect(newState.winner).toBe('player')
+  })
 })
