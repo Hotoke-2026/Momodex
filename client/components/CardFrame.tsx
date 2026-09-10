@@ -1,15 +1,22 @@
-import React from 'react';
-import { Card, Species } from '../../models/types';
-import { StatusBadge } from './StatusBadge';
-import '../styles/index.scss';
+import React from 'react'
+import { Card, Species } from '../../models/types'
+import { StatusBadge } from './StatusBadge'
+import '../styles/index.scss'
 
 export interface CardFrameProps {
-  card: Card;
-  species: Species;
+  card: Card
+  species: Species
+  currentHp?: number
+  compact?: boolean
 }
 
-export const CardFrame: React.FC<CardFrameProps> = ({ card, species }) => {
-  const isNative = species.status.toLowerCase() === 'native';
+export const CardFrame: React.FC<CardFrameProps> = ({
+  card,
+  species,
+  currentHp = species.hp,
+  compact = false,
+}) => {
+  const isNative = species.status.toLowerCase() === 'native'
 
   return (
     <div className="card-frame">
@@ -19,37 +26,64 @@ export const CardFrame: React.FC<CardFrameProps> = ({ card, species }) => {
           <h3 className="card-frame__name">{species.name}</h3>
           <span className="card-frame__rarity">☆ {species.rarity}</span>
         </div>
-        <span className="card-frame__hp">HP {species.hp}</span>
+        {/* HP Bar - Updated for BATTLE!*/}
+        <div className="card-frame__hp-section">
+          <span className="card-frame__hp">
+            HP {currentHp}/{species.hp}
+          </span>
+          <div className="card-frame__hp-bar-track">
+            <div
+              className="card-frame__hp-bar-fill"
+              style={{ width: `${(currentHp / species.hp) * 100}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Card Image */}
-      <div className="card-frame__image-container">
-        <img src={card.image_url} alt={species.name} className="card-frame__image" />
-      </div>
+      {/* Card Image*/}
+      {!compact && (
+        <div className="card-frame__image-container">
+          {card.image_url ? (
+            <img
+              src={card.image_url}
+              alt={species.name}
+              className="card-frame__image"
+            />
+          ) : (
+            <div className="card-frame__image-placeholder">
+              <span>?</span>
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Type & Status Badges */}
+      {/* Type & Status Badges — still shown in compact mode */}
       <div className="card-frame__badges">
         <span className="badge badge--type">{species.type}</span>
         <StatusBadge isNative={isNative} label={species.status} />
       </div>
 
-      {/* Main Move / Attack Details */}
-      <div className="card-frame__moves">
-        <div className="move-item">
-          <div className="move-item__header">
-            <span className="move-item__name">Wing Attack</span>
-            <span className="move-item__damage">Attack: {species.attack}</span>
+      {/* Main Move / Attack Details*/}
+      {!compact && (
+        <div className="card-frame__moves">
+          <div className="move-item">
+            <div className="move-item__header">
+              <span className="move-item__name">Wing Attack</span>
+              <span className="move-item__damage">
+                Attack: {species.attack}
+              </span>
+            </div>
+            <p className="move-item__desc">{species.description}</p>
           </div>
-          <p className="move-item__desc">{species.description}</p>
         </div>
-      </div>
+      )}
 
-      {/* Footer Location Info */}
-      {card.location && (
+      {/* Footer Location Info*/}
+      {!compact && card.location && (
         <div className="card-frame__footer">
           <span>{card.location}</span>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
