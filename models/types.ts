@@ -18,6 +18,7 @@ export interface Species {
 
 export interface Card {
   id: number
+  card_name: string
   user_id: string
   species_id: string
   image_url: string
@@ -35,4 +36,20 @@ export interface CreateCardDTO {
   species_id: string
   image_url: string
   location?: string
+}
+
+export type NewCardPayload = Omit<Card, 'id' | 'user_id'>
+
+export interface GalleryImage {
+  id: number
+  user_id: string
+  image_url: string
+  caption: string | null
+  created_at: string
+}
+
+export interface CreateGalleryImageDTO {
+  user_id: string
+  image_url: string
+  caption?: string
 }
