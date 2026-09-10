@@ -38,6 +38,8 @@ export interface CreateCardDTO {
   location?: string
 }
 
+export type NewCardPayload = Omit<Card, 'id' | 'user_id'>
+
 export interface GalleryImage {
   id: number
   user_id: string
