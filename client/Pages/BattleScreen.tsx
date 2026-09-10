@@ -1,6 +1,7 @@
 import { useReducer } from 'react'
 import { battleReducer } from '../utils/battleReducer'
 import { CardFrame } from '../components/CardFrame'
+import { useAiTurn } from '../hooks/use-ai-turn'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
 
@@ -49,6 +50,7 @@ const initialState: BattleState = {
 
 export default function BattleScreen() {
   const [state, dispatch] = useReducer(battleReducer, initialState)
+  useAiTurn(state, dispatch)
 
   return (
     <div>
@@ -77,14 +79,6 @@ export default function BattleScreen() {
           Wing Attack
         </button>
 
-        {/* ai attack button */}
-        {/* Temporary SETUP for manual testing only, until BAT-3.1 adds real AI turns */}
-        <button
-          onClick={() => dispatch({ type: 'AI_COUNTER' })}
-          disabled={state.turn !== 'ai' || state.isGameOver}
-        >
-          |OpponentTurn|
-        </button>
         {/* Play again button */}
         <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
       </div>
