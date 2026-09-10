@@ -1,9 +1,14 @@
 import request from 'superagent'
-import { Card, NewCardPayload } from '../../models/types'
+import type { Card, CardWithSpecies, NewCardPayload } from '../../models/types'
 
-const rootUrl = '/api/cards'
+const rootURL = new URL(`/api/v1`, document.baseURI)
+
+export async function getCardsByUserId(userId: string) {
+  const response = await request.get(`${rootURL}/cards`).query({ userId })
+  return response.body as CardWithSpecies[]
+}
 
 export async function addCard(newCard: NewCardPayload): Promise<Card> {
-  const res = await request.post(rootUrl).send(newCard)
-  return res.body
+  const response = await request.post(`${rootURL}/cards`).send(newCard)
+  return response.body
 }
