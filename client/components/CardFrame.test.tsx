@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import { CardFrame } from '../components/CardFrame';
-import { Card, Species } from '../../models/types';
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { CardFrame } from '../components/CardFrame'
+import { Card, Species } from '../../models/types'
 
 describe('CardFrame Component', () => {
   const mockSpecies: Species = {
@@ -13,7 +13,7 @@ describe('CardFrame Component', () => {
     rarity: 'rare',
     status: 'threatened',
     description: 'Pecks at anything shiny it can find.',
-  };
+  }
 
   const mockCard: Card = {
     id: 1,
@@ -22,29 +22,40 @@ describe('CardFrame Component', () => {
     image_url: 'https://example.com/kea.jpg',
     location: 'Mount Cook',
     created_at: '2026-01-01',
-  };
+  }
 
   it('renders species details, badges, and attack info correctly', () => {
-    render(<CardFrame card={mockCard} species={mockSpecies} />);
+    render(<CardFrame card={mockCard} species={mockSpecies} />)
 
     // Header checks
-    expect(screen.getByText('Kea')).toBeInTheDocument();
-    expect(screen.getByText('☆ rare')).toBeInTheDocument();
-    expect(screen.getByText('HP 70')).toBeInTheDocument();
+    expect(screen.getByText('Kea')).toBeInTheDocument()
+    expect(screen.getByText('☆ rare')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        (_, element) =>
+          element?.tagName.toLowerCase() === 'span' &&
+          element?.textContent === 'HP 70/70',
+      ),
+    ).toBeInTheDocument()
 
     // Image check
-    expect(screen.getByAltText('Kea')).toHaveAttribute('src', 'https://example.com/kea.jpg');
+    expect(screen.getByAltText('Kea')).toHaveAttribute(
+      'src',
+      'https://example.com/kea.jpg',
+    )
 
     // Badges
-    expect(screen.getByText('Alpine bird')).toBeInTheDocument();
-    expect(screen.getByText('threatened')).toBeInTheDocument();
+    expect(screen.getByText('Alpine bird')).toBeInTheDocument()
+    expect(screen.getByText('threatened')).toBeInTheDocument()
 
     // Attack details
-    expect(screen.getByText('Wing Attack')).toBeInTheDocument();
-    expect(screen.getByText('Attack: 20')).toBeInTheDocument();
-    expect(screen.getByText('Pecks at anything shiny it can find.')).toBeInTheDocument();
+    expect(screen.getByText('Wing Attack')).toBeInTheDocument()
+    expect(screen.getByText('Attack: 20')).toBeInTheDocument()
+    expect(
+      screen.getByText('Pecks at anything shiny it can find.'),
+    ).toBeInTheDocument()
 
     // Location check
-    expect(screen.getByText('Mount Cook')).toBeInTheDocument();
-  });
-});
+    expect(screen.getByText('Mount Cook')).toBeInTheDocument()
+  })
+})
