@@ -36,3 +36,17 @@ export interface CreateCardDTO {
   image_url: string
   location?: string
 }
+
+export interface GalleryImage {
+  id: number
+  user_id: string
+  image_url: string
+  caption: string | null
+  created_at: string
+}
+
+export interface CreateGalleryImageDTO {
+  user_id: string
+  image_url: string
+  caption?: string
+}
