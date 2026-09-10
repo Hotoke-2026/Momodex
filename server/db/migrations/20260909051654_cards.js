@@ -7,6 +7,7 @@
 export async function up(knex) {
   await knex.schema.createTable('cards', (table) => {
     table.increments('id').primary()
+    table.string('card_name').notNullable()
     table.string('user_id').notNullable()
     table.string('species_id').notNullable()
     table.string('image_url').notNullable()
