@@ -26,6 +26,11 @@ export interface Card {
   created_at: string
 }
 
+export interface CardWithSpecies {
+  card: Card
+  species: Species
+}
+
 // DTO = Data Transfer Object.
 // This describes the shape of data the CLIENT SENDS to create a card,
 // which is different from the Card shape above (what's returned FROM the DB).
