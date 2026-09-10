@@ -3,12 +3,16 @@ import * as Path from 'node:path'
 import cardRoutes from '../server/routes/cardRoutes.ts'
 
 import fruitRoutes from './routes/fruits.ts'
+import identifyRoutes from './routes/identify.ts'
+import speciesRoutes from './routes/species.ts'
 
 const server = express()
 
 server.use(express.json())
 
 server.use('/api/cards', cardRoutes)
+server.use('/api/v1/identify', identifyRoutes)
+server.use('/api/v1/species', speciesRoutes)
 
 if (process.env.NODE_ENV === 'production') {
   server.use(express.static(Path.resolve('public')))
