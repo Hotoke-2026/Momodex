@@ -1,5 +1,4 @@
-import type { Species } from '../../shared/types'
-
+import type { Species } from '../models/types'
 export interface BattleCombatant {
   species: Species
   currentHp: number // starts equal to species.hp, decreases as battle progresses
