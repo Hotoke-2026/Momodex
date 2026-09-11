@@ -40,13 +40,13 @@ export function Deck() {
 
   if (isLoading) {
     return (
-      <p className="p-6 font-[family-name:var(--font-body)] text-[color:var(--colour-text-soft)]">
+      <p className="p-6 font-body text-(--colour-text-soft)">
         Loading your deck...
       </p>
     )
   }
   if (isError) {
-    return <p className="p-6 text-[color:var(--colour-red)]">{error.message}</p>
+    return <p className="p-6 text-(--colour-red)">{error.message}</p>
   }
 
   return (
@@ -67,15 +67,15 @@ export function Deck() {
       </nav>
 
       <header className="app-header">
-        <h1 className="font-[family-name:var(--font-display)] text-[length:var(--text-heading-md)] font-[900] text-[color:var(--colour-text)]">
+        <h1 className="font-display text-(length:--text-heading-md) font-[900] text-(--colour-text)">
           Your Card Deck
         </h1>
-        <p className="mt-1 text-[length:var(--text-body-md)]">
-          <span className="font-[700] text-[color:var(--colour-green)]">
+        <p className="mt-1 text-(length:--text-body-md)">
+          <span className="font-[700] text-(--colour-green)">
             {nativeCount} native
           </span>
           {'  ·  '}
-          <span className="font-[700] text-[color:var(--colour-red)]">
+          <span className="font-[700] text-(--colour-red)">
             {invasiveCount} invasive
           </span>
           {'  ·  '}
@@ -87,7 +87,7 @@ export function Deck() {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="mt-4 rounded-lg border px-3 py-1.5 text-[length:var(--text-body-md)] capitalize"
+          className="mt-4 rounded-lg border px-3 py-1.5 text-(length:--text-body-md) capitalize"
           style={{
             borderColor: 'var(--colour-tan)',
             backgroundColor: 'var(--colour-surface)',
@@ -103,7 +103,7 @@ export function Deck() {
 
         <main className="mt-6 pb-12">
           {filteredCards.length === 0 ? (
-            <p className="text-[color:var(--colour-text-soft)]">
+            <p className="text-(--colour-text-soft)">
               No cards caught yet — go identify some species!
             </p>
           ) : (
