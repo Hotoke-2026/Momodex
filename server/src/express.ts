@@ -1,8 +1,6 @@
-// src/types/express.ts
-import { Request } from 'express';
+import { Request } from 'express'
+import { AuthResult } from 'express-oauth2-jwt-bearer'
 
 export interface AuthenticatedRequest extends Request {
-  auth?: {
-    userId: string;
-  };
+  auth?: AuthResult
 }

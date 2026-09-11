@@ -3,9 +3,11 @@ import type { Card, CardWithSpecies, NewCardPayload } from '../../models/types'
 
 const rootURL = new URL(`/api/v1`, document.baseURI)
 
-export async function getCardsByUserId(userId: string) {
-  const response = await request.get(`${rootURL}/cards`).query({ userId })
-  return response.body as CardWithSpecies[]
+export async function fetchCards(token: string): Promise<Card[]> {
+  const res = await request
+    .get('/api/v1/cards')
+    .set('Authorization', `Bearer ${token}`)
+  return res.body
 }
 
 export async function addCard(newCard: NewCardPayload): Promise<Card> {
