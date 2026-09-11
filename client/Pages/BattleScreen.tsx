@@ -1,6 +1,8 @@
 import { useReducer } from 'react'
 import { battleReducer } from '../utils/battleReducer'
+import { MatchResultLayout } from '../components/MatchResultLayout'
 import { CardFrame } from '../components/CardFrame'
+import { useAiTurn } from '../hooks/use-ai-turn'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
 
@@ -10,7 +12,7 @@ const tui: Species = {
   id: 'tui',
   name: 'Tūī',
   type: 'bird',
-  hp: 30,
+  hp: 80,
   attack: 14,
   rarity: 'common',
   status: 'native',
@@ -50,6 +52,7 @@ const initialState: BattleState = {
 
 export default function BattleScreen() {
   const [state, dispatch] = useReducer(battleReducer, initialState)
+  useAiTurn(state, dispatch)
 
   return (
     <div>
@@ -78,26 +81,18 @@ export default function BattleScreen() {
           Wing Attack
         </button>
 
-        {/* ai attack button */}
-        {/* Temporary SETUP for manual testing only, until BAT-3.1 adds real AI turns */}
-        <button
-          onClick={() => dispatch({ type: 'AI_COUNTER' })}
-          disabled={state.turn !== 'ai' || state.isGameOver}
-        >
-          |OpponentTurn|
-        </button>
         {/* Play again button */}
         <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
       </div>
 
-      {state.isGameOver && (
-        <p>
-          <strong>
-            {state.winner === 'player'
-              ? 'You won!'
-              : 'You lost! try again next time! Champ ;)'}
-          </strong>
-        </p>
+      {state.isGameOver && state.winner && (
+        <MatchResultLayout
+          winner={state.winner}
+          onPlayAgain={() => dispatch({ type: 'RESET' })}
+          onReturnToDeck={() => {
+            console.log('Return to deck clicked test')
+          }}
+        />
       )}
 
       <div style={{ marginTop: '1rem' }}>
