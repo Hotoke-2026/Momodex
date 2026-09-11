@@ -11,3 +11,9 @@ export async function insertCard(newCard: NewCardPayload, userId: string): Promi
 
   return createdCard
 }
+
+export async function getUserCards(auth0Id: string) {
+  return db('cards')
+    .where({ user_id: auth0Id })
+    .select('*')
+}
