@@ -6,19 +6,19 @@
   --font-display: 'Nunito', sans-serif;
   --font-body: 'Work Sans', sans-serif;
 
-  /* Main Colours */
-  --colour-base: #f5efe0;
-  --colour-surface: #fefcf4;
-  --colour-text: #1c1a12;
-  --colour-tan: #c4b89a;
-  --colour-green: #2d5a27;
-  --colour-red: #b03a18;
+  /* Main Colors */
+  --color-base: #f5efe0;
+  --color-surface: #fefcf4;
+  --color-text: #1c1a12;
+  --color-tan: #c4b89a;
+  --color-green: #2d5a27;
+  --color-red: #b03a18;
 
-  /* Secondary Colours */
-  --colour-text-soft: #4e4538;
-  --colour-green-tint: #e8f4e1;
-  --colour-red-tint: #fce8e0;
-  --colour-dark: #1c2e1a;
+  /* Secondary colors */
+  --color-text-soft: #4e4538;
+  --color-green-tint: #e8f4e1;
+  --color-red-tint: #fce8e0;
+  --color-dark: #1c2e1a;
 
   /* Font sizes */
   --text-heading-lg: 2.5rem;
@@ -40,23 +40,23 @@
 html,
 body {
   font-family: var(--font-body);
-  background-color: var(--colour-base);
-  color: var(--colour-text);
+  background-color: var(--color-base);
+  color: var(--color-text);
   margin: 0;
 }
 
 /* Page chrome — still plain CSS since it's cross-page structural stuff, not a token */
 .app-header {
-  background-color: var(--colour-base);
-  border-bottom: 1px solid var(--colour-tan);
+  background-color: var(--color-base);
+  border-bottom: 1px solid var(--color-tan);
   padding: 1.25rem 1.25rem 1rem;
 }
 
 .top-nav {
   display: flex;
   justify-content: space-around;
-  background-color: var(--colour-surface);
-  border-bottom: 1px solid var(--colour-tan);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-tan);
   padding: 0.75rem 0;
 }
 
@@ -67,12 +67,12 @@ body {
   font-family: var(--font-body);
   font-size: var(--text-body-md);
   font-weight: var(--font-weight-body-regular);
-  color: var(--colour-text-soft);
+  color: var(--color-text-soft);
   gap: 0.25rem;
   text-decoration: none;
 }
 
 .top-nav__item--active {
-  color: var(--colour-green);
+  color: var(--color-green);
   font-weight: var(--font-weight-body-bold);
 }

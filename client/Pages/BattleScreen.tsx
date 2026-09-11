@@ -4,7 +4,7 @@ import { CardFrame } from '../components/CardFrame'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
 
-// thsese are two species are just for placeholder purposes
+// these are two species are just for placeholder purposes
 // please replace once requirement tickets are done for selecting species from the database
 const tui: Species = {
   id: 'tui',

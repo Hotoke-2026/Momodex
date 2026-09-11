@@ -89,8 +89,8 @@ export function Deck() {
           onChange={(e) => setTypeFilter(e.target.value)}
           className="mt-4 rounded-lg border px-3 py-1.5 text-(length:--text-body-md) capitalize"
           style={{
-            borderColor: 'var(--colour-tan)',
-            backgroundColor: 'var(--colour-surface)',
+            borderColor: 'var(--color-tan)',
+            backgroundColor: 'var(--color-surface)',
           }}
         >
           <option value="all">All types</option>
