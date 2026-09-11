@@ -72,7 +72,7 @@ export function MapPage() {
         <select
           value={dateRange}
           onChange={(e) => setDateRange(e.target.value as DateRangeKey)}
-          className="rounded-md border border-[color:var(--colour-tan)] bg-[color:var(--colour-surface)] px-3 py-1.5 text-sm"
+          className="rounded-md border border-(--color-tan) bg-(--color-surface) px-3 py-1.5 text-sm"
         >
           {Object.entries(DATE_RANGES).map(([key, { label }]) => (
             <option key={key} value={key}>
@@ -84,18 +84,14 @@ export function MapPage() {
 
       <div className="px-6 pb-8">
         {isLoading && (
-          <p className="text-[color:var(--colour-text-soft)]">
-            Loading sightings...
-          </p>
+          <p className="text-(--color-text-soft)]">Loading sightings...</p>
         )}
         {isError && (
-          <p className="text-[color:var(--colour-red)]">
-            Couldn&apos;t load map data.
-          </p>
+          <p className="text-(--color-red)]">Couldn&apos;t load map data.</p>
         )}
 
         {!isLoading && !isError && (
-          <div className="overflow-hidden rounded-xl border border-[color:var(--colour-tan)] shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-(--color-tan)] shadow-sm">
             <MapContainer
               center={[-41.3, 174.8]}
               zoom={5}

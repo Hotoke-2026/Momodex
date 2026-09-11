@@ -1,5 +1,6 @@
 import React from 'react'
 import { Card, Species } from '../../models/types'
+import { HpBar } from './HpBar'
 import { StatusBadge } from './StatusBadge'
 import '../styles/index.scss'
 
@@ -31,12 +32,7 @@ export const CardFrame: React.FC<CardFrameProps> = ({
           <span className="card-frame__hp">
             HP {currentHp}/{species.hp}
           </span>
-          <div className="card-frame__hp-bar-track">
-            <div
-              className="card-frame__hp-bar-fill"
-              style={{ width: `${(currentHp / species.hp) * 100}%` }}
-            />
-          </div>
+          <HpBar currentHp={currentHp} maxHp={species.hp} />
         </div>
       </div>
 
