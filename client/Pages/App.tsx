@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { CardFrame } from '../components/CardFrame.tsx'
 import { identifyPhoto } from '../apis/identify.ts'
 import { getSpeciesById } from '../apis/species.ts'
+import BattleScreen from './BattleScreen' // TEMPORARY — remove after testing
 import '../styles/index.css'
 
 const TUI_TEST_IMAGE_URL =
@@ -15,9 +16,17 @@ function App() {
   const speciesQuery = useQuery({
     queryKey: ['species', identifyMutation.data?.species_id],
     queryFn: () => getSpeciesById(identifyMutation.data!.species_id),
-    enabled: !!identifyMutation.data, // ← the important part, explained below
+    enabled: !!identifyMutation.data,
   })
 
+  // TEMPORARY — testing BattleScreen, real return statement commented below
+  return (
+    <div className="app">
+      <BattleScreen />
+    </div>
+  )
+
+  /* REAL APP CONTENT — uncomment this and delete the temporary return above when done testing
   return (
     <div className="app">
       <h1>Momodex!</h1>
@@ -43,6 +52,7 @@ function App() {
       )}
     </div>
   )
+  */
 }
 
 export default App

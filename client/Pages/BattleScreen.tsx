@@ -1,5 +1,6 @@
 import { useReducer } from 'react'
 import { battleReducer } from '../utils/battleReducer'
+import { MatchResultLayout } from '../components/MatchResultLayout'
 import { CardFrame } from '../components/CardFrame'
 import { useAiTurn } from '../hooks/use-ai-turn'
 import type { BattleState } from '../../models/battleTypes'
@@ -11,7 +12,7 @@ const tui: Species = {
   id: 'tui',
   name: 'Tūī',
   type: 'bird',
-  hp: 30,
+  hp: 80,
   attack: 14,
   rarity: 'common',
   status: 'native',
@@ -84,14 +85,14 @@ export default function BattleScreen() {
         <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
       </div>
 
-      {state.isGameOver && (
-        <p>
-          <strong>
-            {state.winner === 'player'
-              ? 'You won!'
-              : 'You lost! try again next time! Champ ;)'}
-          </strong>
-        </p>
+      {state.isGameOver && state.winner && (
+        <MatchResultLayout
+          winner={state.winner}
+          onPlayAgain={() => dispatch({ type: 'RESET' })}
+          onReturnToDeck={() => {
+            console.log('Return to deck clicked test')
+          }}
+        />
       )}
 
       <div style={{ marginTop: '1rem' }}>
