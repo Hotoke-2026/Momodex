@@ -10,7 +10,7 @@ export async function fetchCards(token: string): Promise<Card[]> {
   return res.body
 }
 
-export async function addCard(newCard: NewCardPayload): Promise<Card> {
-  const response = await request.post(`${rootURL}/cards`).send(newCard)
+export async function addCard(newCard: NewCardPayload, token: string): Promise<Card> {
+  const response = await request.post(`${rootURL}/cards`).set('Authorization', `Bearer ${token}`).send(newCard)
   return response.body
 }
