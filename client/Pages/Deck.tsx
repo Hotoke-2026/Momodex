@@ -40,13 +40,13 @@ export function Deck() {
 
   if (isLoading) {
     return (
-      <p className="p-6 font-[family-name:var(--font-body)] text-[color:var(--colour-text-soft)]">
+      <p className="p-6 font-[family-name:var(--font-body)] text-[color:var(--color-text-soft)]">
         Loading your deck...
       </p>
     )
   }
   if (isError) {
-    return <p className="p-6 text-[color:var(--colour-red)]">{error.message}</p>
+    return <p className="p-6 text-[color:var(--color-red)]">{error.message}</p>
   }
 
   return (
@@ -67,15 +67,15 @@ export function Deck() {
       </nav>
 
       <header className="app-header">
-        <h1 className="font-[family-name:var(--font-display)] text-[length:var(--text-heading-md)] font-[900] text-[color:var(--colour-text)]">
+        <h1 className="font-[family-name:var(--font-display)] text-[length:var(--text-heading-md)] font-[900] text-[color:var(--color-text)]">
           Your Card Deck
         </h1>
         <p className="mt-1 text-[length:var(--text-body-md)]">
-          <span className="font-[700] text-[color:var(--colour-green)]">
+          <span className="font-[700] text-[color:var(--color-green)]">
             {nativeCount} native
           </span>
           {'  ·  '}
-          <span className="font-[700] text-[color:var(--colour-red)]">
+          <span className="font-[700] text-[color:var(--color-red)]">
             {invasiveCount} invasive
           </span>
           {'  ·  '}
@@ -89,8 +89,8 @@ export function Deck() {
           onChange={(e) => setTypeFilter(e.target.value)}
           className="mt-4 rounded-lg border px-3 py-1.5 text-[length:var(--text-body-md)] capitalize"
           style={{
-            borderColor: 'var(--colour-tan)',
-            backgroundColor: 'var(--colour-surface)',
+            borderColor: 'var(--color-tan)',
+            backgroundColor: 'var(--color-surface)',
           }}
         >
           <option value="all">All types</option>
@@ -103,7 +103,7 @@ export function Deck() {
 
         <main className="mt-6 pb-12">
           {filteredCards.length === 0 ? (
-            <p className="text-[color:var(--colour-text-soft)]">
+            <p className="text-[color:var(--color-text-soft)]">
               No cards caught yet — go identify some species!
             </p>
           ) : (
