@@ -290,4 +290,16 @@ body {
     background-color: #f9fafb;
     opacity: 0.75;
   }
+
+  &__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
 }
