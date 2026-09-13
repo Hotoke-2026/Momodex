@@ -1,23 +1,18 @@
-import type { AchievementWithStatus } from '../../models/types'
 import { useAchievements } from '../hooks/useAchievements'
 import '../styles/index.scss'
 import { AchievementBadge } from './AchievementBadge'
 
 export interface BadgeGalleryProps {
   userId: string
-  previewAchievements?: AchievementWithStatus[]
 }
 
-export function BadgeGallery({
-  userId,
-  previewAchievements,
-}: BadgeGalleryProps) {
+export function BadgeGallery({ userId }: BadgeGalleryProps) {
   const {
     data: achievements,
     isLoading,
     isError,
     error,
-  } = useAchievements(userId, previewAchievements)
+  } = useAchievements(userId)
 
   if (isLoading) {
     return <p className="text-[var(--color-text-soft)]">Loading badges...</p>

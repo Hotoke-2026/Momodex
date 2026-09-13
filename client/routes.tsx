@@ -5,7 +5,6 @@ import { Deck } from './Pages/Deck'
 import { BattleScreen } from './Pages/BattleScreen'
 import { MapPage } from './Pages/Map'
 import { Gallery } from './Pages/Gallery'
-import { BadgePreviewPage } from './Pages/BadgePreviewPage'
 
 const routes = createRoutesFromElements(
   <>
@@ -14,7 +13,6 @@ const routes = createRoutesFromElements(
     <Route path="battle" element={<BattleScreen />} />
     <Route path="map" element={<MapPage />} />
     <Route path="gallery" element={<Gallery />} />
-    <Route path="badge-preview" element={<BadgePreviewPage />} />
   </>,
 )
 

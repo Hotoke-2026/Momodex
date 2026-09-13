@@ -1,19 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AchievementWithStatus } from '../../models/types'
 import { getAchievements, checkAchievements } from '../apis/achievements'
 
-export function useAchievements(
-  userId: string,
-  previewAchievements?: AchievementWithStatus[],
-) {
+export function useAchievements(userId: string) {
   return useQuery({
     queryKey: ['achievements', userId],
-    queryFn: () =>
-      previewAchievements
-        ? Promise.resolve(previewAchievements)
-        : getAchievements(userId),
+    queryFn: () => getAchievements(userId),
     enabled: Boolean(userId),
-    initialData: previewAchievements,
   })
 }
 

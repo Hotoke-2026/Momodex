@@ -28,7 +28,7 @@ export function AchievementBadge({ achievement }: AchievementBadgeProps) {
     >
       <div
         aria-hidden="true"
-        className={`mb-3 flex h-16 w-14 items-center justify-center text-2xl [clip-path:polygon(50%_0%,100%_25%,100%_75%,50%_100%,0%_75%,0%_25%)] ${
+        className={`mb-3 flex h-16 w-16 items-center justify-center rounded-full text-2xl ${
           unlocked ? 'bg-[var(--color-green)]' : 'bg-[var(--color-tan)]'
         }`}
       >
