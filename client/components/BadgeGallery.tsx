@@ -45,6 +45,9 @@ export function BadgeGallery({ userId }: BadgeGalleryProps) {
               : 'achievement-card--locked'
           }`}
         >
+          <div className="achievement-card__icon" aria-hidden="true">
+            {BADGE_ICONS[achievement.type] ?? '🎖️'}
+          </div>
           <h3 className="achievement-card__name">{achievement.name}</h3>
           <p className="achievement-card__desc">{achievement.description}</p>
           {achievement.unlocked ? (
