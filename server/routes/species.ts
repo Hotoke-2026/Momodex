@@ -1,7 +1,13 @@
+// get species data from the database
 import { Router } from 'express'
-import { getSpeciesById } from '../services/speciesService'
+import { getSpeciesById, getSpeciesShortlist } from '../services/speciesService'
 
 const router = Router()
+
+router.get('/', async (req, res) => {
+  const species = await getSpeciesShortlist()
+  res.json(species)
+})
 
 router.get('/:id', async (req, res) => {
   const species = await getSpeciesById(req.params.id)

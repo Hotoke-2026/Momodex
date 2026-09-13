@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { CardFrame } from '../components/CardFrame.tsx'
 import { getCardsByUserId } from '../apis/cards.ts'
+import { NavBar } from '../components/NavBar'
 import '../styles/index.css'
 
 const CURRENT_USER_ID = 'user1'
@@ -40,42 +41,29 @@ export function Deck() {
 
   if (isLoading) {
     return (
-      <p className="p-6 font-[family-name:var(--font-body)] text-[color:var(--color-text-soft)]">
+      <p className="p-6 font-body text-(--color-text-soft)">
         Loading your deck...
       </p>
     )
   }
   if (isError) {
-    return <p className="p-6 text-[color:var(--color-red)]">{error.message}</p>
+    return <p className="p-6 text-(--color-red)">{error.message}</p>
   }
 
   return (
     <div className="min-h-screen">
-      <nav className="top-nav">
-        <a href="/" className="top-nav__item">
-          🏠<span>Home</span>
-        </a>
-        <a href="/deck" className="top-nav__item top-nav__item--active">
-          🗂️<span>Gallery</span>
-        </a>
-        <a href="/battle" className="top-nav__item">
-          ⚔️<span>Battle</span>
-        </a>
-        <a href="/map" className="top-nav__item">
-          📍<span>Map</span>
-        </a>
-      </nav>
+      <NavBar />
 
       <header className="app-header">
-        <h1 className="font-[family-name:var(--font-display)] text-[length:var(--text-heading-md)] font-[900] text-[color:var(--color-text)]">
+        <h1 className="font-display text-(length:--text-heading-md) font-black text-(--color-text)">
           Your Card Deck
         </h1>
-        <p className="mt-1 text-[length:var(--text-body-md)]">
-          <span className="font-[700] text-[color:var(--color-green)]">
+        <p className="mt-1 text-(length:--text-body-md)">
+          <span className="font-bold text-(--color-green)">
             {nativeCount} native
           </span>
           {'  ·  '}
-          <span className="font-[700] text-[color:var(--color-red)]">
+          <span className="font-bold text-(--color-red)">
             {invasiveCount} invasive
           </span>
           {'  ·  '}
@@ -87,7 +75,7 @@ export function Deck() {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="mt-4 rounded-lg border px-3 py-1.5 text-[length:var(--text-body-md)] capitalize"
+          className="mt-4 rounded-lg border px-3 py-1.5 text-(length:--text-body-md) capitalize"
           style={{
             borderColor: 'var(--color-tan)',
             backgroundColor: 'var(--color-surface)',
@@ -103,7 +91,7 @@ export function Deck() {
 
         <main className="mt-6 pb-12">
           {filteredCards.length === 0 ? (
-            <p className="text-[color:var(--color-text-soft)]">
+            <p className="text-(--color-text-soft)">
               No cards caught yet — go identify some species!
             </p>
           ) : (

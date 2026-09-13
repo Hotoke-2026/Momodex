@@ -8,6 +8,7 @@ const TUI_TEST_IMAGE_URL =
   'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg/250px-Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg'
 
 function App() {
+  //TODO: replace test image with cloudinary upload input
   const identifyMutation = useMutation({
     mutationFn: () => identifyPhoto(TUI_TEST_IMAGE_URL, 'user1'),
   })
