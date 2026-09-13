@@ -67,4 +67,13 @@ export interface Achievement {
   unlocked_at: string
 }
 
-export type NewAchievementDTO = Omit<Achievement, 'id' | 'unlocked_at'>
+export interface AchievementDefinition {
+  type: string
+  name: string
+  description: string
+}
+
+export interface AchievementWithStatus extends AchievementDefinition {
+  unlocked: boolean
+  unlocked_at: string | null
+}
