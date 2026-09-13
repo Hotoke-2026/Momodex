@@ -17,5 +17,5 @@ it('renders the app heading', () => {
     </QueryClientProvider>,
   )
 
-  expect(screen.getByText(/Fullstack Boilerplate/i)).toBeTruthy()
+  expect(screen.getByText(/Momodex!/i)).toBeTruthy()
 })

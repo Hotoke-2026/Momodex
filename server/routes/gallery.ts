@@ -3,6 +3,7 @@ import multer from 'multer'
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary'
 
 import * as db from '../db/gallery.ts'
+import { checkJwt } from '../middleware/authMiddleware.ts'
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -19,8 +20,15 @@ const upload = multer({
 
 const router = Router()
 
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', checkJwt, upload.single('image'), async (req, res) => {
   try {
+
+    const userId = req.auth?.payload?.sub
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
+
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' })
     }
@@ -38,7 +46,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     )
 
     const image = await db.createGalleryImage({
-      user_id: req.body.user_id,
+      user_id: userId, // Authenticated user
       image_url: uploadResult.secure_url,
       caption: req.body.caption,
     })
