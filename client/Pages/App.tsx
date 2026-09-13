@@ -3,6 +3,7 @@ import { CardFrame } from '../components/CardFrame.tsx'
 import { identifyPhoto } from '../apis/identify.ts'
 import { getSpeciesById } from '../apis/species.ts'
 import '../styles/index.css'
+import BattleScreen from './BattleScreen.tsx'
 
 const TUI_TEST_IMAGE_URL =
   'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg/250px-Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg'
