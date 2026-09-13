@@ -55,7 +55,7 @@ const initialState: BattleState = {
 }
 // Temporary on top ^^^
 
-export default function BattleScreen() {
+export function BattleScreen() {
   const navigate = useNavigate()
   const [state, dispatch] = useReducer(battleReducer, initialState)
   useAiTurn(state, dispatch)

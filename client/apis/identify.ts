@@ -1,4 +1,4 @@
-// src/api/identify.ts
+//identify image using Gemini API
 import request from 'superagent'
 import type { Card } from '../../models/types.ts'
 
