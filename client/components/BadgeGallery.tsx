@@ -5,6 +5,17 @@ export interface BadgeGalleryProps {
   userId: string
 }
 
+const BADGE_ICONS: Record<string, string> = {
+  first_find: '🔍',
+  starter_bird: '🐦',
+  starter_insect: '🐛',
+  starter_plant: '🌿',
+  ten_observations: '🔟',
+  first_legendary: '🌟',
+  first_win: '🏆',
+  first_invasive_defeated: '🛡️',
+}
+
 export function BadgeGallery({ userId }: BadgeGalleryProps) {
   const {
     data: achievements,
