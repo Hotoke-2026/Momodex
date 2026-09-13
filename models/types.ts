@@ -58,3 +58,13 @@ export interface CreateGalleryImageDTO {
   image_url: string
   caption?: string
 }
+
+export interface Achievement {
+  id: string
+  user_id: string
+  type: string
+  name: string
+  unlocked_at: string
+}
+
+export type NewAchievementDTO = Omit<Achievement, 'id' | 'unlocked_at'>
