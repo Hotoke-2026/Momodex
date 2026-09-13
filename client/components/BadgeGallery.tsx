@@ -20,13 +20,17 @@ export function BadgeGallery({
   } = useAchievements(userId, previewAchievements)
 
   if (isLoading) {
-    return <p>Loading badges...</p>
+    return <p className="text-[var(--color-text-soft)]">Loading badges...</p>
   }
   if (isError) {
-    return <p className="text-red-600">{error.message}</p>
+    return <p className="text-[var(--color-red)]">{error.message}</p>
   }
   if (!achievements || achievements.length === 0) {
-    return <p>No achievements available yet!</p>
+    return (
+      <p className="text-[var(--color-text-soft)]">
+        No achievements available yet!
+      </p>
+    )
   }
 
   return (

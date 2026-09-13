@@ -16,28 +16,43 @@ interface AchievementBadgeProps {
 }
 
 export function AchievementBadge({ achievement }: AchievementBadgeProps) {
+  const unlocked = achievement.unlocked
+
   return (
     <div
-      key={achievement.type}
-      className={`achievement-card ${
-        achievement.unlocked
-          ? 'achievement-card--unlocked'
-          : 'achievement-card--locked'
+      className={`flex flex-col items-center rounded-2xl border px-5 pb-5 pt-6 text-center transition-colors ${
+        unlocked
+          ? 'border-[var(--color-green)] bg-[var(--color-green-tint)]'
+          : 'border-[var(--color-tan)] bg-[var(--color-surface)] opacity-60'
       }`}
     >
-      <div className="achievement-card__icon" aria-hidden="true">
-        {BADGE_ICONS[achievement.type] ?? '🎖️'}
+      <div
+        aria-hidden="true"
+        className={`mb-3 flex h-16 w-14 items-center justify-center text-2xl [clip-path:polygon(50%_0%,100%_25%,100%_75%,50%_100%,0%_75%,0%_25%)] ${
+          unlocked ? 'bg-[var(--color-green)]' : 'bg-[var(--color-tan)]'
+        }`}
+      >
+        <span className={unlocked ? '' : 'opacity-70 grayscale'}>
+          {BADGE_ICONS[achievement.type] ?? '🎖️'}
+        </span>
       </div>
-      <h3 className="achievement-card__name">{achievement.name}</h3>
-      <p className="achievement-card__desc">{achievement.description}</p>
-      {achievement.unlocked ? (
-        <span className="achievement-card__status">
+
+      <h3 className="mb-1 font-[family-name:var(--font-display)] text-[length:var(--text-heading-sm)] font-[var(--font-weight-heading-bold)] text-[var(--color-text)]">
+        {achievement.name}
+      </h3>
+
+      <p className="mb-3 text-[length:var(--text-body-xsm)] leading-snug text-[var(--color-text-soft)]">
+        {achievement.description}
+      </p>
+
+      {unlocked ? (
+        <span className="text-[length:var(--text-body-xsm)] font-[var(--font-weight-body-bold)] text-[var(--color-green)]">
           Unlocked{' '}
           {achievement.unlocked_at &&
             new Date(achievement.unlocked_at).toLocaleDateString()}
         </span>
       ) : (
-        <span className="achievement-card__status achievement-card__status--locked">
+        <span className="text-[length:var(--text-body-xsm)] font-[var(--font-weight-body-bold)] text-[var(--color-text-soft)] opacity-70">
           Locked
         </span>
       )}
