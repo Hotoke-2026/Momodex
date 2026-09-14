@@ -78,3 +78,20 @@ export interface AchievementWithStatus extends AchievementDefinition {
   unlocked: boolean
   unlocked_at: string | null
 }
+
+export interface User {
+  id: string
+  name: string
+  avatar_url?: string | null
+}
+
+export interface BattleStats {
+  user_id: string
+  wins: number
+  losses: number
+}
+
+export interface FavouriteSpecies {
+  species: Species
+  card: Card
+}
