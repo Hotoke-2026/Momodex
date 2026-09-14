@@ -29,7 +29,7 @@ it('GET /api/v1/achievements returns all achievements as locked for a new user',
   )
 })
 
-it('unlocks and persists "Full Deck" once a user has collected every species', async () => {
+it('unlocks and persists "First Find" once a user has collected at least one species', async () => {
   const allSpecies = await connection('species').select('id')
 
   await connection('cards').insert(
@@ -43,16 +43,16 @@ it('unlocks and persists "Full Deck" once a user has collected every species', a
 
   const checkRes = await request(server).post('/api/v1/achievements/check').send({ userId })
   expect(checkRes.status).toBe(200)
-  expect(checkRes.body.some((a: { type: string }) => a.type === 'full_deck')).toBe(true)
+  expect(checkRes.body.some((a: { type: string }) => a.type === 'first_find')).toBe(true)
 
   const stored = await connection('achievements')
-    .where({ user_id: userId, type: 'full_deck' })
+    .where({ user_id: userId, type: 'first_find' })
     .first()
   expect(stored).toBeDefined()
 
   const getRes = await request(server).get('/api/v1/achievements').query({ userId })
-  const fullDeck = getRes.body.find((a: { type: string }) => a.type === 'full_deck')
-  expect(fullDeck.unlocked).toBe(true)
+  const firstFind = getRes.body.find((a: { type: string }) => a.type === 'first_find')
+  expect(firstFind.unlocked).toBe(true)
 })
 
 it('does not duplicate an achievement if checked again after already unlocked', async () => {
@@ -70,6 +70,6 @@ it('does not duplicate an achievement if checked again after already unlocked', 
   await request(server).post('/api/v1/achievements/check').send({ userId })
   await request(server).post('/api/v1/achievements/check').send({ userId })
 
-  const rows = await connection('achievements').where({ user_id: userId, type: 'full_deck' })
+  const rows = await connection('achievements').where({ user_id: userId, type: 'first_find' })
   expect(rows.length).toBe(1)
 })
