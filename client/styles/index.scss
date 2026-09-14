@@ -249,3 +249,57 @@ body {
     border: 1px solid #d1d5db;
   }
 }
+
+// Badge gallery — locked vs. unlocked achievement cards
+.achievement-card {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+
+  &__name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+  }
+
+  &__desc {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0 0 0.75rem 0;
+  }
+
+  &__status {
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &--locked {
+      color: #9ca3af;
+    }
+  }
+
+  &--unlocked {
+    background-color: #e8f4e1;
+    border-color: #4ade80;
+
+    .achievement-card__status {
+      color: #166534;
+    }
+  }
+
+  &--locked {
+    background-color: #f9fafb;
+    opacity: 0.75;
+  }
+
+  &__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+}
