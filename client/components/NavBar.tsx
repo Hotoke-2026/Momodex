@@ -12,13 +12,13 @@ const links = [
 ]
 
 export function NavBar() {
-  const { isAuthenticated, user: auth0User, loginWithRedirect, logout } = useAuth0()
+  const { isAuthenticated, user: auth0User, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0()
 
   const userId = auth0User?.sub
 
   const { data: user } = useQuery({
     queryKey: ['user', userId],
-    queryFn: () => getUserById(userId!),
+    queryFn: () => getUserById(userId!, getAccessTokenSilently),
     enabled: isAuthenticated && !!userId,
   })
 
@@ -70,13 +70,13 @@ export function NavBar() {
           </>
         ) : (
           <button 
-  onClick={() => loginWithRedirect({
-    appState: { targetUrl: window.location.pathname }
-  })}
-  className="text-sm font-medium text-(--color-green) hover:underline"
->
-  Log in
-</button>
+            onClick={() => loginWithRedirect({
+              appState: { targetUrl: window.location.pathname }
+            })}
+            className="text-sm font-medium text-(--color-green) hover:underline"
+          >
+            Log in
+          </button>
         )}
       </div>
     </nav>
