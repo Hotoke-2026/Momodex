@@ -1,55 +1,45 @@
 import { useQuery } from '@tanstack/react-query'
 import { NavBar } from '../components/NavBar'
-import { ProfileAvatar } from '../components/ProfileAvatar'
-import { BattleStatsCard } from '../components/BattleStatsCard'
-import { FavouriteSpeciesCard } from '../components/FavouriteSpeciesCard'
+import { ProfileCard } from '../components/ProfileCard'
+import { AchievementCompletionBar } from '../components/AchievementCompletionBar'
 import { BadgeGallery } from '../components/BadgeGallery'
 import { getUserById } from '../apis/users'
 import { useBattleStats } from '../hooks/useBattleStats'
+import { useLastCapture } from '../hooks/useLastCapture.ts'
+import { useAchievements } from '../hooks/useAchievements'
 import '../styles/index.css'
 
 const CURRENT_USER_ID = 'user1'
 
 export function Profile() {
-  const { data: user, isLoading: userLoading } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ['user', CURRENT_USER_ID],
     queryFn: () => getUserById(CURRENT_USER_ID),
   })
-  const { data: battleStats, isLoading: statsLoading } = useBattleStats(CURRENT_USER_ID)
-  const favouriteSpecies = (user as { favourite_species?: string | null | undefined } | undefined)
-    ?.favourite_species
+  const { data: battleStats } = useBattleStats(CURRENT_USER_ID)
+  const { data: lastCapture } = useLastCapture(CURRENT_USER_ID)
+  const { data: achievements } = useAchievements(CURRENT_USER_ID)
+
+  const unlockedCount = achievements?.filter((a) => a.unlocked).length ?? 0
+  const totalCount = achievements?.length ?? 0
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[var(--color-base)]">
       <NavBar />
 
-      <header className="app-header flex items-center gap-4">
-        <ProfileAvatar name={user?.name} avatarUrl={user?.avatar_url} />
-        <div>
-          <h1 className="font-display text-(length:--text-heading-md) font-black text-(--color-text)">
-            {userLoading ? 'Loading...' : user?.name}
-          </h1>
-          <p className="text-(length:--text-body-md) text-(--color-text-soft)">Trainer Profile</p>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-6xl px-4 pb-12">
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {statsLoading ? (
-            <p className="text-(--color-text-soft)">Loading battle stats...</p>
-          ) : (
-            battleStats && <BattleStatsCard stats={battleStats} />
-          )}
-
-          {userLoading ? (
-            <p className="text-(--color-text-soft)">Loading favourite species...</p>
-          ) : (
-            <FavouriteSpeciesCard userId={CURRENT_USER_ID} favouriteSpecies={favouriteSpecies} />
-          )}
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8 lg:grid-cols-[360px_1fr]">
+        <div className="flex flex-col gap-4">
+          <ProfileCard
+            userId={CURRENT_USER_ID}
+            user={user}
+            battleStats={battleStats}
+            lastCapture={lastCapture}
+          />
+          <AchievementCompletionBar unlockedCount={unlockedCount} totalCount={totalCount} />
         </div>
 
-        <main className="mt-8">
-          <h2 className="mb-3 font-display text-(length:--text-heading-sm) font-(--font-weight-heading-bold) text-(--color-text)">
+        <main>
+          <h2 className="mb-4 font-[family-name:var(--font-display)] text-[length:var(--text-heading-md)] font-black text-[var(--color-text)]">
             Achievements
           </h2>
           <BadgeGallery userId={CURRENT_USER_ID} />
