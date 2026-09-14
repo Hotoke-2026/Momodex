@@ -9,9 +9,10 @@ import {
 } from '../db/achievements'
 import type { AchievementDefinition, AchievementWithStatus, Achievement } from '../../models/types'
 
-// NOTE: 'first_win' and 'first_invasive_defeated' are listed here for
-// completeness (so they show up as "locked" in the badge gallery), but
-// nothing unlocks them yet. See TODO below.
+interface BattleAchievementPayload {
+  winner?: 'player' | 'ai'
+  opponentWasInvasive?: boolean
+}
 
 export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   { type: 'first_find', name: 'First Find', description: 'Log your very first species observation.' },
@@ -44,7 +45,10 @@ async function unlockIfNeeded(userId: string, type: string, name: string, newlyU
   }
 }
 
-export async function checkAchievements(userId: string): Promise<Achievement[]> {
+export async function checkAchievements(
+  userId: string,
+  battleResult?: BattleAchievementPayload,
+): Promise<Achievement[]> {
   const newlyUnlocked: Achievement[] = []
 
   const [cardCount, starterType, isLegendary] = await Promise.all([
@@ -73,8 +77,18 @@ export async function checkAchievements(userId: string): Promise<Achievement[]> 
     await unlockIfNeeded(userId, 'first_legendary', 'Once in a Blue Moon', newlyUnlocked)
   }
 
-  // TODO(battle-achievements): 'first_win' and 'first_invasive_defeated'
-  // need a battle result to reach the server before they can unlock.
+  if (battleResult?.winner === 'player') {
+    await unlockIfNeeded(userId, 'first_win', 'On the Board', newlyUnlocked)
+  }
+
+  if (battleResult?.winner === 'player' && battleResult.opponentWasInvasive) {
+    await unlockIfNeeded(
+      userId,
+      'first_invasive_defeated',
+      'Not on My Watch',
+      newlyUnlocked,
+    )
+  }
 
   return newlyUnlocked
 }

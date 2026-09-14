@@ -1,5 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getAchievements, checkAchievements } from '../apis/achievements'
+import {
+  getAchievements,
+  checkAchievements,
+  type CheckAchievementsPayload,
+} from '../apis/achievements'
 
 export function useAchievements(userId: string) {
   return useQuery({
@@ -13,7 +17,8 @@ export function useCheckAchievements(userId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: () => checkAchievements(userId),
+    mutationFn: (payload: Omit<CheckAchievementsPayload, 'userId'> = {}) =>
+      checkAchievements({ userId, ...payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['achievements', userId] })
     },

@@ -73,3 +73,23 @@ it('does not duplicate an achievement if checked again after already unlocked', 
   const rows = await connection('achievements').where({ user_id: userId, type: 'first_find' })
   expect(rows.length).toBe(1)
 })
+
+it('unlocks battle achievements when a battle result is provided', async () => {
+  const res = await request(server).post('/api/v1/achievements/check').send({
+    userId,
+    winner: 'player',
+    opponentWasInvasive: true,
+  })
+
+  expect(res.status).toBe(200)
+  expect(res.body.some((a: { type: string }) => a.type === 'first_win')).toBe(true)
+  expect(
+    res.body.some((a: { type: string }) => a.type === 'first_invasive_defeated'),
+  ).toBe(true)
+
+  const getRes = await request(server).get('/api/v1/achievements').query({ userId })
+  expect(getRes.body.find((a: { type: string }) => a.type === 'first_win').unlocked).toBe(true)
+  expect(
+    getRes.body.find((a: { type: string }) => a.type === 'first_invasive_defeated').unlocked,
+  ).toBe(true)
+})
