@@ -22,6 +22,7 @@ describe('useAiTurn', () => {
     rarity: 'common',
     status: 'native',
     description: 'A test species',
+    fun_fact: 'This is a fun fact about the player species.',
   }
 
   const aiSpecies: Species = {
@@ -33,6 +34,7 @@ describe('useAiTurn', () => {
     rarity: 'common',
     status: 'invasive',
     description: 'A test species',
+    fun_fact: 'This is a fun fact about the AI species.',
   }
 
   it('dispatches AI_COUNTER after a 1.5s delay when it becomes the AI turn', () => {
