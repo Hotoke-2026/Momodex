@@ -63,13 +63,12 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
         {isEditing ? '✕' : '✎'}
       </button>
 
-      <div className="flex items-start gap-4">
-        <ProfileAvatar name={user?.name} avatarUrl={user?.avatar_url} size={72} />
-        <p className="mt-2 text-[length:var(--text-body-md)] italic text-[var(--color-green-tint)]">
-          Momo Collecting since{' '}
-          {formatDate(user?.created_at) ?? '—'}
-        </p>
-      </div>
+      <div className="flex items-start gap-4 pr-12">
+  <ProfileAvatar name={user?.name} avatarUrl={user?.avatar_url} size={72} />
+  <p className="mt-4 text-[length:var(--text-body-md)] italic text-[var(--color-green-tint)]">
+    Momo Collecting since {formatDate(user?.created_at) ?? '—'}
+  </p>
+</div>
 
       <h1 className="mt-4 font-[family-name:var(--font-display)] text-[length:var(--text-heading-lg)] font-black text-[var(--color-surface)]">
         {user?.name ?? 'Loading...'}
