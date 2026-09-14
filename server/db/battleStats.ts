@@ -1,7 +1,17 @@
 import db from './connection'
 import type { BattleStats } from '../../models/types'
 
+async function ensureUserExists(userId: string) {
+  const existingUser = await db('users').where({ id: userId }).first()
+
+  if (!existingUser) {
+    await db('users').insert({ id: userId, name: userId })
+  }
+}
+
 export async function getOrCreateBattleStats(userId: string): Promise<BattleStats> {
+  await ensureUserExists(userId)
+
   let stats = await db('battle_stats').where({ user_id: userId }).first()
   if (!stats) {
     ;[stats] = await db('battle_stats').insert({ user_id: userId }).returning('*')

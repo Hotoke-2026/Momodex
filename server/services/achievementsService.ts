@@ -17,9 +17,9 @@ interface BattleAchievementPayload {
 
 export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   { type: 'first_find', name: 'First Find', description: 'Log your very first species observation.' },
-  { type: 'starter_bird', name: 'Fledgling Flight', description: 'Started your collection with a bird.' },
-  { type: 'starter_insect', name: 'The Larval Stage', description: 'Started your collection with an insect.' },
-  { type: 'starter_plant', name: 'Turning Over a New Leaf', description: 'Started your collection with a plant.' },
+  { type: 'starter_bird', name: 'Fledgling Flight', description: 'Logged your first bird.' },
+  { type: 'starter_insect', name: 'The Larval Stage', description: 'Logged your first insect.' },
+  { type: 'starter_plant', name: 'Turning Over a New Leaf', description: 'Logged your first plant.' },
   { type: 'ten_observations', name: 'Getting Serious About This', description: 'Log 10 observations.' },
   { type: 'first_legendary', name: 'Once in a Blue Moon', description: 'Caught your first legendary-rarity species.' },
   { type: 'first_win', name: 'On the Board', description: 'Claimed your first victory.' },
