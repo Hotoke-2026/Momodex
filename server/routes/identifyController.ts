@@ -3,6 +3,7 @@ import { identifySpecies } from '../services/geminiService.ts'
 import { getSpeciesShortlist } from '../services/speciesService'
 import { uploadImageBuffer } from '../services/cloudinaryService'
 import { insertCard } from '../services/cardsService'
+import { checkAchievements } from '../services/achievementsService.ts'
 
 export async function identifyController(req: Request, res: Response) {
   const { userId, location } = req.body
@@ -53,7 +54,7 @@ export async function identifyController(req: Request, res: Response) {
       image_url: imageUrl,
       location: location ?? null,
     })
-
+    await checkAchievements(userId)
     return res.status(200).json(card)
   } catch (err) {
     // Catches anything unexpected — Gemini being down, network failure, etc.
