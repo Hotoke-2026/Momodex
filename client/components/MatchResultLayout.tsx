@@ -18,39 +18,43 @@ export const MatchResultLayout: React.FC<MatchResultLayoutProps> = ({
   const isVictory = winner === 'player'
 
   return (
-    <div
-      className={`match-result ${isVictory ? 'match-result--victory' : 'match-result--defeat'}`}
-    >
-      {/* showcases Match results */}
-      <div className="match-result__icon">{isVictory ? '🌱' : '💀'}</div>
+    <div className="match-result-overlay">
+      <div
+        className={`match-result ${isVictory ? 'match-result--victory' : 'match-result--defeat'}`}
+      >
+        {/* showcases Match results */}
+        <div className="match-result__icon">{isVictory ? '🌱' : '💀'}</div>
 
-      <h2 className="match-result__heading">
-        {isVictory ? 'Victory!' : 'Defeated'}
-      </h2>
-      <p className="match-result__subtitle">
-        {isVictory ? 'Hey, you won' : 'Sorry buddy you lost'}
-      </p>
-      {/* showcases Facts of the species*/}
-      {speciesFact && (
-        <div className="match-result__fact-box">
-          <p className="match-result__fact-label">Field Note — {speciesName}</p>
-          <p className="match-result__fact-text">{speciesFact}</p>
+        <h2 className="match-result__heading">
+          {isVictory ? 'Victory!' : 'Defeated'}
+        </h2>
+        <p className="match-result__subtitle">
+          {isVictory ? 'Hey, you won' : 'Sorry buddy you lost'}
+        </p>
+        {/* showcases Facts of the species*/}
+        {speciesFact && (
+          <div className="match-result__fact-box">
+            <p className="match-result__fact-label">
+              Field Note — {speciesName}
+            </p>
+            <p className="match-result__fact-text">{speciesFact}</p>
+          </div>
+        )}
+        {/* Buttons*/}
+        <div className="match-result__actions">
+          <button
+            className="match-result-btn match-result-btn--primary"
+            onClick={onPlayAgain}
+          >
+            Play Again
+          </button>
+          <button
+            className="match-result-btn match-result-btn--secondary"
+            onClick={onReturnToDeck}
+          >
+            Return to Deck
+          </button>
         </div>
-      )}
-      {/* Buttons*/}
-      <div className="match-result__actions">
-        <button
-          className="match-result-btn match-result-btn--primary"
-          onClick={onPlayAgain}
-        >
-          Play Again
-        </button>
-        <button
-          className="match-result-btn match-result-btn--secondary"
-          onClick={onReturnToDeck}
-        >
-          Return to Deck
-        </button>
       </div>
     </div>
   )
