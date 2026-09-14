@@ -14,4 +14,7 @@ export interface BattleState {
 }
 
 export type BattleAction =
-  { type: 'ATTACK' } | { type: 'AI_COUNTER' } | { type: 'RESET' } // the player attacks, the AI counterattacks, or the battle is reset
+  | { type: 'ATTACK' }
+  | { type: 'AI_COUNTER' }
+  | { type: 'RESET' }
+  | { type: 'SET_OPPONENT'; species: Species } // the player attacks, the AI counterattacks, or the battle is reset
