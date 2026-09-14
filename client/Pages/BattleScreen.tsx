@@ -1,9 +1,11 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { battleReducer } from '../utils/battleReducer'
+import { useNavigate } from 'react-router'
 import { MatchResultLayout } from '../components/MatchResultLayout'
 import { CardFrame } from '../components/CardFrame'
 import { useAiTurn } from '../hooks/use-ai-turn'
+import { useCheckAchievements } from '../hooks/useAchievements'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
 import { NavBar } from '../components/NavBar'
@@ -14,11 +16,13 @@ const tui: Species = {
   id: 'tui',
   name: 'Tūī',
   type: 'bird',
-  hp: 80,
+  hp: 20,
   attack: 14,
   rarity: 'common',
   status: 'native',
   description: 'A native NZ bird known for its distinctive song.',
+  fun_fact:
+    'Tūī have two voice boxes, letting them sing two different notes at the same time.',
 }
 
 const possum: Species = {
@@ -30,6 +34,7 @@ const possum: Species = {
   rarity: 'common',
   status: 'invasive',
   description: 'An invasive species that damages native forests.',
+  fun_fact: ''
 }
 
 const initialState: BattleState = {
@@ -41,7 +46,10 @@ const initialState: BattleState = {
   winner: null,
 }
 
+const CURRENT_USER_ID = 'user1'
+
 export function BattleScreen() {
+  const navigate = useNavigate()
   const { isAuthenticated, user: auth0User } = useAuth0()
   const userId = auth0User?.sub ?? 'test'
 
@@ -56,7 +64,28 @@ export function BattleScreen() {
   }
 
   const [state, dispatch] = useReducer(battleReducer, initialState)
+  const checkAchievementsMutation = useCheckAchievements(CURRENT_USER_ID)
+  const hasSentBattleResult = useRef(false)
+
   useAiTurn(state, dispatch)
+
+  useEffect(() => {
+    if (!state.isGameOver || !state.winner) {
+      hasSentBattleResult.current = false
+      return
+    }
+
+    if (hasSentBattleResult.current) {
+      return
+    }
+
+    hasSentBattleResult.current = true
+
+    checkAchievementsMutation.mutate({
+      winner: state.winner,
+      opponentWasInvasive: state.ai.species.status === 'invasive',
+    })
+  }, [state.isGameOver, state.winner, state.ai.species.status, checkAchievementsMutation])
 
   if (!isAuthenticated) {
     return (
@@ -105,9 +134,17 @@ export function BattleScreen() {
         <MatchResultLayout
           winner={state.winner}
           onPlayAgain={() => dispatch({ type: 'RESET' })}
-          onReturnToDeck={() => {
-            console.log('Return to deck clicked test')
-          }}
+          onReturnToDeck={() => navigate('/deck')}
+          speciesFact={
+            state.winner === 'player'
+              ? state.ai.species.fun_fact
+              : state.player.species.fun_fact
+          }
+          speciesName={
+            state.winner === 'player'
+              ? state.ai.species.name
+              : state.player.species.name
+          }
         />
       )}
 

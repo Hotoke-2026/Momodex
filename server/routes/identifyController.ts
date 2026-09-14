@@ -1,29 +1,22 @@
-// server/routes/identifyController.ts
-
 import { Request, Response } from 'express'
 import { identifySpecies } from '../services/geminiService.ts'
 import { getSpeciesShortlist } from '../services/speciesService'
-import { Card } from '../../models/types' // your interface
-
-interface IdentifyRequestBody {
-  imageUrl: string
-  userId: string
-  location?: string
-}
+import { uploadImageBuffer } from '../services/cloudinaryService'
+import { insertCard } from '../services/cardsService'
 
 export async function identifyController(req: Request, res: Response) {
-  const { imageUrl, userId, location } = req.body as IdentifyRequestBody
+  const { userId, location } = req.body
+  const file = req.file
 
-  // Step 1: validate BEFORE doing any expensive work.
-  // Failing fast here means a bad request never even reaches Gemini —
-  // saves you an API call, and gives a much clearer error than
-  // a confusing crash three functions deep.
-  if (!imageUrl || !userId) {
-    return res.status(400).json({ error: 'imageUrl and userId are required' })
+  // Step 1: validate BEFORE a bad request reaches Gemini —
+  // saves an API call, and gives a much clearer error
+  if (!file || !userId) {
+    return res.status(400).json({ error: 'image file and userId are required' })
   }
 
   try {
-    // Step 2: ask Gemini which species this is, constrained to species we actually know about
+    const imageUrl = await uploadImageBuffer(file.buffer)
+    // Step 2: ask Gemini which species this is, constrained to species in our list
     // it stops Gemini from returning a species your hardcoded data doesn't have
     const shortlist = await getSpeciesShortlist() // pulled from seeded data
     const speciesName = await identifySpecies(imageUrl, shortlist)
@@ -52,20 +45,14 @@ export async function identifyController(req: Request, res: Response) {
         .json({ error: `Unrecognized species from Gemini: ${speciesName}` })
     }
 
-    // Step 4: build the Card row. Note this matches your interface exactly —
-    // this route's ONLY job is producing this shape correctly.
-    const card: Card = {
-      id: Date.now(), // TEMPORARY — replace with your DB's auto-generated id once that's wired up
+    // Step 4: build the Card row.
+    const card = await insertCard({
+      card_name: matchedSpecies.name,
       user_id: userId,
       species_id: matchedSpecies.id,
       image_url: imageUrl,
       location: location ?? null,
-      created_at: new Date().toISOString(),
-    }
-
-    // TODO: once the database is ready, insert `card` there instead of
-    // just returning it — for now this lets your teammates build against
-    // a real response shape before that piece exists.
+    })
 
     return res.status(200).json(card)
   } catch (err) {

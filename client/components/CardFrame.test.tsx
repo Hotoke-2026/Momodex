@@ -22,6 +22,7 @@ describe('CardFrame Component', () => {
     image_url: 'https://example.com/kea.jpg',
     location: 'Mount Cook',
     created_at: '2026-01-01',
+    card_name: ''
   }
 
   it('renders species details, badges, and attack info correctly', () => {
