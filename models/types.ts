@@ -14,6 +14,7 @@ export interface Species {
   rarity: string // 'common' | 'rare' | 'legendary'
   status: string // 'native' | 'invasive'
   description: string
+  fun_fact: string
 }
 
 export interface Card {

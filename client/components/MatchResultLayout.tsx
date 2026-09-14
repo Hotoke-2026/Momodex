@@ -5,6 +5,7 @@ interface MatchResultLayoutProps {
   onPlayAgain: () => void
   onReturnToDeck: () => void
   speciesFact?: string
+  speciesName?: string
 }
 
 export const MatchResultLayout: React.FC<MatchResultLayoutProps> = ({
@@ -12,6 +13,7 @@ export const MatchResultLayout: React.FC<MatchResultLayoutProps> = ({
   onPlayAgain,
   onReturnToDeck,
   speciesFact,
+  speciesName,
 }) => {
   const isVictory = winner === 'player'
 
@@ -31,7 +33,7 @@ export const MatchResultLayout: React.FC<MatchResultLayoutProps> = ({
       {/* showcases Facts of the species*/}
       {speciesFact && (
         <div className="match-result__fact-box">
-          <p className="match-result__fact-label">Field note</p>
+          <p className="match-result__fact-label">Field Note — {speciesName}</p>
           <p className="match-result__fact-text">{speciesFact}</p>
         </div>
       )}
