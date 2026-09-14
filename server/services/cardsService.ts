@@ -1,5 +1,11 @@
 // server/services/cardsService.ts
 import db from '../db/connection'
+import { NewCard } from '../../models/types'
+
+export async function insertCard(newCard: NewCard) {
+  const [card] = await db('cards').insert(newCard).returning('*')
+  return card
+}
 
 export async function getCardsByUserId(userId: string) {
   const rows = await db('cards')
