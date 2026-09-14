@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import { battleReducer } from '../utils/battleReducer'
 import { useNavigate } from 'react-router'
 import { MatchResultLayout } from '../components/MatchResultLayout'
@@ -6,6 +6,7 @@ import { CardFrame } from '../components/CardFrame'
 import { useAiTurn } from '../hooks/use-ai-turn'
 import '../styles/index.css'
 import '../styles/index.scss'
+import { useCheckAchievements } from '../hooks/useAchievements'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
 
@@ -56,12 +57,40 @@ const initialState: BattleState = {
   winner: null,
 }
 
+const CURRENT_USER_ID = 'user1'
+// Temporary on top ^^^
+
 export function BattleScreen() {
   const navigate = useNavigate()
   const [state, dispatch] = useReducer(battleReducer, initialState)
+  const checkAchievementsMutation = useCheckAchievements(CURRENT_USER_ID)
+  const hasSentBattleResult = useRef(false)
+
   useAiTurn(state, dispatch)
 
   const isPlayerTurn = state.turn === 'player' && !state.isGameOver
+  useEffect(() => {
+    if (!state.isGameOver || !state.winner) {
+      hasSentBattleResult.current = false
+      return
+    }
+
+    if (hasSentBattleResult.current) {
+      return
+    }
+
+    hasSentBattleResult.current = true
+
+    checkAchievementsMutation.mutate({
+      winner: state.winner,
+      opponentWasInvasive: state.ai.species.status === 'invasive',
+    })
+  }, [
+    state.isGameOver,
+    state.winner,
+    state.ai.species.status,
+    checkAchievementsMutation,
+  ])
 
   return (
     <div className="battle-container">

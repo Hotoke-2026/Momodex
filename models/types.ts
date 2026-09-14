@@ -32,16 +32,16 @@ export interface CardWithSpecies {
   species: Species
 }
 
-// DTO = Data Transfer Object.
 // This describes the shape of data the CLIENT SENDS to create a card,
 // which is different from the Card shape above (what's returned FROM the DB).
 // It excludes `id` and `created_at` because those are generated
 // automatically by SQLite on insert — the client never provides them.
-export interface CreateCardDTO {
+export interface NewCard {
+  card_name: string
   user_id: string
   species_id: string
   image_url: string
-  location?: string
+  location?: string | null
 }
 
 export type NewCardPayload = Omit<Card, 'id' | 'user_id'>
@@ -58,4 +58,23 @@ export interface CreateGalleryImageDTO {
   user_id: string
   image_url: string
   caption?: string
+}
+
+export interface Achievement {
+  id: string
+  user_id: string
+  type: string
+  name: string
+  unlocked_at: string
+}
+
+export interface AchievementDefinition {
+  type: string
+  name: string
+  description: string
+}
+
+export interface AchievementWithStatus extends AchievementDefinition {
+  unlocked: boolean
+  unlocked_at: string | null
 }
