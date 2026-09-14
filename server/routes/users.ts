@@ -13,19 +13,26 @@ router.get('/:id', async (req, res) => {
   }
   res.json(user)
 })
-router.get('/:id/battle-stats', async (req, res) => {
-  const stats = await getOrCreateBattleStats(req.params.id)
-  res.json(stats)
+
+router.get('/:id/last-capture', async (req, res) => {
+  const card = await db('cards')
+    .where({ user_id: req.params.id })
+    .orderBy('created_at', 'desc')
+    .select('created_at', 'location')
+    .first()
+  res.json(card ?? null)
 })
 
-router.patch('/:id/favourite-species', async (req, res) => {
-  const name = req.body.name as string
-  if (!name) {
-    return res.status(400).json({ error: 'name is required' })
+router.patch('/:id', async (req, res) => {
+  const { favourite_species, currently_seeking } = req.body
+  const updates = {}
+  if (favourite_species !== undefined) updates.favourite_species = favourite_species
+  if (currently_seeking !== undefined) updates.currently_seeking = currently_seeking
+  if (Object.keys(updates).length > 0) {
+    await db('users').where({ id: req.params.id }).update(updates)
   }
-
-  await db('users').where({ id: req.params.id }).update({ favourite_species: name })
   const user = await db('users').where({ id: req.params.id }).first()
   res.json(user)
 })
+
 export default router
