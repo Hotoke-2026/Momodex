@@ -8,6 +8,7 @@ import {
   hasLegendaryCard,
 } from '../db/achievements'
 import type { AchievementDefinition, AchievementWithStatus, Achievement } from '../../models/types'
+import { recordBattleOutcome } from '../db/battleStats'
 
 interface BattleAchievementPayload {
   winner?: 'player' | 'ai'
@@ -39,6 +40,7 @@ export async function getAchievementsForUser(userId: string): Promise<Achievemen
   })
 }
 
+
 async function unlockIfNeeded(userId: string, type: string, name: string, newlyUnlocked: Achievement[]) {
   if (!(await hasAchievement(userId, type))) {
     newlyUnlocked.push(await insertAchievement(userId, type, name))
@@ -56,6 +58,10 @@ export async function checkAchievements(
     getFirstCardSpeciesType(userId),
     hasLegendaryCard(userId),
   ])
+
+    if (battleResult?.winner) {
+    await recordBattleOutcome(userId, battleResult.winner === 'player')
+  }
 
   if (cardCount >= 1) {
     await unlockIfNeeded(userId, 'first_find', 'First Find', newlyUnlocked)
