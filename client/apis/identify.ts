@@ -1,17 +1,23 @@
 //identify image using Gemini API
 import request from 'superagent'
-import type { Card } from '../../models/types.ts'
+import type { Card } from '../../models/types'
 
 const rootURL = new URL(`/api/v1`, document.baseURI)
 
-export async function identifyPhoto(imageUrl: string, userId: string) {
-  try {
-    const response = await request
-      .post(`${rootURL}/identify`)
-      .send({ imageUrl, userId })
-    return response.body as Card
-  } catch (err: unknown) {
-    const error = err as { response?: { body?: { error?: string } } }
-    throw new Error(error.response?.body?.error || 'Request failed')
+export async function identifyPhoto(
+  file: File,
+  userId: string,
+  location?: string,
+) {
+  const req = request
+    .post(`${rootURL}/identify`)
+    .attach('image', file) // field name MUST match multer's upload.single('image')
+    .field('userId', userId)
+
+  if (location) {
+    req.field('location', location)
   }
+
+  const response = await req
+  return response.body as Card
 }
