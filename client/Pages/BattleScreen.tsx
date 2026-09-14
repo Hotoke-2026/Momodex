@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router'
 import { MatchResultLayout } from '../components/MatchResultLayout'
 import { CardFrame } from '../components/CardFrame'
 import { useAiTurn } from '../hooks/use-ai-turn'
+import '../styles/index.css'
+import '../styles/index.scss'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
 
@@ -53,42 +55,85 @@ const initialState: BattleState = {
   isGameOver: false,
   winner: null,
 }
-// Temporary on top ^^^
 
 export function BattleScreen() {
   const navigate = useNavigate()
   const [state, dispatch] = useReducer(battleReducer, initialState)
   useAiTurn(state, dispatch)
 
+  const isPlayerTurn = state.turn === 'player' && !state.isGameOver
+
   return (
-    <div>
-      <h2>Battle</h2>
+    <div className="battle-container">
+      <div className="battle-container__content">
+        {/* Header Section */}
+        <div className="battle-container__header">
+          <button
+            className="battle-container__retreat-btn"
+            onClick={() => navigate('/deck')}
+          >
+            Retreat
+          </button>
 
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        <CardFrame
-          card={placeholderCard}
-          species={state.player.species}
-          currentHp={state.player.currentHp}
-          compact={true}
-        />
-        <CardFrame
-          card={placeholderCard}
-          species={state.ai.species}
-          currentHp={state.ai.currentHp}
-          compact={true}
-        />
-      </div>
-      {/* attack button */}
-      <div style={{ marginTop: '1rem' }}>
-        <button
-          onClick={() => dispatch({ type: 'ATTACK' })}
-          disabled={state.turn !== 'player' || state.isGameOver}
-        >
-          Wing Attack
-        </button>
+          <h1 className="battle-container__title">BATTLE</h1>
 
-        {/* Play again button */}
-        <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
+          {state.turn === 'ai' && !state.isGameOver ? (
+            <span className="battle-container__status-pill">
+              Opponent is thinking...
+            </span>
+          ) : (
+            <span className="battle-container__status-text">
+              {state.isGameOver ? 'Game Over' : 'Your turn — choose a move'}
+            </span>
+          )}
+        </div>
+
+        {/* Combatants Grid */}
+        <div>
+          <div className="battle-container__combatants-labels">
+            <span>YOU</span>
+            <span>OPPONENT</span>
+          </div>
+          <div className="battle-container__grid">
+            <CardFrame
+              card={placeholderCard}
+              species={state.player.species}
+              currentHp={state.player.currentHp}
+              compact={true}
+            />
+            <CardFrame
+              card={placeholderCard}
+              species={state.ai.species}
+              currentHp={state.ai.currentHp}
+              compact={true}
+            />
+          </div>
+        </div>
+
+        {/* Action Controls */}
+        <div>
+          <p className="battle-container__moves-label">Choose a move:</p>
+          <div className="battle-container__moves-grid">
+            <button
+              className="battle-container__move-btn"
+              onClick={() => dispatch({ type: 'ATTACK' })}
+              disabled={!isPlayerTurn}
+            >
+              <div className="move-title">Wing Attack</div>
+              <div className="move-dmg">{state.player.species.attack} DMG</div>
+            </button>
+          </div>
+        </div>
+
+        {/* Battle Log Box */}
+        <div className="battle-container__log-box">
+          <h3>BATTLE LOG</h3>
+          <div className="log-entries">
+            {state.log.map((entry, i) => (
+              <div key={i}>{entry}</div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {state.isGameOver && state.winner && (
@@ -108,16 +153,6 @@ export function BattleScreen() {
           }
         />
       )}
-
-      <div style={{ marginTop: '1rem' }}>
-        {/* Battle log */}
-        <h3>Battle Log</h3>
-        <ul>
-          {state.log.map((entry, i) => (
-            <li key={i}>{entry}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   )
 }
