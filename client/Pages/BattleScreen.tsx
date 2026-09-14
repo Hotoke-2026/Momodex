@@ -1,10 +1,13 @@
-import { useEffect, useReducer, useRef } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { battleReducer } from '../utils/battleReducer'
 import { useNavigate } from 'react-router'
 import { MatchResultLayout } from '../components/MatchResultLayout'
 import { CardFrame } from '../components/CardFrame'
 import { useAiTurn } from '../hooks/use-ai-turn'
+import { useQuery } from '@tanstack/react-query'
+import { getAllSpecies, getSpeciesById } from '../apis/species'
+import { getRandomOpponent } from '../utils/getRandomOpponent'
 import '../styles/index.css'
 import '../styles/index.scss'
 import { useCheckAchievements } from '../hooks/useAchievements'
@@ -12,8 +15,7 @@ import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
 import { NavBar } from '../components/NavBar'
 
-// these are two species are just for placeholder purposes
-// please replace once requirement tickets are done for selecting species from the database
+// player side is still a placeholder — real card selection is a separate ticket
 const tui: Species = {
   id: 'tui',
   name: 'Tūī',
@@ -27,6 +29,7 @@ const tui: Species = {
     'Tūī have two voice boxes, letting them sing two different notes at the same time.',
 }
 
+// starting AI species — immediately replaced once the real random opponent loads
 const possum: Species = {
   id: 'possum',
   name: 'Common Brushtail Possum',
@@ -52,8 +55,33 @@ const CURRENT_USER_ID = 'user1'
 
 export function BattleScreen() {
   const navigate = useNavigate()
-  const { isAuthenticated, user: auth0User } = useAuth0()
+  const { isAuthenticated, user: auth0User, getAccessTokenSilently } = useAuth0()
   const userId = auth0User?.sub ?? 'test'
+
+  // Step 1: get the full species pool
+  const speciesListQuery = useQuery({
+  queryKey: ['species'],
+  queryFn: () => getAllSpecies(getAccessTokenSilently),
+  enabled: isAuthenticated,
+})
+
+  // Step 2: once the pool arrives, pick ONE random opponent id (only once)
+  const [opponentId, setOpponentId] = useState<string | null>(null)
+  useEffect(() => {
+    if (speciesListQuery.data && Array.isArray(speciesListQuery.data) && !opponentId) {
+      const picked = getRandomOpponent(speciesListQuery.data)
+      if (picked) {
+        setOpponentId(picked.id)
+      }
+    }
+  }, [speciesListQuery.data, opponentId])
+
+  // Step 3: fetch full stats for that one chosen id
+  const opponentSpeciesQuery = useQuery({
+    queryKey: ['species', opponentId],
+    queryFn: () => getSpeciesById(opponentId as string, getAccessTokenSilently),
+    enabled: isAuthenticated && !!opponentId,
+  })
 
   const placeholderCard: Card = {
     id: 0,
@@ -66,22 +94,27 @@ export function BattleScreen() {
   }
 
   const [state, dispatch] = useReducer(battleReducer, initialState)
+
+  // Step 3b: once the real opponent's full data arrives, swap it into battle state
+  useEffect(() => {
+    if (opponentSpeciesQuery.data) {
+      dispatch({ type: 'SET_OPPONENT', species: opponentSpeciesQuery.data })
+    }
+  }, [opponentSpeciesQuery.data])
+
   const checkAchievementsMutation = useCheckAchievements(CURRENT_USER_ID)
   const hasSentBattleResult = useRef(false)
 
   useAiTurn(state, dispatch)
 
   const isPlayerTurn = state.turn === 'player' && !state.isGameOver
+
   useEffect(() => {
     if (!state.isGameOver || !state.winner) {
       hasSentBattleResult.current = false
       return
     }
-
-    if (hasSentBattleResult.current) {
-      return
-    }
-
+    if (hasSentBattleResult.current) return
     hasSentBattleResult.current = true
 
     checkAchievementsMutation.mutate({
@@ -106,11 +139,19 @@ export function BattleScreen() {
     )
   }
 
+  // Step 4: don't show the battle UI until the REAL opponent has loaded
+  if (speciesListQuery.isLoading || !opponentSpeciesQuery.data) {
+    return (
+      <div className="battle-container">
+        <p>Finding an opponent...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="battle-container">
       <NavBar />
       <div className="battle-container__content">
-        {/* Header Section */}
         <div className="battle-container__header">
           <button
             className="battle-container__retreat-btn"
@@ -132,7 +173,6 @@ export function BattleScreen() {
           )}
         </div>
 
-        {/* Combatants Grid */}
         <div>
           <div className="battle-container__combatants-labels">
             <span>YOU</span>
@@ -154,7 +194,6 @@ export function BattleScreen() {
           </div>
         </div>
 
-        {/* Action Controls */}
         <div>
           <p className="battle-container__moves-label">Choose a move:</p>
           <div className="battle-container__moves-grid">
@@ -169,7 +208,6 @@ export function BattleScreen() {
           </div>
         </div>
 
-        {/* Battle Log Box */}
         <div className="battle-container__log-box">
           <h3>BATTLE LOG</h3>
           <div className="log-entries">
