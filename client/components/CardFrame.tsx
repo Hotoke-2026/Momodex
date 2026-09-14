@@ -9,6 +9,7 @@ export interface CardFrameProps {
   species: Species
   currentHp?: number
   compact?: boolean
+  level?: number
 }
 
 export const CardFrame: React.FC<CardFrameProps> = ({
@@ -16,11 +17,12 @@ export const CardFrame: React.FC<CardFrameProps> = ({
   species,
   currentHp = species.hp,
   compact = false,
+  level = 1,
 }) => {
   const isNative = species.status.toLowerCase() === 'native'
 
   return (
-    <div className="card-frame">
+    <div className={`card-frame card-frame--level-${level}`}>
       {/* Header: Name, Rarity Badge, HP */}
       <div className="card-frame__header">
         <div className="card-frame__title-group">
