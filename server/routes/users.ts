@@ -18,8 +18,14 @@ router.get('/:id/battle-stats', async (req, res) => {
   res.json(stats)
 })
 
-router.get('/:id/favourite-species', async (req, res) => {
-  const favourite = await getFavouriteSpeciesForUser(req.params.id)
-  res.json(favourite)
+router.patch('/:id/favourite-species', async (req, res) => {
+  const name = req.body.name as string
+  if (!name) {
+    return res.status(400).json({ error: 'name is required' })
+  }
+
+  await db('users').where({ id: req.params.id }).update({ favourite_species: name })
+  const user = await db('users').where({ id: req.params.id }).first()
+  res.json(user)
 })
 export default router
