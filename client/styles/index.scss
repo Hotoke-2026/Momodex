@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap');
 
-
-html, 
+html,
 body {
   font-family: 'Montserrat', sans-serif;
 }
@@ -161,7 +160,7 @@ body {
   transition: width 0.3s ease;
 }
 
-// Match result screen 
+// Match result screen
 .match-result {
   display: flex;
   flex-direction: column;
@@ -250,6 +249,162 @@ body {
   }
 }
 
+.match-result-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+// Battle Screen Layout
+.battle-container {
+  background-color: var(--color-green);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  color: var(--color-surface);
+
+  &__content {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  &__header {
+    position: relative;
+    text-align: center;
+  }
+
+  &__retreat-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: #3e6b38;
+    color: #d4e7d1;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--text-body-xsm);
+    font-weight: var(--font-weight-body-bold);
+
+    &:hover {
+      background-color: #4a7d43;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    letter-spacing: 2px;
+    font-weight: var(--font-weight-heading-bold);
+  }
+
+  &__status-pill {
+    display: inline-block;
+    margin-top: 0.5rem;
+    background-color: var(--color-red);
+    color: #ffffff;
+    padding: 0.2rem 0.75rem;
+    border-radius: 12px;
+    font-size: var(--text-body-xsm);
+    font-weight: var(--font-weight-body-bold);
+  }
+
+  &__status-text {
+    display: block;
+    margin-top: 0.5rem;
+    color: #d4e7d1;
+    font-size: var(--text-body-xsm);
+  }
+
+  &__combatants-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-body-xsm);
+    color: #a3c29e;
+    margin-bottom: 0.25rem;
+    font-weight: var(--font-weight-body-bold);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  &__moves-label {
+    margin: 0 0 0.5rem 0;
+    font-size: var(--text-body-xsm);
+    color: #d4e7d1;
+  }
+
+  &__moves-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  &__move-btn {
+    background-color: #7a1f12;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:disabled {
+      background-color: #4d2d26;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-red);
+    }
+
+    .move-title {
+      font-weight: var(--font-weight-body-bold);
+      font-size: var(--text-body-md);
+    }
+
+    .move-dmg {
+      font-size: var(--text-body-xsm);
+      opacity: 0.8;
+    }
+  }
+
+  &__log-box {
+    background-color: var(--color-dark);
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 100px;
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: var(--text-body-xsm);
+      letter-spacing: 1px;
+      color: #8fae8a;
+      font-family: var(--font-display);
+    }
+
+    .log-entries {
+      font-size: var(--text-body-xsm);
+      color: #d4e7d1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+}
+
 // Badge gallery — locked vs. unlocked achievement cards
 .achievement-card {
   border-radius: 0.75rem;
@@ -292,14 +447,14 @@ body {
   }
 
   &__icon {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 9999px;
-  background-color: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-}
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
 }
