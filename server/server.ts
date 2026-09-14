@@ -1,6 +1,5 @@
 import express from 'express'
 import * as Path from 'node:path'
-import galleryRoutes from './routes/gallery.ts'
 
 import identifyRoutes from './routes/identify.ts'
 import speciesRoutes from './routes/species.ts'
@@ -10,7 +9,6 @@ import usersRoutes from './routes/users.ts'
 const server = express()
 
 server.use(express.json())
-server.use('/api/v1/gallery', galleryRoutes)
 server.use('/api/v1/cards', cardsRoutes)
 server.use('/api/v1/identify', identifyRoutes)
 server.use('/api/v1/species', speciesRoutes)
