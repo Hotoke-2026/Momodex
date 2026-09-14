@@ -1,6 +1,7 @@
 // Map page for displaying sightings on a Leaflet map
 import { useMemo, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { useAuth0 } from '@auth0/auth0-react'
 import 'leaflet/dist/leaflet.css'
 import { useMapObservations } from '../hooks/useMapObservations'
 import { NavBar } from '../components/NavBar'
@@ -15,6 +16,7 @@ const DATE_RANGES = {
 type DateRangeKey = keyof typeof DATE_RANGES
 
 export function MapPage() {
+  const { isAuthenticated } = useAuth0()
   const { data: pins, isLoading, isError } = useMapObservations()
   const [speciesFilter, setSpeciesFilter] = useState('all')
   const [dateRange, setDateRange] = useState<DateRangeKey>('all')
@@ -42,8 +44,19 @@ export function MapPage() {
     })
   }, [pins, speciesFilter, dateRange])
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen">
+        <NavBar />
+        <p className="p-6 text-(--color-text-soft)">
+          Please log in to view the sightings map.
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-(--color-base)]">
+    <div className="min-h-screen bg-(--color-base)">
       <NavBar />
 
       <header className="px-6 pb-4 pt-6">
@@ -59,7 +72,7 @@ export function MapPage() {
         <select
           value={speciesFilter}
           onChange={(e) => setSpeciesFilter(e.target.value)}
-          className="rounded-md border border-(--color-tan)] bg-[color:var(--color-surface) px-3 py-1.5 text-sm"
+          className="rounded-md border border-(--color-tan) bg-[color:var(--color-surface)] px-3 py-1.5 text-sm"
         >
           <option value="all">All species</option>
           {speciesOptions.map((name) => (
@@ -84,14 +97,14 @@ export function MapPage() {
 
       <div className="px-6 pb-8">
         {isLoading && (
-          <p className="text-(--color-text-soft)]">Loading sightings...</p>
+          <p className="text-(--color-text-soft)">Loading sightings...</p>
         )}
         {isError && (
-          <p className="text-(--color-red)]">Couldn&apos;t load map data.</p>
+          <p className="text-(--color-red)">Couldn&apos;t load map data.</p>
         )}
 
         {!isLoading && !isError && (
-          <div className="overflow-hidden rounded-xl border border-(--color-tan)] shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-(--color-tan) shadow-sm">
             <MapContainer
               center={[-41.3, 174.8]}
               zoom={5}

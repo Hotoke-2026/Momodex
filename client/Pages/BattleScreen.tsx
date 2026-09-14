@@ -1,10 +1,12 @@
 import { useReducer } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import { battleReducer } from '../utils/battleReducer'
 import { MatchResultLayout } from '../components/MatchResultLayout'
 import { CardFrame } from '../components/CardFrame'
 import { useAiTurn } from '../hooks/use-ai-turn'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
+import { NavBar } from '../components/NavBar'
 
 // these are two species are just for placeholder purposes
 // please replace once requirement tickets are done for selecting species from the database
@@ -30,16 +32,6 @@ const possum: Species = {
   description: 'An invasive species that damages native forests.',
 }
 
-const placeholderCard: Card = {
-  id: 0,
-  card_name: 'Placeholder Card',
-  user_id: 'test',
-  species_id: '',
-  image_url: '',
-  location: null,
-  created_at: new Date().toISOString(),
-}
-
 const initialState: BattleState = {
   player: { species: tui, currentHp: tui.hp },
   ai: { species: possum, currentHp: possum.hp },
@@ -48,14 +40,38 @@ const initialState: BattleState = {
   isGameOver: false,
   winner: null,
 }
-// Temporary on top ^^^
 
 export function BattleScreen() {
+  const { isAuthenticated, user: auth0User } = useAuth0()
+  const userId = auth0User?.sub ?? 'test'
+
+  const placeholderCard: Card = {
+    id: 0,
+    card_name: 'Placeholder Card',
+    user_id: userId,
+    species_id: '',
+    image_url: '',
+    location: null,
+    created_at: new Date().toISOString(),
+  }
+
   const [state, dispatch] = useReducer(battleReducer, initialState)
   useAiTurn(state, dispatch)
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen">
+        <NavBar />
+        <p className="p-6 text-(--color-text-soft)">
+          Please log in to participate in battles.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div>
+      <NavBar />
       <h2>Battle</h2>
 
       <div style={{ display: 'flex', gap: '2rem' }}>

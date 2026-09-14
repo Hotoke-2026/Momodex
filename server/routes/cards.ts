@@ -5,7 +5,7 @@ import { checkJwt } from '../middleware/authMiddleware'
 
 const router = express.Router()
 
-router.get('/', checkJwt, async (req, res) => {
+router.get('/:userId', checkJwt, async (req, res) => {
   try {
     const userId = req.auth?.payload?.sub
 
