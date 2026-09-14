@@ -3,9 +3,9 @@ import {
   getAchievementsByUserId,
   hasAchievement,
   insertAchievement,
-  getFirstCardSpeciesType,
   getCardCount,
   hasLegendaryCard,
+  hasCardOfType,
 } from '../db/achievements'
 import type { AchievementDefinition, AchievementWithStatus, Achievement } from '../../models/types'
 import { recordBattleOutcome } from '../db/battleStats'
@@ -53,11 +53,31 @@ export async function checkAchievements(
 ): Promise<Achievement[]> {
   const newlyUnlocked: Achievement[] = []
 
-  const [cardCount, starterType, isLegendary] = await Promise.all([
-    getCardCount(userId),
-    getFirstCardSpeciesType(userId),
-    hasLegendaryCard(userId),
-  ])
+ const [cardCount, hasBird, hasInsect, hasPlant, isLegendary] = await Promise.all([
+  getCardCount(userId),
+  hasCardOfType(userId, 'bird'),
+  hasCardOfType(userId, 'insect'),
+  hasCardOfType(userId, 'plant'),
+  hasLegendaryCard(userId),
+])
+
+if (battleResult?.winner) {
+  await recordBattleOutcome(userId, battleResult.winner === 'player')
+}
+
+if (cardCount >= 1) {
+  await unlockIfNeeded(userId, 'first_find', 'First Find', newlyUnlocked)
+}
+
+if (hasBird) {
+  await unlockIfNeeded(userId, 'starter_bird', 'Fledgling Flight', newlyUnlocked)
+}
+if (hasInsect) {
+  await unlockIfNeeded(userId, 'starter_insect', 'The Larval Stage', newlyUnlocked)
+}
+if (hasPlant) {
+  await unlockIfNeeded(userId, 'starter_plant', 'Turning Over a New Leaf', newlyUnlocked)
+}
 
     if (battleResult?.winner) {
     await recordBattleOutcome(userId, battleResult.winner === 'player')
@@ -65,14 +85,6 @@ export async function checkAchievements(
 
   if (cardCount >= 1) {
     await unlockIfNeeded(userId, 'first_find', 'First Find', newlyUnlocked)
-  }
-
-  if (starterType === 'bird') {
-    await unlockIfNeeded(userId, 'starter_bird', 'Fledgling Flight', newlyUnlocked)
-  } else if (starterType === 'insect') {
-    await unlockIfNeeded(userId, 'starter_insect', 'The Larval Stage', newlyUnlocked)
-  } else if (starterType === 'plant') {
-    await unlockIfNeeded(userId, 'starter_plant', 'Turning Over a New Leaf', newlyUnlocked)
   }
 
   if (cardCount >= 10) {
@@ -95,6 +107,7 @@ export async function checkAchievements(
       newlyUnlocked,
     )
   }
+  
 
   return newlyUnlocked
 }
