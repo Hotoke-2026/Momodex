@@ -59,3 +59,22 @@ export interface CreateGalleryImageDTO {
   image_url: string
   caption?: string
 }
+
+export interface Achievement {
+  id: string
+  user_id: string
+  type: string
+  name: string
+  unlocked_at: string
+}
+
+export interface AchievementDefinition {
+  type: string
+  name: string
+  description: string
+}
+
+export interface AchievementWithStatus extends AchievementDefinition {
+  unlocked: boolean
+  unlocked_at: string | null
+}
