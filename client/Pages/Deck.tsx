@@ -5,6 +5,7 @@ import { CardFrame } from '../components/CardFrame.tsx'
 import { getCardsByUserId } from '../apis/cards.ts'
 import { NavBar } from '../components/NavBar'
 import '../styles/index.css'
+import { Footer } from '../components/Footer.tsx'
 
 export function Deck() {
   const { user: auth0User, isAuthenticated, isLoading: isAuthLoading, getAccessTokenSilently } = useAuth0()
@@ -86,7 +87,7 @@ export function Deck() {
   }
 
   return (
-    <div className="min-h-screen">
+    <><div className="min-h-screen">
       <NavBar />
 
       <header className="app-header px-6 py-4">
@@ -139,5 +140,6 @@ export function Deck() {
         </main>
       </div>
     </div>
+    <Footer /></>
   )
 }

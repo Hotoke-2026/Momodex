@@ -58,7 +58,7 @@ export async function identifyPhoto(
     }
   } catch (err: unknown) {
     const error = err as { response?: { body?: { error?: string } } }
-    throw new Error(error.response?.body?.error || 'Request failed')
+    throw new Error(error.response?.body?.error || 'Please log in to identify')
   }
 }
 

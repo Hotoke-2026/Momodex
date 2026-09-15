@@ -8,6 +8,7 @@ import { useBattleStats } from '../hooks/useBattleStats'
 import { useLastCapture } from '../hooks/useLastCapture.ts'
 import { useAchievements } from '../hooks/useAchievements'
 import '../styles/index.css'
+import { Footer } from '../components/Footer.tsx'
 import { useAuth0 } from '@auth0/auth0-react'
 
 export function Profile() {
@@ -58,7 +59,7 @@ export function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-base)]">
+    <><div className="min-h-screen bg-[var(--color-base)]">
       <NavBar />
 
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8 lg:grid-cols-[360px_1fr]">
@@ -67,8 +68,7 @@ export function Profile() {
             userId={userId}
             user={user}
             battleStats={battleStats}
-            lastCapture={lastCapture}
-          />
+            lastCapture={lastCapture} />
           <AchievementCompletionBar unlockedCount={unlockedCount} totalCount={totalCount} />
         </div>
 
@@ -79,6 +79,6 @@ export function Profile() {
           <BadgeGallery userId={userId} />
         </main>
       </div>
-    </div>
+    </div><Footer /></>
   )
 }
