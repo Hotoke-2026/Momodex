@@ -1,9 +1,9 @@
 import type { BattleState, BattleAction } from '../../models/battleTypes'
+import { getLeveledStat } from '../utils/getLeveledStat'
+import { getTypeMultiplier } from './typeChart'
 
-const POISON_DURATION = 3 // turns — not stored in the DB, a fixed game rule
+const POISON_DURATION = 3
 
-// --- Passive defense: dodge, intimidate, and slippery all reduce incoming damage,
-// just via different math. This runs on WHOEVER IS DEFENDING, based on their own species. ---
 function applyPassiveDefense(
   rawDamage: number,
   defender: BattleState['player'],
@@ -17,7 +17,7 @@ function applyPassiveDefense(
   if (effect_type === 'dodge' || effect_type === 'intimidate') {
     const roll = Math.random() * 100
     if (roll < effect_value) {
-      return { damage: 0, wasAvoided: true, defenseNote: null } // the "avoided" message is handled separately, see below
+      return { damage: 0, wasAvoided: true, defenseNote: null }
     }
     return { damage: rawDamage, wasAvoided: false, defenseNote: null }
   }
@@ -31,7 +31,6 @@ function applyPassiveDefense(
   return { damage: rawDamage, wasAvoided: false, defenseNote: null }
 }
 
-// --- Shared attack resolution, used by player (move 1 or 2) and AI alike ---
 function resolveAttack(
   attacker: BattleState['player'],
   defender: BattleState['player'],
@@ -41,24 +40,25 @@ function resolveAttack(
   const isSecondMove = move === 'two'
   const baseDamage = isSecondMove ? (species.attack_two ?? 0) : species.attack
   const moveName = isSecondMove ? species.attack_two_name : species.attack_name
-
   const hasOnAttackEffect =
     isSecondMove && species.effect_trigger === 'on_attack'
 
-  let rawDamage = baseDamage
-  if (
-    hasOnAttackEffect &&
-    species.effect_type === 'swarm' &&
-    species.effect_value
-  ) {
-    rawDamage = baseDamage * species.effect_value
-  }
+  // Level bonus applies to the raw stat first
+  const leveledDamage = getLeveledStat(baseDamage, attacker.level)
 
+  // Swarm multiplies hits — applied before type effectiveness
+  const swarmMultiplier =
+    hasOnAttackEffect && species.effect_type === 'swarm' && species.effect_value
+      ? species.effect_value
+      : 1
+
+  const typeMultiplier = getTypeMultiplier(species.type, defender.species.type)
+
+  const rawDamage = Math.round(leveledDamage * swarmMultiplier * typeMultiplier)
   const { damage, wasAvoided, defenseNote } = applyPassiveDefense(
     rawDamage,
     defender,
   )
-
   const newDefenderHp = Math.max(0, defender.currentHp - damage)
 
   let logEntry: string
@@ -70,9 +70,9 @@ function resolveAttack(
     logEntry = `${species.name} used ${moveName}, but ${defenseType}`
   } else {
     logEntry = `${species.name} used ${moveName} for ${damage} damage!`
-    if (defenseNote) {
-      logEntry += ` ${defenseNote}`
-    }
+    if (typeMultiplier > 1) logEntry += " It's super effective!"
+    else if (typeMultiplier < 1) logEntry += ' Not very effective...'
+    if (defenseNote) logEntry += ` ${defenseNote}`
   }
 
   let attackerHpGain = 0
@@ -103,14 +103,11 @@ function resolveAttack(
   return { newDefenderHp, attackerHpGain, poisonInflicted, logEntry }
 }
 
-// --- Poison ticks at the start of whoever's turn it is, before their move resolves ---
 function tickPoison(hp: number, poison: BattleState['playerPoison']) {
   if (!poison) return { hp, poison: null, logEntry: null }
-
   const newHp = Math.max(0, hp - poison.damage)
   const remaining = poison.turnsRemaining - 1
   const logEntry = `Poison dealt ${poison.damage} damage!`
-
   return {
     hp: newHp,
     poison: remaining > 0 ? { ...poison, turnsRemaining: remaining } : null,
@@ -127,7 +124,6 @@ export const battleReducer = (
     case 'ATTACK_TWO': {
       if (state.turn !== 'player' || state.isGameOver) return state
 
-      // Step 1: poison ticks on the PLAYER first, since it's now their turn
       const tick = tickPoison(state.player.currentHp, state.playerPoison)
       const log = tick.logEntry ? [...state.log, tick.logEntry] : [...state.log]
 
@@ -142,7 +138,6 @@ export const battleReducer = (
         }
       }
 
-      // Step 2: resolve the actual attack, using the post-poison HP
       const playerAfterPoison = { ...state.player, currentHp: tick.hp }
       const move = action.type === 'ATTACK_TWO' ? 'two' : 'one'
       const result = resolveAttack(playerAfterPoison, state.ai, move)
@@ -169,7 +164,6 @@ export const battleReducer = (
     case 'AI_COUNTER': {
       if (state.turn !== 'ai' || state.isGameOver) return state
 
-      // Poison ticks on the AI first, since it's now their turn
       const tick = tickPoison(state.ai.currentHp, state.aiPoison)
       const log = tick.logEntry ? [...state.log, tick.logEntry] : [...state.log]
 
@@ -185,7 +179,6 @@ export const battleReducer = (
       }
 
       const aiAfterPoison = { ...state.ai, currentHp: tick.hp }
-      // Simple AI: randomly picks between its two moves, if a second one exists
       const move =
         aiAfterPoison.species.attack_two != null && Math.random() < 0.5
           ? 'two'
@@ -213,8 +206,17 @@ export const battleReducer = (
 
     case 'RESET': {
       return {
-        player: { ...state.player, currentHp: state.player.species.hp },
-        ai: { ...state.ai, currentHp: state.ai.species.hp },
+        player: {
+          ...state.player,
+          currentHp: getLeveledStat(
+            state.player.species.hp,
+            state.player.level,
+          ),
+        },
+        ai: {
+          ...state.ai,
+          currentHp: getLeveledStat(state.ai.species.hp, state.ai.level),
+        },
         turn: 'player',
         log: [],
         isGameOver: false,
@@ -225,10 +227,26 @@ export const battleReducer = (
     }
 
     case 'SET_OPPONENT': {
+      const leveledHp = getLeveledStat(action.species.hp, action.level)
       return {
         ...state,
-        ai: { species: action.species, currentHp: action.species.hp },
+        ai: {
+          species: action.species,
+          currentHp: leveledHp,
+          level: action.level,
+        },
         aiPoison: null,
+      }
+    }
+
+    case 'SET_PLAYER_LEVEL': {
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          level: action.level,
+          currentHp: getLeveledStat(state.player.species.hp, action.level),
+        },
       }
     }
 

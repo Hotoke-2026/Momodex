@@ -11,62 +11,52 @@ import '../styles/index.css'
 import '../styles/index.scss'
 import { useCheckAchievements } from '../hooks/useAchievements'
 import type { BattleState } from '../../models/battleTypes'
-import type { Card, Species } from '../../models/types'
+import type { Species } from '../../models/types'
 import { getCardsByUserId } from '../apis/cards'
+import { getCardLevel } from '../utils/getCardLevel'
+import { getAiLevel } from '../utils/getAiLevel'
 
-// player side is still a placeholder — real card selection is a separate ticket
 const tui: Species = {
   id: 'tui',
   name: 'Tūī',
   type: 'bird',
   hp: 20,
   attack: 14,
+  attack_name: 'Sharp Peck',
+  attack_two: 18,
+  attack_two_name: 'Aerial Dive',
   rarity: 'common',
   status: 'native',
   description: 'A native NZ bird known for its distinctive song.',
   fun_fact:
     'Tūī have two voice boxes, letting them sing two different notes at the same time.',
-  attack_name: '',
-  attack_two: null,
-  attack_two_name: null,
   effect_type: null,
   effect_value: null,
   effect_trigger: null,
 }
 
-// starting AI species — immediately replaced once the real random opponent loads
 const possum: Species = {
   id: 'possum',
   name: 'Common Brushtail Possum',
   type: 'mammal',
   hp: 32,
   attack: 17,
+  attack_name: 'Claw Swipe',
+  attack_two: 21,
+  attack_two_name: 'Vicious Bite',
   rarity: 'common',
   status: 'invasive',
   description: 'An invasive species that damages native forests.',
   fun_fact:
     'A single possum can eat around 21,000 leaves a year, stripping native trees bare over time.',
-  attack_name: '',
-  attack_two: null,
-  attack_two_name: null,
   effect_type: null,
   effect_value: null,
   effect_trigger: null,
 }
 
-const placeholderCard: Card = {
-  id: 0,
-  card_name: 'Placeholder Card',
-  user_id: 'test',
-  species_id: '',
-  image_url: '',
-  location: null,
-  created_at: new Date().toISOString(),
-}
-
 const initialState: BattleState = {
-  player: { species: tui, currentHp: tui.hp },
-  ai: { species: possum, currentHp: possum.hp },
+  player: { species: tui, currentHp: tui.hp, level: 1 },
+  ai: { species: possum, currentHp: possum.hp, level: 1 },
   turn: 'player',
   log: [],
   isGameOver: false,
@@ -85,10 +75,13 @@ const screenBattleReducer = (
   if (action.type === 'SET_PLAYER') {
     return {
       ...state,
-      player: { species: action.species, currentHp: action.species.hp },
+      player: {
+        ...state.player,
+        species: action.species,
+        currentHp: action.species.hp,
+      },
     }
   }
-
   return battleReducer(state, action)
 }
 
@@ -97,31 +90,23 @@ const CURRENT_USER_ID = 'user1'
 export function BattleScreen() {
   const navigate = useNavigate()
 
-  //fetch the player's own cards
   const cardsQuery = useQuery({
     queryKey: ['cards', CURRENT_USER_ID],
     queryFn: () => getCardsByUserId(CURRENT_USER_ID),
   })
 
-  //track which card the player picked, before battle starts
   const [selectedCardId, setSelectedCardId] = useState<number | null>(null)
 
-  // get the full species pool
   const speciesListQuery = useQuery({
     queryKey: ['species'],
     queryFn: getAllSpecies,
   })
 
-  //once the pool arrives, pick ONE random opponent id (only once)
-  const opponentId = useMemo(
-    () =>
-      speciesListQuery.data
-        ? getRandomOpponent(speciesListQuery.data).id
-        : null,
-    [speciesListQuery.data],
-  )
+  const opponentId = useMemo(() => {
+    if (!speciesListQuery.data) return null
+    return getRandomOpponent(speciesListQuery.data).id
+  }, [speciesListQuery.data])
 
-  // fetch full stats for that one chosen id
   const opponentSpeciesQuery = useQuery({
     queryKey: ['species', opponentId],
     queryFn: () => getSpeciesById(opponentId as string),
@@ -130,28 +115,38 @@ export function BattleScreen() {
 
   const [state, dispatch] = useReducer(screenBattleReducer, initialState)
 
-  // once the player picks a card, push it into battle state the same way
   const selectedEntry = cardsQuery.data?.find(
     (c) => c.card.id === selectedCardId,
   )
+
   useEffect(() => {
     if (selectedEntry) {
       dispatch({ type: 'SET_PLAYER', species: selectedEntry.species })
     }
   }, [selectedEntry])
 
-  // Step 3b: once the real opponent's full data arrives, swap it into battle state
+  // Once we have the selected card, the opponent, AND the full card list,
+  // compute real level from actual capture count and push both levels in.
   useEffect(() => {
-    if (opponentSpeciesQuery.data) {
-      dispatch({ type: 'SET_OPPONENT', species: opponentSpeciesQuery.data })
+    if (selectedEntry && opponentSpeciesQuery.data && cardsQuery.data) {
+      const playerCaptureCount = cardsQuery.data.filter(
+        (c) => c.card.species_id === selectedEntry.species.id,
+      ).length
+      const playerLevel = getCardLevel(playerCaptureCount)
+      const aiLevel = getAiLevel(playerLevel)
+
+      dispatch({ type: 'SET_PLAYER_LEVEL', level: playerLevel })
+      dispatch({
+        type: 'SET_OPPONENT',
+        species: opponentSpeciesQuery.data,
+        level: aiLevel,
+      })
     }
-  }, [opponentSpeciesQuery.data])
+  }, [selectedEntry, opponentSpeciesQuery.data, cardsQuery.data])
 
   const checkAchievementsMutation = useCheckAchievements(CURRENT_USER_ID)
   const hasSentBattleResult = useRef(false)
-
   useAiTurn(state, dispatch)
-
   const isPlayerTurn = state.turn === 'player' && !state.isGameOver
 
   useEffect(() => {
@@ -161,7 +156,6 @@ export function BattleScreen() {
     }
     if (hasSentBattleResult.current) return
     hasSentBattleResult.current = true
-
     checkAchievementsMutation.mutate({
       winner: state.winner,
       opponentWasInvasive: state.ai.species.status === 'invasive',
@@ -173,7 +167,6 @@ export function BattleScreen() {
     checkAchievementsMutation,
   ])
 
-  // Step 4: don't show the battle UI until user chooses card and the REAL opponent has loaded
   if (cardsQuery.isLoading) {
     return (
       <div className="battle-container">
@@ -199,7 +192,6 @@ export function BattleScreen() {
           <p className="battle-container__selection-subtitle">
             Pick a species from your collection to battle with.
           </p>
-
           <div className="battle-container__selection-grid">
             {cardsQuery.data?.map(({ card, species }) => (
               <button
@@ -216,7 +208,6 @@ export function BattleScreen() {
     )
   }
 
-  // don't proceed to battle UI until BOTH player and opponent have loaded
   if (
     speciesListQuery.isLoading ||
     !opponentSpeciesQuery.data ||
@@ -239,9 +230,7 @@ export function BattleScreen() {
           >
             Retreat
           </button>
-
           <h1 className="battle-container__title">BATTLE</h1>
-
           {state.turn === 'ai' && !state.isGameOver ? (
             <span className="battle-container__status-pill">
               Opponent is thinking...
@@ -260,16 +249,26 @@ export function BattleScreen() {
           </div>
           <div className="battle-container__grid">
             <CardFrame
-              card={selectedEntry.card} // user selected card
+              card={selectedEntry.card}
               species={state.player.species}
               currentHp={state.player.currentHp}
               compact={true}
+              level={state.player.level}
             />
             <CardFrame
-              card={placeholderCard}
+              card={{
+                id: 0,
+                card_name: state.ai.species.name,
+                user_id: 'ai',
+                species_id: state.ai.species.id,
+                image_url: '',
+                location: null,
+                created_at: new Date().toISOString(),
+              }}
               species={state.ai.species}
               currentHp={state.ai.currentHp}
               compact={true}
+              level={state.ai.level}
             />
           </div>
         </div>
