@@ -1,23 +1,81 @@
-//identify image using Gemini API
 import request from 'superagent'
 import type { Card } from '../../models/types'
 
 const rootURL = new URL(`/api/v1`, document.baseURI)
 
 export async function identifyPhoto(
-  file: File,
+  fileOrUrl: File | string,
   userId: string,
-  location?: string,
-) {
-  const req = request
-    .post(`${rootURL}/identify`)
-    .attach('image', file) // field name MUST match multer's upload.single('image')
-    .field('userId', userId)
+  locationOrToken: string | ((options?: object) => Promise<string>),
+  maybeToken?: (options?: object) => Promise<string>,
+): Promise<Card> {
+  try {
+    if (fileOrUrl instanceof File) {
+      const file = fileOrUrl
+      const location = typeof locationOrToken === 'string' ? locationOrToken : undefined
+      const getAccessTokenSilently = typeof locationOrToken === 'function' ? locationOrToken : maybeToken
 
-  if (location) {
-    req.field('location', location)
+      if (!getAccessTokenSilently) {
+        throw new Error('Authentication function is required')
+      }
+
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: 'https://api.momodex.com',
+        },
+      })
+
+      const req = request
+        .post(`${rootURL}/identify`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach('image', file)
+        .field('userId', userId)
+
+      if (location) {
+        req.field('location', location)
+      }
+
+      const response = await req
+      return response.body as Card
+    } else {
+      const imageUrl = fileOrUrl
+      const getAccessTokenSilently = locationOrToken as (options?: object) => Promise<string>
+
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: 'https://api.momodex.com',
+        },
+      })
+
+      const response = await request
+        .post(`${rootURL}/identify`)
+        .set('Authorization', `Bearer ${token}`)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .send({ imageUrl, userId })
+
+      return response.body as Card
+    }
+  } catch (err: unknown) {
+    const error = err as { response?: { body?: { error?: string } } }
+    throw new Error(error.response?.body?.error || 'Please log in to identify')
   }
+}
 
-  const response = await req
-  return response.body as Card
+export async function fetchUserById(
+  userId: string,
+  getAccessTokenSilently: (options?: object) => Promise<string>,
+) {
+  const token = await getAccessTokenSilently({
+    authorizationParams: {
+      audience: 'https://api.momodex.com',
+    },
+  })
+
+  const response = await request
+    .get(`${rootURL}/users/${userId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .set('Accept', 'application/json')
+
+  return response.body
 }

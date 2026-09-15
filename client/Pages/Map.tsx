@@ -1,4 +1,3 @@
-// Map page for displaying sightings on a Leaflet map
 import { useMemo, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -33,7 +32,7 @@ export function MapPage() {
 
       const days = DATE_RANGES[dateRange].days
       if (days !== null) {
-        if (!pin.observedOn) return false // unknown date can't satisfy a date filter
+        if (!pin.observedOn) return false
         const cutoff = new Date()
         cutoff.setDate(cutoff.getDate() - days)
         if (new Date(pin.observedOn) < cutoff) return false
@@ -60,7 +59,7 @@ export function MapPage() {
         <select
           value={speciesFilter}
           onChange={(e) => setSpeciesFilter(e.target.value)}
-          className="rounded-md border border-(--color-tan)] bg-[color:var(--color-surface) px-3 py-1.5 text-sm"
+          className="rounded-md border border-(--color-tan) bg-(--color-surface) px-3 py-1.5 text-sm"
         >
           <option value="all">All species</option>
           {speciesOptions.map((name) => (
@@ -85,14 +84,14 @@ export function MapPage() {
 
       <div className="px-6 pb-8">
         {isLoading && (
-          <p className="text-(--color-text-soft)]">Loading sightings...</p>
+          <p className="text-(--color-text-soft)">Loading sightings...</p>
         )}
         {isError && (
-          <p className="text-(--color-red)]">Couldn&apos;t load map data.</p>
+          <p className="text-(--color-red)">Couldn&apos;t load map data.</p>
         )}
 
         {!isLoading && !isError && (
-          <div className="overflow-hidden rounded-xl border border-(--color-tan)] shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-(--color-tan) shadow-sm">
             <MapContainer
               center={[-41.3, 174.8]}
               zoom={5}

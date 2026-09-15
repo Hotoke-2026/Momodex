@@ -2,8 +2,7 @@
 import { NavLink } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '../apis/users'
-
-const CURRENT_USER_ID = 'user1' // hardcoded until real auth exists
+import { useAuth0 } from '@auth0/auth0-react'
 
 const links = [
   { to: '/', label: 'Home', icon: '🏠' },
@@ -13,9 +12,24 @@ const links = [
 ]
 
 export function NavBar() {
+  const {
+    isAuthenticated,
+    user: auth0User,
+    loginWithRedirect,
+    logout,
+    getAccessTokenSilently,
+  } = useAuth0()
+
+  const userId = auth0User?.sub
+
   const { data: user } = useQuery({
-    queryKey: ['user', CURRENT_USER_ID],
-    queryFn: () => getUserById(CURRENT_USER_ID),
+    queryKey: ['user', userId],
+    queryFn: () =>
+      getUserById(userId!, getAccessTokenSilently, {
+        name: auth0User?.name,
+        picture: auth0User?.picture,
+      }),
+    enabled: isAuthenticated && !!userId,
   })
 
   return (
@@ -55,17 +69,42 @@ export function NavBar() {
             }`
           }
         >
-          {/* TODO: replace initial-letter placeholder with a real profile icon/avatar */}
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white">
-            {user?.name?.[0] ?? '?'}
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white overflow-hidden">
+            {auth0User?.picture ? (
+              <img
+                src={auth0User.picture}
+                alt="Avatar"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              (user?.name?.[0] ?? auth0User?.name?.[0] ?? '?')
+            )}
           </div>
           <span className="text-sm font-medium text-(--color-text)">
-            {user?.name ?? 'Loading...'}
+            {user?.name ?? auth0User?.name ?? 'Log in please...'}
           </span>
         </NavLink>
-        <button className="text-sm font-medium text-(--color-red)">
-          Log out
-        </button>
+        {isAuthenticated ? (
+          <button
+            onClick={() =>
+              logout({ logoutParams: { returnTo: window.location.origin } })
+            }
+            className="text-sm font-medium text-(--color-red) hover:underline"
+          >
+            Log out
+          </button>
+        ) : (
+          <button
+            onClick={() =>
+              loginWithRedirect({
+                appState: { targetUrl: window.location.pathname },
+              })
+            }
+            className="text-sm font-medium text-(--color-green) hover:underline"
+          >
+            Log in
+          </button>
+        )}
       </div>
     </nav>
   )

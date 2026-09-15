@@ -1,24 +1,27 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useAuth0 } from '@auth0/auth0-react'
 import { CardFrame } from '../components/CardFrame.tsx'
 import { getCardsByUserId } from '../apis/cards.ts'
 import { NavBar } from '../components/NavBar'
 import '../styles/index.css'
 import { Footer } from '../components/Footer.tsx'
 
-const CURRENT_USER_ID = 'user1'
-
 export function Deck() {
+  const { user: auth0User, isAuthenticated, isLoading: isAuthLoading, getAccessTokenSilently } = useAuth0()
+  const userId = auth0User?.sub
+
   const [typeFilter, setTypeFilter] = useState('all')
 
   const {
     data: cards,
-    isLoading,
+    isLoading: isCardsLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ['cards', CURRENT_USER_ID],
-    queryFn: () => getCardsByUserId(CURRENT_USER_ID),
+    queryKey: ['cards', userId],
+    queryFn: () => getCardsByUserId(userId!, getAccessTokenSilently),
+    enabled: isAuthenticated && !!userId,
   })
 
   const types = useMemo(
@@ -40,22 +43,54 @@ export function Deck() {
     cards?.filter((c) => c.species.status.toLowerCase() === 'invasive')
       .length ?? 0
 
-  if (isLoading) {
+  if (isAuthLoading) {
     return (
-      <p className="p-6 font-body text-(--color-text-soft)">
-        Loading your deck...
-      </p>
+      <div className="min-h-screen">
+        <NavBar />
+        <p className="p-6 font-body text-(--color-text-soft)">
+          Loading session...
+        </p>
+      </div>
     )
   }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen">
+        <NavBar />
+        <p className="p-6 text-(--color-text-soft)">
+          Please log in to view your card deck.
+        </p>
+      </div>
+    )
+  }
+
+  if (isCardsLoading) {
+    return (
+      <div className="min-h-screen">
+        <NavBar />
+        <p className="p-6 font-body text-(--color-text-soft)">
+          Loading your deck...
+        </p>
+      </div>
+    )
+  }
+
   if (isError) {
-    return <p className="p-6 text-(--color-red)">{error.message}</p>
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
+    return (
+      <div className="min-h-screen">
+        <NavBar />
+        <p className="p-6 text-(--color-red)">{errorMessage}</p>
+      </div>
+    )
   }
 
   return (
     <><div className="min-h-screen">
       <NavBar />
 
-      <header className="app-header">
+      <header className="app-header px-6 py-4">
         <h1 className="font-display text-(length:--text-heading-md) font-black text-(--color-text)">
           Your Card Deck
         </h1>

@@ -16,10 +16,10 @@ describe('CardFrame Component', () => {
     rarity: 'rare',
     status: 'threatened',
     description: 'Pecks at anything shiny it can find.',
-    fun_fact: 'Kea are known for their intelligence and curiosity.',
+    fun_fact: '',
     effect_type: null,
     effect_value: null,
-    effect_trigger: null,
+    effect_trigger: null
   }
 
   const mockCard: Card = {

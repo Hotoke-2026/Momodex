@@ -5,17 +5,13 @@ import { updateProfileFields } from '../apis/users'
 import { ProfileAvatar } from './ProfileAvatar'
 import { BattleStatsCard } from './BattleStatsCard'
 import type { User, BattleStats, LastCapture } from '../../models/types'
+import { useAuth0 } from '@auth0/auth0-react'
 
 interface ProfileCardProps {
   userId: string
   user?: User
   battleStats?: BattleStats
   lastCapture?: LastCapture | null
-}
-
-type ProfileUser = User & {
-  favourite_species?: string
-  currently_seeking?: string
 }
 
 function formatDate(value?: string | null) {
@@ -28,24 +24,29 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
   const [favouriteDraft, setFavouriteDraft] = useState('')
   const [seekingDraft, setSeekingDraft] = useState('')
   const queryClient = useQueryClient()
+  const { getAccessTokenSilently } = useAuth0()
 
   const { data: speciesList } = useQuery({
     queryKey: ['species-list'],
-    queryFn: getAllSpecies,
+    queryFn: () => getAllSpecies(),
     enabled: isEditing,
   })
 
   const saveMutation = useMutation({
-    mutationFn: () =>
-      updateProfileFields(userId, {
+  mutationFn: () =>
+    updateProfileFields(
+      userId,
+      {
         favourite_species: favouriteDraft || user?.favourite_species || '',
         currently_seeking: seekingDraft || user?.currently_seeking || '',
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', userId] })
-      setIsEditing(false)
-    },
-  })
+      },
+      getAccessTokenSilently
+    ),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['user', userId] })
+    setIsEditing(false)
+  },
+})
 
   const startEditing = () => {
     setFavouriteDraft(user?.favourite_species ?? '')

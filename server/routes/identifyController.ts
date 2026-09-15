@@ -6,13 +6,18 @@ import { insertCard } from '../services/cardsService'
 import { checkAchievements } from '../services/achievementsService.ts'
 
 export async function identifyController(req: Request, res: Response) {
-  const { userId, location } = req.body
+  const userId = req.auth?.payload?.sub
+  const { location } = req.body
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized: please log in' })
+  }
+  
   const file = req.file
 
   // Step 1: validate BEFORE a bad request reaches Gemini —
   // saves an API call, and gives a much clearer error
-  if (!file || !userId) {
-    return res.status(400).json({ error: 'image file and userId are required' })
+  if (!file) {
+    return res.status(400).json({ error: 'image file is required' })
   }
 
   try {

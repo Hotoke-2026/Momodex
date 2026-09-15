@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import multer from 'multer'
 import { identifyController } from './identifyController'
+import { checkJwt } from '../middleware/authMiddleware'
 
 const router = Router()
 
@@ -9,6 +10,6 @@ const router = Router()
 // Cloudinary, there's no reason to touch the filesystem at all.
 const upload = multer({ storage: multer.memoryStorage() })
 
-router.post('/', upload.single('image'), identifyController)
+router.post('/', checkJwt, upload.single('image'), identifyController)
 
 export default router

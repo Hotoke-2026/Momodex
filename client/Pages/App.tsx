@@ -1,15 +1,24 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { CardFrame } from '../components/CardFrame'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { useAuth0 } from '@auth0/auth0-react'
 import { NavBar } from '../components/NavBar'
 import { Footer } from '../components/Footer'
 import { useIdentifyPhoto } from '../hooks/useIdentifyPhoto'
-import { getSpeciesById } from '../apis/species'
+import { getSpeciesById } from '../apis/species.ts'
+import { identifyPhoto } from '../apis/identify.ts'
+import { CardFrame } from '../components/CardFrame.tsx'
+import '../styles/index.css'
+
+const TUI_TEST_IMAGE_URL =
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg/250px-Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg'
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [location, setLocation] = useState('')
+
+  const { isAuthenticated, user: auth0User, getAccessTokenSilently, loginWithRedirect } = useAuth0()
+  const userId = auth0User?.sub ?? 'test'
 
   const identifyMutation = useIdentifyPhoto()
 
