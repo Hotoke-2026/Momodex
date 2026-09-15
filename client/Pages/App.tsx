@@ -345,9 +345,7 @@ function App() {
           </div>
 
           <div className="relative z-10 mx-auto max-w-3xl text-center flex flex-col items-center">
-            <span className="text-xs font-bold tracking-widest text-(--color-green) uppercase mb-3">
-              Rare Species Focus
-            </span>
+            
 
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
               Every Sight Counts for Aotearoa’s Wildlife
