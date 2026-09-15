@@ -4,6 +4,7 @@ import { CardFrame } from '../components/CardFrame.tsx'
 import { getCardsByUserId } from '../apis/cards.ts'
 import { NavBar } from '../components/NavBar'
 import '../styles/index.css'
+import { Footer } from '../components/Footer.tsx'
 
 const CURRENT_USER_ID = 'user1'
 
@@ -51,7 +52,7 @@ export function Deck() {
   }
 
   return (
-    <div className="min-h-screen">
+    <><div className="min-h-screen">
       <NavBar />
 
       <header className="app-header">
@@ -104,5 +105,6 @@ export function Deck() {
         </main>
       </div>
     </div>
+    <Footer /></>
   )
 }
