@@ -37,14 +37,42 @@ body {
     margin: 0;
   }
 
-  &__rarity {
+    &__rarity {
     font-size: 0.75rem;
-    color: #4e4538; //color-text-soft
+    color: #4e4538;
     border: 1px solid #c4b89a;
     border-radius: 0.25rem;
     padding: 0.1rem 0.3rem;
     text-transform: capitalize;
     margin-left: auto;
+
+    // Common — Pebble: unchanged, matches Level 1's "no flourish" philosophy
+    &--common {
+      color: #4e4538;
+      border-color: #c4b89a;
+    }
+
+   // Rare — Pounamu: NZ greenstone, jade green, pulsing glow
+    &--rare {
+      background-color: #d1fae5;
+      color: #065f46;
+      border-color: #10b981;
+      font-weight: 700;
+      animation: pounamu-pulse 2.5s ease-in-out infinite;
+    }
+
+    // Legendary — Aurora: shifting green/purple/pink glow, like the
+    // Aurora Australis — the most dramatic tier, animated on two axes
+    &--legendary {
+      background: linear-gradient(120deg, #6ee7b7, #a78bfa, #f9a8d4, #6ee7b7);
+      background-size: 300% 100%;
+      color: #1e1b4b;
+      border-color: #a78bfa;
+      font-weight: 700;
+      animation:
+        aurora-shift 4s ease-in-out infinite,
+        aurora-glow 2s ease-in-out infinite;
+    }
   }
 
   &__hp {
@@ -293,6 +321,31 @@ body {
   }
   50% {
     box-shadow: 0 0 16px rgba(124, 58, 237, 0.8);
+  }
+}
+@keyframes aurora-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes aurora-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(167, 139, 250, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(167, 139, 250, 0.8);
+  }
+}
+@keyframes pounamu-pulse {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.8);
   }
 }
 
