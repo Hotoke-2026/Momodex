@@ -1,4 +1,5 @@
 import type { BattleState, BattleAction } from '../../models/battleTypes'
+import { getLeveledStat } from '../utils/getLeveledStat'
 
 export const battleReducer = (
   state: BattleState,
@@ -10,7 +11,10 @@ export const battleReducer = (
         return state // ignore if it's not the player's turn or the game is over
       }
       // this determines how much damage the player does to the AI
-      const damage = state.player.species.attack
+      const damage = getLeveledStat(
+        state.player.species.attack,
+        state.player.level,
+      )
       // this determines the new HP of the AI after taking damage
       const newAiHp = Math.max(0, state.ai.currentHp - damage)
       const logEntry = `${state.player.species.name} attacks ${state.ai.species.name} for ${damage} damage!`
@@ -34,7 +38,7 @@ export const battleReducer = (
         return state // ignore if it's not the AI's turn or the game is over
       }
       // this determines how much damage the AI does to the player
-      const damage = state.ai.species.attack
+      const damage = getLeveledStat(state.ai.species.attack, state.ai.level)
       // this determines the new HP of the player after taking damage
       const newPlayerHp = Math.max(0, state.player.currentHp - damage)
       const logEntry = `${state.ai.species.name} attacks ${state.player.species.name} for ${damage} damage!`
@@ -54,10 +58,18 @@ export const battleReducer = (
       }
     }
     case 'RESET': {
-      // reset the battle state to the initial state
       return {
-        player: { ...state.player, currentHp: state.player.species.hp },
-        ai: { ...state.ai, currentHp: state.ai.species.hp },
+        player: {
+          ...state.player,
+          currentHp: getLeveledStat(
+            state.player.species.hp,
+            state.player.level,
+          ),
+        },
+        ai: {
+          ...state.ai,
+          currentHp: getLeveledStat(state.ai.species.hp, state.ai.level),
+        },
         turn: 'player',
         log: [],
         isGameOver: false,
@@ -65,9 +77,14 @@ export const battleReducer = (
       }
     }
     case 'SET_OPPONENT': {
+      const leveledHp = getLeveledStat(action.species.hp, action.level)
       return {
         ...state,
-        ai: { species: action.species, currentHp: action.species.hp },
+        ai: {
+          species: action.species,
+          currentHp: leveledHp,
+          level: action.level,
+        },
       }
     }
 

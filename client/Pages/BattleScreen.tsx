@@ -12,6 +12,9 @@ import '../styles/index.scss'
 import { useCheckAchievements } from '../hooks/useAchievements'
 import type { BattleState } from '../../models/battleTypes'
 import type { Card, Species } from '../../models/types'
+import { getCardsByUserId } from '../apis/cards'
+import { getCardLevel } from '../utils/getCardLevel'
+import { getAiLevel } from '../utils/getAiLevel'
 
 // player side is still a placeholder — real card selection is a separate ticket
 const tui: Species = {
@@ -52,8 +55,8 @@ const placeholderCard: Card = {
 }
 
 const initialState: BattleState = {
-  player: { species: tui, currentHp: tui.hp },
-  ai: { species: possum, currentHp: possum.hp },
+  player: { species: tui, currentHp: tui.hp, level: 1 },
+  ai: { species: possum, currentHp: possum.hp, level: 1 },
   turn: 'player',
   log: [],
   isGameOver: false,
@@ -87,14 +90,33 @@ export function BattleScreen() {
     enabled: !!opponentId,
   })
 
+  // Step 3c: fetch the user's cards so we can count captures per species
+  const userCardsQuery = useQuery({
+    queryKey: ['cards', CURRENT_USER_ID],
+    queryFn: () => getCardsByUserId(CURRENT_USER_ID),
+  })
+
   const [state, dispatch] = useReducer(battleReducer, initialState)
 
-  // Step 3b: once the real opponent's full data arrives, swap it into battle state
+  // Step 3b: once the real opponent's full data arrives, compute its level from
+  // how many times the player has already captured that species, then swap it
+  // into battle state — this is what makes the AI scale with player progress.
   useEffect(() => {
-    if (opponentSpeciesQuery.data) {
-      dispatch({ type: 'SET_OPPONENT', species: opponentSpeciesQuery.data })
+    if (opponentSpeciesQuery.data && userCardsQuery.data) {
+      // count how many times the player has captured THEIR species (tui, for now)
+      const playerCaptureCount = userCardsQuery.data.filter(
+        (c) => c.card.species_id === tui.id,
+      ).length
+      const playerLevel = getCardLevel(playerCaptureCount)
+      const aiLevel = getAiLevel(playerLevel)
+
+      dispatch({
+        type: 'SET_OPPONENT',
+        species: opponentSpeciesQuery.data,
+        level: aiLevel,
+      })
     }
-  }, [opponentSpeciesQuery.data])
+  }, [opponentSpeciesQuery.data, userCardsQuery.data])
 
   const checkAchievementsMutation = useCheckAchievements(CURRENT_USER_ID)
   const hasSentBattleResult = useRef(false)
@@ -122,8 +144,13 @@ export function BattleScreen() {
     checkAchievementsMutation,
   ])
 
-  // Step 4: don't show the battle UI until the REAL opponent has loaded
-  if (speciesListQuery.isLoading || !opponentSpeciesQuery.data) {
+  // Step 4: don't show the battle UI until the REAL opponent (with its real
+  // level) and the user's cards have both loaded
+  if (
+    speciesListQuery.isLoading ||
+    !opponentSpeciesQuery.data ||
+    userCardsQuery.isLoading
+  ) {
     return (
       <div className="battle-container">
         <p>Finding an opponent...</p>
@@ -166,12 +193,14 @@ export function BattleScreen() {
               species={state.player.species}
               currentHp={state.player.currentHp}
               compact={true}
+              level={state.player.level}
             />
             <CardFrame
               card={placeholderCard}
               species={state.ai.species}
               currentHp={state.ai.currentHp}
               compact={true}
+              level={state.ai.level}
             />
           </div>
         </div>
