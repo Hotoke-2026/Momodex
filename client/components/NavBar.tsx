@@ -12,7 +12,13 @@ const links = [
 ]
 
 export function NavBar() {
-  const { isAuthenticated, user: auth0User, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0()
+  const {
+    isAuthenticated,
+    user: auth0User,
+    loginWithRedirect,
+    logout,
+    getAccessTokenSilently,
+  } = useAuth0()
 
   const userId = auth0User?.sub
 
@@ -63,38 +69,37 @@ export function NavBar() {
             }`
           }
         >
-          {/* TODO: replace initial-letter placeholder with a real profile icon/avatar */}
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white">
-            {user?.name?.[0] ?? '?'}
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white overflow-hidden">
+            {auth0User?.picture ? (
+              <img
+                src={auth0User.picture}
+                alt="Avatar"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              (user?.name?.[0] ?? auth0User?.name?.[0] ?? '?')
+            )}
           </div>
           <span className="text-sm font-medium text-(--color-text)">
-            {user?.name ?? 'Loading...'}
+            {user?.name ?? auth0User?.name ?? 'Log in please...'}
           </span>
         </NavLink>
         {isAuthenticated ? (
-          <>
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white overflow-hidden">
-              {auth0User?.picture ? (
-                <img src={auth0User.picture} alt="Avatar" className="h-full w-full object-cover" />
-              ) : (
-                user?.name?.[0] ?? auth0User?.name?.[0] ?? '?'
-              )}
-            </div>
-            <span className="text-sm font-medium text-(--color-text)">
-              {user?.name ?? auth0User?.name ?? 'Loading...'}
-            </span>
-            <button 
-              onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
-              className="text-sm font-medium text-(--color-red) hover:underline"
-            >
-              Log out
-            </button>
-          </>
+          <button
+            onClick={() =>
+              logout({ logoutParams: { returnTo: window.location.origin } })
+            }
+            className="text-sm font-medium text-(--color-red) hover:underline"
+          >
+            Log out
+          </button>
         ) : (
-          <button 
-            onClick={() => loginWithRedirect({
-              appState: { targetUrl: window.location.pathname }
-            })}
+          <button
+            onClick={() =>
+              loginWithRedirect({
+                appState: { targetUrl: window.location.pathname },
+              })
+            }
             className="text-sm font-medium text-(--color-green) hover:underline"
           >
             Log in
