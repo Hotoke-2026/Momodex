@@ -18,5 +18,8 @@ export type BattleAction =
   | { type: 'ATTACK' }
   | { type: 'AI_COUNTER' }
   | { type: 'RESET' }
-  | { type: 'SET_OPPONENT'; species: Species; level: number }
+  | { type: 'SET_OPPONENT'; species: Species; level: number } // the player attacks, the AI counterattacks, or the battle is reset
   | { type: 'SET_PLAYER_LEVEL'; level: number }
+
+export type SpeciesType =
+  'bird' | 'herp' | 'insect' | 'plant' | 'fungi' | 'mammal'
