@@ -8,9 +8,6 @@ import { getSpeciesById } from '../apis/species.ts'
 import { CardFrame } from '../components/CardFrame.tsx'
 import '../styles/index.css'
 
-const TUI_TEST_IMAGE_URL =
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg/250px-Tui_%28Prosthemadera_novaeseelandiae%29_Tiritiri_Matangi.jpg'
-
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -129,9 +126,9 @@ function App() {
                 Conservation in Aotearoa
               </h2>
               <p className="text-sm text-(--color-text-soft) mt-2 leading-relaxed">
-                New Zealand's long isolation produced unique ecosystems. Over
-                80% of native insects, birds, and plants are found nowhere else
-                on Earth.
+                New Zealand&apos;s long isolation produced unique ecosystems.
+                Over 80% of native insects, birds, and plants are found nowhere
+                else on Earth.
               </p>
             </div>
 
@@ -495,7 +492,7 @@ function App() {
                 <p className="text-xs text-(--color-text-soft) leading-relaxed">
                   By turning field data into interactive gameplay, everyday
                   citizen science directly fuels engagement and awareness for
-                  New Zealand's biodiversity.
+                  New Zealand&apos;s biodiversity.
                 </p>
               </div>
             </div>
