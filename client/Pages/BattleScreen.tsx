@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { battleReducer } from '../utils/battleReducer'
 import { useNavigate } from 'react-router'
 import { MatchResultLayout } from '../components/MatchResultLayout'
@@ -11,12 +11,12 @@ import '../styles/index.css'
 import '../styles/index.scss'
 import { useCheckAchievements } from '../hooks/useAchievements'
 import type { BattleState } from '../../models/battleTypes'
-import type { Card, Species } from '../../models/types'
+import type { Species } from '../../models/types'
 import { getCardsByUserId } from '../apis/cards'
 import { getCardLevel } from '../utils/getCardLevel'
 import { getAiLevel } from '../utils/getAiLevel'
+import { TypeChart } from '../components/TypeChart'
 
-// player side is still a placeholder — real card selection is a separate ticket
 const tui: Species = {
   id: 'tui',
   name: 'Tūī',
@@ -36,7 +36,6 @@ const tui: Species = {
   effect_trigger: null,
 }
 
-// starting AI species — immediately replaced once the real random opponent loads
 const possum: Species = {
   id: 'possum',
   name: 'Common Brushtail Possum',
@@ -56,16 +55,6 @@ const possum: Species = {
   effect_trigger: null,
 }
 
-const placeholderCard: Card = {
-  id: 0,
-  card_name: 'Placeholder Card',
-  user_id: 'test',
-  species_id: '',
-  image_url: '',
-  location: null,
-  created_at: new Date().toISOString(),
-}
-
 const initialState: BattleState = {
   player: { species: tui, currentHp: tui.hp, level: 1 },
   ai: { species: possum, currentHp: possum.hp, level: 1 },
@@ -73,6 +62,28 @@ const initialState: BattleState = {
   log: [],
   isGameOver: false,
   winner: null,
+  playerPoison: null,
+  aiPoison: null,
+}
+
+type BattleAction =
+  Parameters<typeof battleReducer>[1] | { type: 'SET_PLAYER'; species: Species }
+
+const screenBattleReducer = (
+  state: BattleState,
+  action: BattleAction,
+): BattleState => {
+  if (action.type === 'SET_PLAYER') {
+    return {
+      ...state,
+      player: {
+        ...state.player,
+        species: action.species,
+        currentHp: action.species.hp,
+      },
+    }
+  }
+  return battleReducer(state, action)
 }
 
 const CURRENT_USER_ID = 'user1'
@@ -80,12 +91,20 @@ const CURRENT_USER_ID = 'user1'
 export function BattleScreen() {
   const navigate = useNavigate()
 
+  const cardsQuery = useQuery({
+    queryKey: ['cards', CURRENT_USER_ID],
+    queryFn: () => getCardsByUserId(CURRENT_USER_ID),
+  })
+
+  const [showTypeChart, setShowTypeChart] = useState(false)
+
+  const [selectedCardId, setSelectedCardId] = useState<number | null>(null)
+
   const speciesListQuery = useQuery({
     queryKey: ['species'],
     queryFn: getAllSpecies,
   })
 
-  // pure derivation from already-loaded data — no effect/setState needed
   const opponentId = useMemo(() => {
     if (!speciesListQuery.data) return null
     return getRandomOpponent(speciesListQuery.data).id
@@ -97,20 +116,24 @@ export function BattleScreen() {
     enabled: !!opponentId,
   })
 
-  const userCardsQuery = useQuery({
-    queryKey: ['cards', CURRENT_USER_ID],
-    queryFn: () => getCardsByUserId(CURRENT_USER_ID),
-  })
+  const [state, dispatch] = useReducer(screenBattleReducer, initialState)
 
-  const [state, dispatch] = useReducer(battleReducer, initialState)
+  const selectedEntry = cardsQuery.data?.find(
+    (c) => c.card.id === selectedCardId,
+  )
 
-  // Once the opponent's data AND the user's cards have both loaded, compute
-  // the PLAYER's level from real capture counts, derive the AI's level from
-  // that, and apply both to battle state.
   useEffect(() => {
-    if (opponentSpeciesQuery.data && userCardsQuery.data) {
-      const playerCaptureCount = userCardsQuery.data.filter(
-        (c) => c.card.species_id === tui.id,
+    if (selectedEntry) {
+      dispatch({ type: 'SET_PLAYER', species: selectedEntry.species })
+    }
+  }, [selectedEntry])
+
+  // Once we have the selected card, the opponent, AND the full card list,
+  // compute real level from actual capture count and push both levels in.
+  useEffect(() => {
+    if (selectedEntry && opponentSpeciesQuery.data && cardsQuery.data) {
+      const playerCaptureCount = cardsQuery.data.filter(
+        (c) => c.card.species_id === selectedEntry.species.id,
       ).length
       const playerLevel = getCardLevel(playerCaptureCount)
       const aiLevel = getAiLevel(playerLevel)
@@ -122,13 +145,11 @@ export function BattleScreen() {
         level: aiLevel,
       })
     }
-  }, [opponentSpeciesQuery.data, userCardsQuery.data])
+  }, [selectedEntry, opponentSpeciesQuery.data, cardsQuery.data])
 
   const checkAchievementsMutation = useCheckAchievements(CURRENT_USER_ID)
   const hasSentBattleResult = useRef(false)
-
   useAiTurn(state, dispatch)
-
   const isPlayerTurn = state.turn === 'player' && !state.isGameOver
 
   useEffect(() => {
@@ -138,7 +159,6 @@ export function BattleScreen() {
     }
     if (hasSentBattleResult.current) return
     hasSentBattleResult.current = true
-
     checkAchievementsMutation.mutate({
       winner: state.winner,
       opponentWasInvasive: state.ai.species.status === 'invasive',
@@ -150,10 +170,80 @@ export function BattleScreen() {
     checkAchievementsMutation,
   ])
 
+  if (cardsQuery.isLoading) {
+    return (
+      <div className="battle-container">
+        <p>Loading your deck...</p>
+      </div>
+    )
+  }
+  if (cardsQuery.isError) {
+    return (
+      <div className="battle-container">
+        <p>Couldn&apos;t load your deck.</p>
+      </div>
+    )
+  }
+
+  if (!selectedCardId) {
+    return (
+      <div className="battle-container">
+        <div className="battle-container__selection">
+          <h1 className="battle-container__selection-title">
+            Choose your card
+          </h1>
+
+          {opponentSpeciesQuery.data ? (
+            <div className="battle-container__opponent-preview">
+              <p className="battle-container__opponent-preview-label">
+                Your opponent:
+              </p>
+              <p className="battle-container__opponent-preview-name">
+                {opponentSpeciesQuery.data.name}
+                <span className="battle-container__opponent-preview-type">
+                  {' '}
+                  ({opponentSpeciesQuery.data.type})
+                </span>
+              </p>
+            </div>
+          ) : (
+            <p className="battle-container__selection-subtitle">
+              Finding an opponent...
+            </p>
+          )}
+
+          <button
+            className="battle-container__type-chart-toggle"
+            onClick={() => setShowTypeChart((prev) => !prev)}
+          >
+            {showTypeChart ? 'Hide type chart' : 'View type chart'}
+          </button>
+
+          {showTypeChart && <TypeChart />}
+
+          <p className="battle-container__selection-subtitle">
+            Pick a species from your collection to battle with.
+          </p>
+
+          <div className="battle-container__selection-grid">
+            {cardsQuery.data?.map(({ card, species }) => (
+              <button
+                key={card.id}
+                onClick={() => setSelectedCardId(card.id)}
+                className="battle-container__selection-card-btn"
+              >
+                <CardFrame card={card} species={species} compact />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
   if (
     speciesListQuery.isLoading ||
     !opponentSpeciesQuery.data ||
-    userCardsQuery.isLoading
+    !selectedEntry
   ) {
     return (
       <div className="battle-container">
@@ -172,9 +262,7 @@ export function BattleScreen() {
           >
             Retreat
           </button>
-
           <h1 className="battle-container__title">BATTLE</h1>
-
           {state.turn === 'ai' && !state.isGameOver ? (
             <span className="battle-container__status-pill">
               Opponent is thinking...
@@ -193,14 +281,22 @@ export function BattleScreen() {
           </div>
           <div className="battle-container__grid">
             <CardFrame
-              card={placeholderCard}
+              card={selectedEntry.card}
               species={state.player.species}
               currentHp={state.player.currentHp}
               compact={true}
               level={state.player.level}
             />
             <CardFrame
-              card={placeholderCard}
+              card={{
+                id: 0,
+                card_name: state.ai.species.name,
+                user_id: 'ai',
+                species_id: state.ai.species.id,
+                image_url: '',
+                location: null,
+                created_at: new Date().toISOString(),
+              }}
               species={state.ai.species}
               currentHp={state.ai.currentHp}
               compact={true}
@@ -217,9 +313,36 @@ export function BattleScreen() {
               onClick={() => dispatch({ type: 'ATTACK' })}
               disabled={!isPlayerTurn}
             >
-              <div className="move-title">Wing Attack</div>
+              <div className="move-title">
+                {state.player.species.attack_name || 'Attack'}
+              </div>
               <div className="move-dmg">{state.player.species.attack} DMG</div>
             </button>
+
+            {state.player.species.attack_two != null && (
+              <button
+                className="battle-container__move-btn"
+                onClick={() => dispatch({ type: 'ATTACK_TWO' })}
+                disabled={!isPlayerTurn}
+              >
+                <div className="move-title">
+                  {state.player.species.attack_two_name}
+                </div>
+                <div className="move-dmg">
+                  {state.player.species.attack_two} DMG
+                </div>
+                {state.player.species.effect_type && (
+                  <div className="move-effect">
+                    {state.player.species.effect_type === 'poison' &&
+                      '☠️ Poison'}
+                    {state.player.species.effect_type === 'lifesteal' &&
+                      '💚 Lifesteal'}
+                    {state.player.species.effect_type === 'swarm' &&
+                      '⚡ Double Hit'}
+                  </div>
+                )}
+              </button>
+            )}
           </div>
         </div>
 

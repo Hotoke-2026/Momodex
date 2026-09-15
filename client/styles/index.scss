@@ -435,10 +435,11 @@ body {
   }
 
   &__moves-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
+  display: grid;
+  grid-template-columns: 1fr; 
+  max-width: 280px;            // keeps buttons from stretching full width
+  gap: 0.75rem;
+}
 
   &__move-btn {
     background-color: #7a1f12;
@@ -493,6 +494,121 @@ body {
       gap: 0.25rem;
     }
   }
+
+    &__selection {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  &__selection-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    letter-spacing: 2px;
+    font-weight: var(--font-weight-heading-bold);
+  }
+
+  &__selection-subtitle {
+    margin: 0.5rem 0 0 0;
+    color: #d4e7d1;
+    font-size: var(--text-body-xsm);
+  }
+
+ &__selection-grid {
+  margin-top: 2rem;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); // fixed 3 columns, not auto-fill
+  gap: 1.25rem;
+}
+
+  &__selection-card-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: transform 0.15s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-red);
+      outline-offset: 2px;
+    }
+  }
+  &__opponent-preview {
+  margin-top: 1rem;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-dark);
+  border-radius: 8px;
+}
+
+&__opponent-preview-label {
+  margin: 0;
+  font-size: var(--text-body-xsm);
+  color: #8fae8a;
+}
+
+&__opponent-preview-name {
+  margin: 0.25rem 0 0 0;
+  font-family: var(--font-display);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-heading-bold);
+}
+
+&__opponent-preview-type {
+  font-weight: var(--font-weight-body-regular);
+  text-transform: capitalize;
+  color: #d4e7d1;
+}
+&__type-chart {
+  margin-top: 1rem;
+  background-color: var(--color-dark);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: left;
+}
+
+&__type-chart-title {
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-display);
+  font-size: var(--text-body-md);
+  color: #8fae8a;
+}
+
+&__type-chart-note {
+  font-size: var(--text-body-xsm);
+  color: #d4e7d1;
+  margin: 0.25rem 0;
+}
+
+&__type-chart-warning {
+  color: #e8b4a0;
+}
+
+&__type-chart-toggle {
+  background-color: #3e6b38;
+  color: #d4e7d1;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: var(--text-body-xsm);
+  font-weight: var(--font-weight-body-bold);
+  margin-top: 1rem;
+
+  &:hover {
+    background-color: #4a7d43;
+  }
+}
+
 }
 
 // Badge gallery — locked vs. unlocked achievement cards
