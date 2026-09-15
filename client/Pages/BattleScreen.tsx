@@ -51,19 +51,16 @@ const initialState: BattleState = {
   winner: null,
 }
 
-const CURRENT_USER_ID = 'user1'
-
 export function BattleScreen() {
   const navigate = useNavigate()
-  const { isAuthenticated, user: auth0User, getAccessTokenSilently } = useAuth0()
+  const { isAuthenticated, user: auth0User } = useAuth0()
   const userId = auth0User?.sub ?? 'test'
 
-  // Step 1: get the full species pool
+  // Step 1: get the full species pool (public catalog data)
   const speciesListQuery = useQuery({
-  queryKey: ['species'],
-  queryFn: () => getAllSpecies(getAccessTokenSilently),
-  enabled: isAuthenticated,
-})
+    queryKey: ['species'],
+    queryFn: () => getAllSpecies(),
+  })
 
   // Step 2: once the pool arrives, pick ONE random opponent id (only once)
   const [opponentId, setOpponentId] = useState<string | null>(null)
@@ -76,11 +73,11 @@ export function BattleScreen() {
     }
   }, [speciesListQuery.data, opponentId])
 
-  // Step 3: fetch full stats for that one chosen id
+  // Step 3: fetch full stats for that one chosen id (public catalog data)
   const opponentSpeciesQuery = useQuery({
     queryKey: ['species', opponentId],
-    queryFn: () => getSpeciesById(opponentId as string, getAccessTokenSilently),
-    enabled: isAuthenticated && !!opponentId,
+    queryFn: () => getSpeciesById(opponentId as string),
+    enabled: !!opponentId,
   })
 
   const placeholderCard: Card = {
@@ -102,7 +99,7 @@ export function BattleScreen() {
     }
   }, [opponentSpeciesQuery.data])
 
-  const checkAchievementsMutation = useCheckAchievements(CURRENT_USER_ID)
+  const checkAchievementsMutation = useCheckAchievements(userId)
   const hasSentBattleResult = useRef(false)
 
   useAiTurn(state, dispatch)
@@ -117,23 +114,26 @@ export function BattleScreen() {
     if (hasSentBattleResult.current) return
     hasSentBattleResult.current = true
 
-    checkAchievementsMutation.mutate({
-      winner: state.winner,
-      opponentWasInvasive: state.ai.species.status === 'invasive',
-    })
+    if (isAuthenticated) {
+      checkAchievementsMutation.mutate({
+        winner: state.winner,
+        opponentWasInvasive: state.ai.species.status === 'invasive',
+      })
+    }
   }, [
     state.isGameOver,
     state.winner,
     state.ai.species.status,
     checkAchievementsMutation,
+    isAuthenticated,
   ])
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-(--color-base)">
         <NavBar />
         <p className="p-6 text-(--color-text-soft)">
-          Please log in to participate in battles.
+          Please log in to start battling.
         </p>
       </div>
     )
@@ -143,7 +143,8 @@ export function BattleScreen() {
   if (speciesListQuery.isLoading || !opponentSpeciesQuery.data) {
     return (
       <div className="battle-container">
-        <p>Finding an opponent...</p>
+        <NavBar />
+        <p className="p-6 text-(--color-text-soft)">Finding an opponent...</p>
       </div>
     )
   }
