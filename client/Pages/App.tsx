@@ -53,7 +53,7 @@ function App() {
         <header className="relative overflow-hidden border-b border-white/10 pt-16 pb-20 px-6 sm:px-8">
           <div className="absolute inset-0 z-0">
             <img
-              src="https://www.stevecouperphotography.co.nz/cdn/shop/products/tui-kowhai-flower-portrait.jpg?v=1755629298"
+              src="public/Images/tui.jpg"
               alt="Tūī on Kowhai flower background"
               className="w-full h-full object-center object-cover"
             />
@@ -337,7 +337,7 @@ function App() {
         <section className="relative overflow-hidden border-t border-b border-white/10 py-20 px-6 sm:px-8">
           <div className="absolute inset-0 z-0">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiHt2BOsok2N5BlYBHat9AXSWtNJdF-mO386JXP2zx7A&s=10"
+              src="public/Images/kakapo.jpg"
               alt="Kākāpō in native sanctuary"
               className="w-full h-full object-center object-cover"
             />
