@@ -28,7 +28,7 @@ function App() {
 
   const speciesQuery = useQuery({
     queryKey: ['species', activeMutation.data?.species_id],
-    queryFn: () => getSpeciesById(activeMutation.data!.species_id, getAccessTokenSilently),
+    queryFn: () => getSpeciesById(activeMutation.data!.species_id),
     enabled: !!activeMutation.data?.species_id,
   })
 

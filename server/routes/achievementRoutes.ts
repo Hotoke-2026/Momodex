@@ -1,10 +1,11 @@
 import express from 'express'
 import { getAchievementsForUser, checkAchievements } from '../services/achievementsService'
+import { checkJwt } from '../middleware/authMiddleware'
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
-  const userId = req.query.userId as string
+router.get('/', checkJwt, async (req, res) => {
+  const userId = req.auth?.payload?.sub
 
   if (!userId) {
     return res.status(400).json({ error: 'userId query parameter is required' })
@@ -16,8 +17,8 @@ router.get('/', async (req, res) => {
 
 // Re-evaluates a user's achievements against their current card collection.
 // Call this after a card is successfully saved (see useCreateCard).
-router.post('/check', async (req, res) => {
-  const userId = req.body.userId as string
+router.post('/check', checkJwt, async (req, res) => {
+  const userId = req.auth?.payload?.sub
   const winner = req.body.winner as 'player' | 'ai' | undefined
   const opponentWasInvasive = Boolean(req.body.opponentWasInvasive)
 
