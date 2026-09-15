@@ -348,7 +348,7 @@ function App() {
             
 
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
-              Every Sight Counts for Aotearoa’s Wildlife
+              Every Log Counts for Aotearoa’s Wildlife
             </h2>
 
             <p className="mt-3 text-sm sm:text-base text-slate-200 leading-relaxed font-medium drop-shadow-sm max-w-xl">
