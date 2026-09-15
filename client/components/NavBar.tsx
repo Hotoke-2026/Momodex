@@ -59,37 +59,40 @@ export function NavBar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <NavLink
-          to="/profile"
-          className={({ isActive }) =>
-            `flex items-center gap-3 rounded-md px-2 py-1 transition-colors ${
-              isActive
-                ? 'bg-(--color-green-tint) text-(--color-green)'
-                : 'text-(--color-text) hover:bg-(--color-base)'
-            }`
-          }
-        >
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white overflow-hidden">
-            {auth0User?.picture ? (
-              <img
-                src={auth0User.picture}
-                alt="Avatar"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              (user?.name?.[0] ?? auth0User?.name?.[0] ?? '?')
-            )}
-          </div>
-          <span className="text-sm font-medium text-(--color-text)">
-            {user?.name ?? auth0User?.name ?? 'Log in please...'}
-          </span>
-        </NavLink>
+        {isAuthenticated && (
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-md px-2 py-1 transition-colors ${
+                isActive
+                  ? 'bg-(--color-green-tint) text-(--color-green)'
+                  : 'text-(--color-text) hover:bg-(--color-base)'
+              }`
+            }
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white overflow-hidden">
+              {auth0User?.picture ? (
+                <img
+                  src={auth0User.picture}
+                  alt="Avatar"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                (user?.name?.[0] ?? auth0User?.name?.[0] ?? '?')
+              )}
+            </div>
+            <span className="text-sm font-medium text-(--color-text)">
+              {user?.name ?? auth0User?.name}
+            </span>
+          </NavLink>
+        )}
+
         {isAuthenticated ? (
           <button
             onClick={() =>
               logout({ logoutParams: { returnTo: window.location.origin } })
             }
-            className="text-sm font-medium text-(--color-red) hover:underline"
+            className="rounded-lg border border-(--color-red)/30 bg-(--color-red-tint,rgba(239,68,68,0.1)) px-3.5 py-1.5 text-sm font-semibold text-(--color-red) shadow-xs hover:bg-(--color-red) hover:text-white transition-all active:scale-95 cursor-pointer"
           >
             Log out
           </button>
@@ -100,7 +103,7 @@ export function NavBar() {
                 appState: { targetUrl: window.location.pathname },
               })
             }
-            className="text-sm font-medium text-(--color-green) hover:underline"
+            className="rounded-lg bg-(--color-green) px-4 py-1.5 text-sm font-semibold text-white shadow-xs hover:brightness-110 transition-all active:scale-95 cursor-pointer"
           >
             Log in
           </button>
