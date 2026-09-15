@@ -105,6 +105,15 @@ export function BattleScreen() {
     enabled: !!userId, // don't attempt to fetch before we actually know who's logged in
   })
 
+  // Count captures per species so we can derive each card's level here too
+  const captureCountBySpecies = useMemo(() => {
+    const counts: Record<string, number> = {}
+    cardsQuery.data?.forEach((c) => {
+      counts[c.species.id] = (counts[c.species.id] ?? 0) + 1
+    })
+    return counts
+  }, [cardsQuery.data])
+
   const [showTypeChart, setShowTypeChart] = useState(false)
   const [selectedCardId, setSelectedCardId] = useState<number | null>(null)
 
@@ -262,7 +271,12 @@ export function BattleScreen() {
                   onClick={() => setSelectedCardId(card.id)}
                   className="battle-container__selection-card-btn"
                 >
-                  <CardFrame card={card} species={species} compact />
+                  <CardFrame
+                    card={card}
+                    species={species}
+                    compact
+                    level={getCardLevel(captureCountBySpecies[species.id] ?? 1)}
+                  />
                 </button>
               ))}
             </div>

@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, Species } from '../../models/types'
 import { HpBar } from './HpBar'
 import { StatusBadge } from './StatusBadge'
+import { getLeveledStat } from '../utils/getLeveledStat'
 import '../styles/index.scss'
 
 export interface CardFrameProps {
@@ -15,11 +16,20 @@ export interface CardFrameProps {
 export const CardFrame: React.FC<CardFrameProps> = ({
   card,
   species,
-  currentHp = species.hp,
+  currentHp,
   compact = false,
   level = 1,
 }) => {
   const isNative = species.status.toLowerCase() === 'native'
+
+  const maxHp = getLeveledStat(species.hp, level)
+  const attackDamage = getLeveledStat(species.attack, level)
+  const attackTwoDamage =
+    species.attack_two != null
+      ? getLeveledStat(species.attack_two, level)
+      : undefined
+
+  const resolvedCurrentHp = currentHp ?? maxHp
 
   return (
     <div className={`card-frame card-frame--level-${level}`}>
@@ -31,9 +41,9 @@ export const CardFrame: React.FC<CardFrameProps> = ({
         {/* HP Bar - Updated for BATTLE!*/}
         <div className="card-frame__hp-section">
           <span className="card-frame__hp">
-            HP {currentHp}/{species.hp}
+            HP {resolvedCurrentHp}/{maxHp}
           </span>
-          <HpBar currentHp={currentHp} maxHp={species.hp} />
+          <HpBar currentHp={resolvedCurrentHp} maxHp={maxHp} />
         </div>
       </div>
 
@@ -71,14 +81,12 @@ export const CardFrame: React.FC<CardFrameProps> = ({
           <div className="move-item">
             <div className="move-item__header">
               <span className="move-item__name">{species.attack_name}</span>
-              <span className="move-item__damage">
-                Damage: {species.attack}
-              </span>
+              <span className="move-item__damage">Damage: {attackDamage}</span>
             </div>
             <div className="move-item__header">
               <span className="move-item__name">{species.attack_two_name}</span>
               <span className="move-item__damage">
-                Damage: {species.attack_two}
+                Damage: {attackTwoDamage}
               </span>
             </div>
             <div className="move-item__header">
