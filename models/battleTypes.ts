@@ -2,6 +2,7 @@ import type { Species } from '../models/types'
 export interface BattleCombatant {
   species: Species
   currentHp: number // starts equal to species.hp, decreases as battle progresses
+  level: number // 1-4, based on captures count
 }
 
 export interface BattleState {
@@ -17,4 +18,8 @@ export type BattleAction =
   | { type: 'ATTACK' }
   | { type: 'AI_COUNTER' }
   | { type: 'RESET' }
-  | { type: 'SET_OPPONENT'; species: Species } // the player attacks, the AI counterattacks, or the battle is reset
+  | { type: 'SET_OPPONENT'; species: Species; level: number } // the player attacks, the AI counterattacks, or the battle is reset
+  | { type: 'SET_PLAYER_LEVEL'; level: number }
+
+export type SpeciesType =
+  'bird' | 'herp' | 'insect' | 'plant' | 'fungi' | 'mammal'
