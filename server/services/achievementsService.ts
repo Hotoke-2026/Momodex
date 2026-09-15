@@ -3,11 +3,12 @@ import {
   getAchievementsByUserId,
   hasAchievement,
   insertAchievement,
-  getFirstCardSpeciesType,
   getCardCount,
   hasLegendaryCard,
+  hasCardOfType,
 } from '../db/achievements'
 import type { AchievementDefinition, AchievementWithStatus, Achievement } from '../../models/types'
+import { recordBattleOutcome } from '../db/battleStats'
 
 interface BattleAchievementPayload {
   winner?: 'player' | 'ai'
@@ -16,9 +17,9 @@ interface BattleAchievementPayload {
 
 export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   { type: 'first_find', name: 'First Find', description: 'Log your very first species observation.' },
-  { type: 'starter_bird', name: 'Fledgling Flight', description: 'Started your collection with a bird.' },
-  { type: 'starter_insect', name: 'The Larval Stage', description: 'Started your collection with an insect.' },
-  { type: 'starter_plant', name: 'Turning Over a New Leaf', description: 'Started your collection with a plant.' },
+  { type: 'starter_bird', name: 'Fledgling Flight', description: 'Logged your first bird.' },
+  { type: 'starter_insect', name: 'The Larval Stage', description: 'Logged your first insect.' },
+  { type: 'starter_plant', name: 'Turning Over a New Leaf', description: 'Logged your first plant.' },
   { type: 'ten_observations', name: 'Getting Serious About This', description: 'Log 10 observations.' },
   { type: 'first_legendary', name: 'Once in a Blue Moon', description: 'Caught your first legendary-rarity species.' },
   { type: 'first_win', name: 'On the Board', description: 'Claimed your first victory.' },
@@ -39,6 +40,7 @@ export async function getAchievementsForUser(userId: string): Promise<Achievemen
   })
 }
 
+
 async function unlockIfNeeded(userId: string, type: string, name: string, newlyUnlocked: Achievement[]) {
   if (!(await hasAchievement(userId, type))) {
     newlyUnlocked.push(await insertAchievement(userId, type, name))
@@ -51,22 +53,38 @@ export async function checkAchievements(
 ): Promise<Achievement[]> {
   const newlyUnlocked: Achievement[] = []
 
-  const [cardCount, starterType, isLegendary] = await Promise.all([
-    getCardCount(userId),
-    getFirstCardSpeciesType(userId),
-    hasLegendaryCard(userId),
-  ])
+ const [cardCount, hasBird, hasInsect, hasPlant, isLegendary] = await Promise.all([
+  getCardCount(userId),
+  hasCardOfType(userId, 'bird'),
+  hasCardOfType(userId, 'insect'),
+  hasCardOfType(userId, 'plant'),
+  hasLegendaryCard(userId),
+])
+
+if (battleResult?.winner) {
+  await recordBattleOutcome(userId, battleResult.winner === 'player')
+}
+
+if (cardCount >= 1) {
+  await unlockIfNeeded(userId, 'first_find', 'First Find', newlyUnlocked)
+}
+
+if (hasBird) {
+  await unlockIfNeeded(userId, 'starter_bird', 'Fledgling Flight', newlyUnlocked)
+}
+if (hasInsect) {
+  await unlockIfNeeded(userId, 'starter_insect', 'The Larval Stage', newlyUnlocked)
+}
+if (hasPlant) {
+  await unlockIfNeeded(userId, 'starter_plant', 'Turning Over a New Leaf', newlyUnlocked)
+}
+
+    if (battleResult?.winner) {
+    await recordBattleOutcome(userId, battleResult.winner === 'player')
+  }
 
   if (cardCount >= 1) {
     await unlockIfNeeded(userId, 'first_find', 'First Find', newlyUnlocked)
-  }
-
-  if (starterType === 'bird') {
-    await unlockIfNeeded(userId, 'starter_bird', 'Fledgling Flight', newlyUnlocked)
-  } else if (starterType === 'insect') {
-    await unlockIfNeeded(userId, 'starter_insect', 'The Larval Stage', newlyUnlocked)
-  } else if (starterType === 'plant') {
-    await unlockIfNeeded(userId, 'starter_plant', 'Turning Over a New Leaf', newlyUnlocked)
   }
 
   if (cardCount >= 10) {
@@ -89,6 +107,7 @@ export async function checkAchievements(
       newlyUnlocked,
     )
   }
+  
 
   return newlyUnlocked
 }

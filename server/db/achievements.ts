@@ -25,17 +25,15 @@ export async function insertAchievement(
   return achievement
 }
 
-export async function getFirstCardSpeciesType(userId: string): Promise<string | null> {
+export async function hasCardOfType(userId: string, type: string): Promise<boolean> {
   const row = await db('cards')
     .join('species', 'cards.species_id', 'species.id')
     .where('cards.user_id', userId)
-    .orderBy('cards.created_at', 'asc')
-    .select('species.type')
+    .andWhere('species.type', type)
     .first()
 
-  return row ? row.type : null
+  return Boolean(row)
 }
-
 export async function getCardCount(userId: string): Promise<number> {
   const row = await db('cards').where({ user_id: userId }).count({ count: '*' }).first()
   return Number(row?.count ?? 0)

@@ -13,6 +13,7 @@ describe('battleReducer', () => {
     rarity: 'common',
     status: 'native',
     description: 'A test species',
+    fun_fact: ''
   }
 
   const aiSpecies: Species = {
@@ -24,6 +25,7 @@ describe('battleReducer', () => {
     rarity: 'common',
     status: 'invasive',
     description: 'A test species',
+    fun_fact: ''
   }
 
   const initialState: BattleState = {

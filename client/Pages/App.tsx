@@ -44,7 +44,6 @@ function App() {
   return (
     <div className="app">
       <NavBar />
-      <h1>Momodex!</h1>
       <button
         onClick={() => testIdentifyMutation.mutate()}
         disabled={testIdentifyMutation.isPending || identifyMutation.isPending}

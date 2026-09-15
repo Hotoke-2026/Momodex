@@ -13,6 +13,7 @@ describe('CardFrame Component', () => {
     rarity: 'rare',
     status: 'threatened',
     description: 'Pecks at anything shiny it can find.',
+    fun_fact: ''
   }
 
   const mockCard: Card = {
