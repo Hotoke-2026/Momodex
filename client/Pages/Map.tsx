@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useMapObservations } from '../hooks/useMapObservations'
 import { NavBar } from '../components/NavBar'
+import { Footer } from '../components/Footer'
 
 const DATE_RANGES = {
   all: { label: 'All time', days: null },
@@ -43,7 +44,7 @@ export function MapPage() {
   }, [pins, speciesFilter, dateRange])
 
   return (
-    <div className="min-h-screen bg-(--color-base)]">
+    <><div className="min-h-screen bg-(--color-base)]">
       <NavBar />
 
       <header className="px-6 pb-4 pt-6">
@@ -99,8 +100,7 @@ export function MapPage() {
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
+                attribution="&copy; OpenStreetMap contributors" />
               {filteredPins.map((pin) => (
                 <Marker key={pin.id} position={[pin.lat, pin.lng]}>
                   <Popup>
@@ -124,6 +124,7 @@ export function MapPage() {
           </div>
         )}
       </div>
-    </div>
+    </div><Footer /></>
+    
   )
 }
