@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express from 'express'
 import { handleSaveCard } from '../../client/hooks/cardController'
 
 const router = express.Router()

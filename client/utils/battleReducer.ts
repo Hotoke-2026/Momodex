@@ -64,6 +64,12 @@ export const battleReducer = (
         winner: null,
       }
     }
+    case 'SET_OPPONENT': {
+      return {
+        ...state,
+        ai: { species: action.species, currentHp: action.species.hp },
+      }
+    }
 
     default:
       return state

@@ -3,6 +3,10 @@
 export interface User {
   id: string
   name: string
+  avatar_url?: string | null
+  favourite_species?: string | null
+  currently_seeking?: string | null
+  created_at?: string | null
 }
 
 export interface Species {
@@ -83,4 +87,15 @@ export interface AchievementDefinition {
 export interface AchievementWithStatus extends AchievementDefinition {
   unlocked: boolean
   unlocked_at: string | null
+}
+
+export interface BattleStats {
+  user_id: string
+  wins: number
+  losses: number
+}
+
+export interface LastCapture {
+  created_at: string
+  location: string | null
 }
