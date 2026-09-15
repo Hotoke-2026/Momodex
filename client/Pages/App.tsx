@@ -333,6 +333,31 @@ function App() {
             </div>
           </div>
         </section>
+
+        <section className="relative overflow-hidden border-t border-b border-white/10 py-20 px-6 sm:px-8">
+          <div className="absolute inset-0 z-0">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiHt2BOsok2N5BlYBHat9AXSWtNJdF-mO386JXP2zx7A&s=10"
+              alt="Kākāpō in native sanctuary"
+              className="w-full h-full object-center object-cover"
+            />
+            <div className="absolute inset-0 bg-radial from-transparent via-black/40 to-black/90" />
+          </div>
+
+          <div className="relative z-10 mx-auto max-w-3xl text-center flex flex-col items-center">
+            <span className="text-xs font-bold tracking-widest text-(--color-green) uppercase mb-3">
+              Rare Species Focus
+            </span>
+
+            <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
+              Every Sight Counts for Aotearoa’s Wildlife
+            </h2>
+
+            <p className="mt-3 text-sm sm:text-base text-slate-200 leading-relaxed font-medium drop-shadow-sm max-w-xl">
+              Critically endangered species like the flightless Kākāpō rely on intensive sanctuary preservation. Your observations help build broader awareness and protection networks for vulnerable species across New Zealand.
+            </p>
+          </div>
+        </section>
       </div>
 
       {/* --- FOOTER --- */}
