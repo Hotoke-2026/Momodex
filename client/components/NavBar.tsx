@@ -34,7 +34,7 @@ export function NavBar() {
 
   return (
     <nav className="flex items-center justify-between border-b border-(--color-tan) bg-(--color-surface) px-6 py-3">
-      <span className="font-(--font-display) font-(--font-weight-heading-bold) text-lg text-(--color-text)">
+      <span className=" font-(--font-weight-heading-bold) text-lg text-(--color-text)">
         Momodex
       </span>
 

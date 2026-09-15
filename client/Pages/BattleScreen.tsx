@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { battleReducer } from '../utils/battleReducer'
 import { useNavigate } from 'react-router'
@@ -12,13 +12,13 @@ import '../styles/index.css'
 import '../styles/index.scss'
 import { useCheckAchievements } from '../hooks/useAchievements'
 import type { BattleState } from '../../models/battleTypes'
-import type { Card, Species } from '../../models/types'
+import type { Species } from '../../models/types'
 import { getCardsByUserId } from '../apis/cards'
 import { getCardLevel } from '../utils/getCardLevel'
 import { getAiLevel } from '../utils/getAiLevel'
+import { TypeChart } from '../components/TypeChart'
 import { NavBar } from '../components/NavBar'
 
-// player side is still a placeholder — real card selection is a separate ticket
 const tui: Species = {
   id: 'tui',
   name: 'Tūī',
@@ -38,7 +38,6 @@ const tui: Species = {
   effect_trigger: null,
 }
 
-// starting AI species — immediately replaced once the real random opponent loads
 const possum: Species = {
   id: 'possum',
   name: 'Common Brushtail Possum',
@@ -58,16 +57,6 @@ const possum: Species = {
   effect_trigger: null,
 }
 
-const placeholderCard: Card = {
-  id: 0,
-  card_name: 'Placeholder Card',
-  user_id: 'test',
-  species_id: '',
-  image_url: '',
-  location: null,
-  created_at: new Date().toISOString(),
-}
-
 const initialState: BattleState = {
   player: { species: tui, currentHp: tui.hp, level: 1 },
   ai: { species: possum, currentHp: possum.hp, level: 1 },
@@ -75,20 +64,55 @@ const initialState: BattleState = {
   log: [],
   isGameOver: false,
   winner: null,
+  playerPoison: null,
+  aiPoison: null,
+}
+
+type BattleAction =
+  Parameters<typeof battleReducer>[1] | { type: 'SET_PLAYER'; species: Species }
+
+const screenBattleReducer = (
+  state: BattleState,
+  action: BattleAction,
+): BattleState => {
+  if (action.type === 'SET_PLAYER') {
+    return {
+      ...state,
+      player: {
+        ...state.player,
+        species: action.species,
+        currentHp: action.species.hp,
+      },
+    }
+  }
+  return battleReducer(state, action)
 }
 
 export function BattleScreen() {
   const navigate = useNavigate()
-  const { isAuthenticated, user: auth0User } = useAuth0()
-  const userId = auth0User?.sub ?? 'test'
 
-  // Step 1: get the full species pool (public catalog data)
-  const speciesListQuery = useQuery({
-    queryKey: ['species'],
-    queryFn: () => getAllSpecies(),
+  // --- Auth ---
+  const {
+    isAuthenticated,
+    user: auth0User,
+    getAccessTokenSilently,
+  } = useAuth0()
+  const userId = auth0User?.sub
+
+  const cardsQuery = useQuery({
+    queryKey: ['cards', userId],
+    queryFn: () => getCardsByUserId(userId as string, getAccessTokenSilently),
+    enabled: !!userId, // don't attempt to fetch before we actually know who's logged in
   })
 
-  // pure derivation from already-loaded data — no effect/setState needed
+  const [showTypeChart, setShowTypeChart] = useState(false)
+  const [selectedCardId, setSelectedCardId] = useState<number | null>(null)
+
+  const speciesListQuery = useQuery({
+    queryKey: ['species'],
+    queryFn: getAllSpecies,
+  })
+
   const opponentId = useMemo(() => {
     if (!speciesListQuery.data) return null
     return getRandomOpponent(speciesListQuery.data).id
@@ -100,20 +124,22 @@ export function BattleScreen() {
     enabled: !!opponentId,
   })
 
-  const userCardsQuery = useQuery({
-    queryKey: ['cards', userId],
-    queryFn: () => getCardsByUserId(userId, getAccessTokenSilently),
-  })
+  const [state, dispatch] = useReducer(screenBattleReducer, initialState)
 
-  const [state, dispatch] = useReducer(battleReducer, initialState)
+  const selectedEntry = cardsQuery.data?.find(
+    (c) => c.card.id === selectedCardId,
+  )
 
-  // Once the opponent's data AND the user's cards have both loaded, compute
-  // the PLAYER's level from real capture counts, derive the AI's level from
-  // that, and apply both to battle state.
   useEffect(() => {
-    if (opponentSpeciesQuery.data && userCardsQuery.data) {
-      const playerCaptureCount = userCardsQuery.data.filter(
-        (c) => c.card.species_id === tui.id,
+    if (selectedEntry) {
+      dispatch({ type: 'SET_PLAYER', species: selectedEntry.species })
+    }
+  }, [selectedEntry])
+
+  useEffect(() => {
+    if (selectedEntry && opponentSpeciesQuery.data && cardsQuery.data) {
+      const playerCaptureCount = cardsQuery.data.filter(
+        (c) => c.card.species_id === selectedEntry.species.id,
       ).length
       const playerLevel = getCardLevel(playerCaptureCount)
       const aiLevel = getAiLevel(playerLevel)
@@ -125,13 +151,11 @@ export function BattleScreen() {
         level: aiLevel,
       })
     }
-  }, [opponentSpeciesQuery.data, userCardsQuery.data])
+  }, [selectedEntry, opponentSpeciesQuery.data, cardsQuery.data])
 
-  const checkAchievementsMutation = useCheckAchievements(userId)
+  const checkAchievementsMutation = useCheckAchievements(userId ?? '')
   const hasSentBattleResult = useRef(false)
-
   useAiTurn(state, dispatch)
-
   const isPlayerTurn = state.turn === 'player' && !state.isGameOver
 
   useEffect(() => {
@@ -153,126 +177,242 @@ export function BattleScreen() {
     state.winner,
     state.ai.species.status,
     checkAchievementsMutation,
-    isAuthenticated
+    isAuthenticated,
   ])
 
+  // --- Auth gate — after all hooks, before any other conditional return ---
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-(--color-base)">
+      <>
         <NavBar />
-        <p className="p-6 text-(--color-text-soft)">
-          Please log in to start battling.
-        </p>
-      </div>
+        <div className="battle-container">
+          <p className="p-6">Please log in to start battling.</p>
+        </div>
+      </>
+    )
+  }
+
+  if (cardsQuery.isLoading) {
+    return (
+      <>
+        <NavBar />
+        <div className="battle-container">
+          <p>Loading your deck...</p>
+        </div>
+      </>
+    )
+  }
+  if (cardsQuery.isError) {
+    return (
+      <>
+        <NavBar />
+        <div className="battle-container">
+          <p>Couldn&apos;t load your deck.</p>
+        </div>
+      </>
+    )
+  }
+
+  if (!selectedCardId) {
+    return (
+      <>
+        <NavBar />
+        <div className="battle-container">
+          <div className="battle-container__selection">
+            <h1 className="battle-container__selection-title">
+              Choose your card
+            </h1>
+
+            {opponentSpeciesQuery.data ? (
+              <div className="battle-container__opponent-preview">
+                <p className="battle-container__opponent-preview-label">
+                  Your opponent:
+                </p>
+                <p className="battle-container__opponent-preview-name">
+                  {opponentSpeciesQuery.data.name}
+                  <span className="battle-container__opponent-preview-type">
+                    {' '}
+                    ({opponentSpeciesQuery.data.type})
+                  </span>
+                </p>
+              </div>
+            ) : (
+              <p className="battle-container__selection-subtitle">
+                Finding an opponent...
+              </p>
+            )}
+
+            <button
+              className="battle-container__type-chart-toggle"
+              onClick={() => setShowTypeChart((prev) => !prev)}
+            >
+              {showTypeChart ? 'Hide type chart' : 'View type chart'}
+            </button>
+
+            {showTypeChart && <TypeChart />}
+
+            <p className="battle-container__selection-subtitle">
+              Pick a species from your collection to battle with.
+            </p>
+
+            <div className="battle-container__selection-grid">
+              {cardsQuery.data?.map(({ card, species }) => (
+                <button
+                  key={card.id}
+                  onClick={() => setSelectedCardId(card.id)}
+                  className="battle-container__selection-card-btn"
+                >
+                  <CardFrame card={card} species={species} compact />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
     )
   }
 
   if (
     speciesListQuery.isLoading ||
     !opponentSpeciesQuery.data ||
-    userCardsQuery.isLoading
+    !selectedEntry
   ) {
     return (
-      <div className="battle-container">
+      <>
         <NavBar />
-        <p className="p-6 text-(--color-text-soft)">Finding an opponent...</p>
-      </div>
+        <div className="battle-container">
+          <p>Finding an opponent...</p>
+        </div>
+      </>
     )
   }
 
   return (
-    <div className="battle-container">
+    <>
       <NavBar />
-      <div className="battle-container__content">
-        <div className="battle-container__header">
-          <button
-            className="battle-container__retreat-btn"
-            onClick={() => navigate('/deck')}
-          >
-            Retreat
-          </button>
-
-          <h1 className="battle-container__title">BATTLE</h1>
-
-          {state.turn === 'ai' && !state.isGameOver ? (
-            <span className="battle-container__status-pill">
-              Opponent is thinking...
-            </span>
-          ) : (
-            <span className="battle-container__status-text">
-              {state.isGameOver ? 'Game Over' : 'Your turn — choose a move'}
-            </span>
-          )}
-        </div>
-
-        <div>
-          <div className="battle-container__combatants-labels">
-            <span>YOU</span>
-            <span>OPPONENT</span>
-          </div>
-          <div className="battle-container__grid">
-            <CardFrame
-              card={placeholderCard}
-              species={state.player.species}
-              currentHp={state.player.currentHp}
-              compact={true}
-              level={state.player.level}
-            />
-            <CardFrame
-              card={placeholderCard}
-              species={state.ai.species}
-              currentHp={state.ai.currentHp}
-              compact={true}
-              level={state.ai.level}
-            />
-          </div>
-        </div>
-
-        <div>
-          <p className="battle-container__moves-label">Choose a move:</p>
-          <div className="battle-container__moves-grid">
+      <div className="battle-container">
+        <div className="battle-container__content">
+          <div className="battle-container__header">
             <button
-              className="battle-container__move-btn"
-              onClick={() => dispatch({ type: 'ATTACK' })}
-              disabled={!isPlayerTurn}
+              className="battle-container__retreat-btn"
+              onClick={() => navigate('/deck')}
             >
-              <div className="move-title">Wing Attack</div>
-              <div className="move-dmg">{state.player.species.attack} DMG</div>
+              Retreat
             </button>
+            <h1 className="battle-container__title">BATTLE</h1>
+            {state.turn === 'ai' && !state.isGameOver ? (
+              <span className="battle-container__status-pill">
+                Opponent is thinking...
+              </span>
+            ) : (
+              <span className="battle-container__status-text">
+                {state.isGameOver ? 'Game Over' : 'Your turn — choose a move'}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <div className="battle-container__combatants-labels">
+              <span>YOU</span>
+              <span>OPPONENT</span>
+            </div>
+            <div className="battle-container__grid">
+              <CardFrame
+                card={selectedEntry.card}
+                species={state.player.species}
+                currentHp={state.player.currentHp}
+                compact={true}
+                level={state.player.level}
+              />
+              <CardFrame
+                card={{
+                  id: 0,
+                  card_name: state.ai.species.name,
+                  user_id: 'ai',
+                  species_id: state.ai.species.id,
+                  image_url: '',
+                  location: null,
+                  created_at: new Date().toISOString(),
+                }}
+                species={state.ai.species}
+                currentHp={state.ai.currentHp}
+                compact={true}
+                level={state.ai.level}
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="battle-container__moves-label">Choose a move:</p>
+            <div className="battle-container__moves-grid">
+              <button
+                className="battle-container__move-btn"
+                onClick={() => dispatch({ type: 'ATTACK' })}
+                disabled={!isPlayerTurn}
+              >
+                <div className="move-title">
+                  {state.player.species.attack_name || 'Attack'}
+                </div>
+                <div className="move-dmg">
+                  {state.player.species.attack} DMG
+                </div>
+              </button>
+
+              {state.player.species.attack_two != null && (
+                <button
+                  className="battle-container__move-btn"
+                  onClick={() => dispatch({ type: 'ATTACK_TWO' })}
+                  disabled={!isPlayerTurn}
+                >
+                  <div className="move-title">
+                    {state.player.species.attack_two_name}
+                  </div>
+                  <div className="move-dmg">
+                    {state.player.species.attack_two} DMG
+                  </div>
+                  {state.player.species.effect_type && (
+                    <div className="move-effect">
+                      {state.player.species.effect_type === 'poison' &&
+                        '☠️ Poison'}
+                      {state.player.species.effect_type === 'lifesteal' &&
+                        '💚 Lifesteal'}
+                      {state.player.species.effect_type === 'swarm' &&
+                        '⚡ Double Hit'}
+                    </div>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="battle-container__log-box">
+            <h3>BATTLE LOG</h3>
+            <div className="log-entries">
+              {state.log.map((entry, i) => (
+                <div key={i}>{entry}</div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="battle-container__log-box">
-          <h3>BATTLE LOG</h3>
-          <div className="log-entries">
-            {state.log.map((entry, i) => (
-              <div key={i}>{entry}</div>
-            ))}
-          </div>
-        </div>
+        {state.isGameOver && state.winner && (
+          <MatchResultLayout
+            winner={state.winner}
+            onPlayAgain={() => dispatch({ type: 'RESET' })}
+            onReturnToDeck={() => navigate('/deck')}
+            speciesFact={
+              state.winner === 'player'
+                ? state.ai.species.fun_fact
+                : state.player.species.fun_fact
+            }
+            speciesName={
+              state.winner === 'player'
+                ? state.ai.species.name
+                : state.player.species.name
+            }
+          />
+        )}
       </div>
-
-      {state.isGameOver && state.winner && (
-        <MatchResultLayout
-          winner={state.winner}
-          onPlayAgain={() => dispatch({ type: 'RESET' })}
-          onReturnToDeck={() => navigate('/deck')}
-          speciesFact={
-            state.winner === 'player'
-              ? state.ai.species.fun_fact
-              : state.player.species.fun_fact
-          }
-          speciesName={
-            state.winner === 'player'
-              ? state.ai.species.name
-              : state.player.species.name
-          }
-        />
-      )}
-    </div>
+    </>
   )
-}
-
-function getAccessTokenSilently(options?: object | undefined): Promise<string> {
-  throw new Error('Function not implemented.')
 }
