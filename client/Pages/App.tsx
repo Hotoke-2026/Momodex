@@ -73,8 +73,8 @@ function App() {
           </h1>
 
           {/* Subtitle */}
-          <p className="mt-4 text-base sm:text-lg text-slate-200 max-w-xl leading-relaxed font-medium drop-shadow-sm">
-            Snap photos of flora and fauna to instantly identify species, record field locations, and build your personal nature log.
+          <p className="mt-4 text-white sm:text-lg text-slate-200 max-w-xl leading-relaxed font-medium drop-shadow-sm">
+            Snap photos of flora, fauna, insects and animals to instantly identify species, record field locations, and build your personal nature log.
           </p>
 
           {/* Hero CTAs */}
