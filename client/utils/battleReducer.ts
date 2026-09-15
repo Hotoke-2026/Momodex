@@ -1,60 +1,217 @@
 import type { BattleState, BattleAction } from '../../models/battleTypes'
 
+const POISON_DURATION = 3 // turns — not stored in the DB, a fixed game rule
+
+// --- Passive defense: dodge, intimidate, and slippery all reduce incoming damage,
+// just via different math. This runs on WHOEVER IS DEFENDING, based on their own species. ---
+function applyPassiveDefense(
+  rawDamage: number,
+  defender: BattleState['player'],
+) {
+  const { effect_type, effect_trigger, effect_value } = defender.species
+
+  if (effect_trigger !== 'passive' || effect_value == null) {
+    return { damage: rawDamage, wasAvoided: false, defenseNote: null }
+  }
+
+  if (effect_type === 'dodge' || effect_type === 'intimidate') {
+    const roll = Math.random() * 100
+    if (roll < effect_value) {
+      return { damage: 0, wasAvoided: true, defenseNote: null } // the "avoided" message is handled separately, see below
+    }
+    return { damage: rawDamage, wasAvoided: false, defenseNote: null }
+  }
+
+  if (effect_type === 'slippery') {
+    const reduced = Math.round(rawDamage * (1 - effect_value / 100))
+    const defenseNote = `${defender.species.name}'s slippery scales reduced the hit from ${rawDamage} to ${reduced}!`
+    return { damage: reduced, wasAvoided: false, defenseNote }
+  }
+
+  return { damage: rawDamage, wasAvoided: false, defenseNote: null }
+}
+
+// --- Shared attack resolution, used by player (move 1 or 2) and AI alike ---
+function resolveAttack(
+  attacker: BattleState['player'],
+  defender: BattleState['player'],
+  move: 'one' | 'two',
+) {
+  const species = attacker.species
+  const isSecondMove = move === 'two'
+  const baseDamage = isSecondMove ? (species.attack_two ?? 0) : species.attack
+  const moveName = isSecondMove ? species.attack_two_name : species.attack_name
+
+  const hasOnAttackEffect =
+    isSecondMove && species.effect_trigger === 'on_attack'
+
+  let rawDamage = baseDamage
+  if (
+    hasOnAttackEffect &&
+    species.effect_type === 'swarm' &&
+    species.effect_value
+  ) {
+    rawDamage = baseDamage * species.effect_value
+  }
+
+  const { damage, wasAvoided, defenseNote } = applyPassiveDefense(
+    rawDamage,
+    defender,
+  )
+
+  const newDefenderHp = Math.max(0, defender.currentHp - damage)
+
+  let logEntry: string
+  if (wasAvoided) {
+    const defenseType =
+      defender.species.effect_type === 'intimidate'
+        ? `${defender.species.name}'s intimidating presence threw off the attack!`
+        : `${defender.species.name} dodged out of the way!`
+    logEntry = `${species.name} used ${moveName}, but ${defenseType}`
+  } else {
+    logEntry = `${species.name} used ${moveName} for ${damage} damage!`
+    if (defenseNote) {
+      logEntry += ` ${defenseNote}`
+    }
+  }
+
+  let attackerHpGain = 0
+  if (
+    hasOnAttackEffect &&
+    species.effect_type === 'lifesteal' &&
+    species.effect_value &&
+    !wasAvoided
+  ) {
+    attackerHpGain = Math.round(damage * (species.effect_value / 100))
+    logEntry += ` ${species.name} healed ${attackerHpGain} HP!`
+  }
+
+  let poisonInflicted = null
+  if (
+    hasOnAttackEffect &&
+    species.effect_type === 'poison' &&
+    species.effect_value &&
+    !wasAvoided
+  ) {
+    poisonInflicted = {
+      damage: species.effect_value,
+      turnsRemaining: POISON_DURATION,
+    }
+    logEntry += ` ${defender.species.name} was poisoned!`
+  }
+
+  return { newDefenderHp, attackerHpGain, poisonInflicted, logEntry }
+}
+
+// --- Poison ticks at the start of whoever's turn it is, before their move resolves ---
+function tickPoison(hp: number, poison: BattleState['playerPoison']) {
+  if (!poison) return { hp, poison: null, logEntry: null }
+
+  const newHp = Math.max(0, hp - poison.damage)
+  const remaining = poison.turnsRemaining - 1
+  const logEntry = `Poison dealt ${poison.damage} damage!`
+
+  return {
+    hp: newHp,
+    poison: remaining > 0 ? { ...poison, turnsRemaining: remaining } : null,
+    logEntry,
+  }
+}
+
 export const battleReducer = (
   state: BattleState,
   action: BattleAction,
 ): BattleState => {
   switch (action.type) {
-    case 'ATTACK': {
-      if (state.turn !== 'player' || state.isGameOver) {
-        return state // ignore if it's not the player's turn or the game is over
+    case 'ATTACK':
+    case 'ATTACK_TWO': {
+      if (state.turn !== 'player' || state.isGameOver) return state
+
+      // Step 1: poison ticks on the PLAYER first, since it's now their turn
+      const tick = tickPoison(state.player.currentHp, state.playerPoison)
+      const log = tick.logEntry ? [...state.log, tick.logEntry] : [...state.log]
+
+      if (tick.hp <= 0) {
+        return {
+          ...state,
+          player: { ...state.player, currentHp: 0 },
+          playerPoison: tick.poison,
+          log,
+          isGameOver: true,
+          winner: 'ai',
+        }
       }
-      // this determines how much damage the player does to the AI
-      const damage = state.player.species.attack
-      // this determines the new HP of the AI after taking damage
-      const newAiHp = Math.max(0, state.ai.currentHp - damage)
-      const logEntry = `${state.player.species.name} attacks ${state.ai.species.name} for ${damage} damage!`
-      // this determines if the game is over and who the winner is
-      const isGameOver = newAiHp <= 0
-      // this determines the winner of the game if it is over
-      const winner = isGameOver ? 'player' : null
+
+      // Step 2: resolve the actual attack, using the post-poison HP
+      const playerAfterPoison = { ...state.player, currentHp: tick.hp }
+      const move = action.type === 'ATTACK_TWO' ? 'two' : 'one'
+      const result = resolveAttack(playerAfterPoison, state.ai, move)
+
+      const newPlayerHp = Math.min(
+        playerAfterPoison.species.hp,
+        playerAfterPoison.currentHp + result.attackerHpGain,
+      )
+      const isGameOver = result.newDefenderHp <= 0
 
       return {
-        // return a new state object with the updated AI HP, log, game over status, winner, and turn
         ...state,
-        ai: { ...state.ai, currentHp: newAiHp },
-        log: [...state.log, logEntry],
+        player: { ...playerAfterPoison, currentHp: newPlayerHp },
+        ai: { ...state.ai, currentHp: result.newDefenderHp },
+        aiPoison: result.poisonInflicted ?? state.aiPoison,
+        playerPoison: tick.poison,
+        log: [...log, result.logEntry],
         isGameOver,
-        winner,
+        winner: isGameOver ? 'player' : null,
         turn: isGameOver ? state.turn : 'ai',
       }
     }
+
     case 'AI_COUNTER': {
-      if (state.turn !== 'ai' || state.isGameOver) {
-        return state // ignore if it's not the AI's turn or the game is over
+      if (state.turn !== 'ai' || state.isGameOver) return state
+
+      // Poison ticks on the AI first, since it's now their turn
+      const tick = tickPoison(state.ai.currentHp, state.aiPoison)
+      const log = tick.logEntry ? [...state.log, tick.logEntry] : [...state.log]
+
+      if (tick.hp <= 0) {
+        return {
+          ...state,
+          ai: { ...state.ai, currentHp: 0 },
+          aiPoison: tick.poison,
+          log,
+          isGameOver: true,
+          winner: 'player',
+        }
       }
-      // this determines how much damage the AI does to the player
-      const damage = state.ai.species.attack
-      // this determines the new HP of the player after taking damage
-      const newPlayerHp = Math.max(0, state.player.currentHp - damage)
-      const logEntry = `${state.ai.species.name} attacks ${state.player.species.name} for ${damage} damage!`
-      // this determines if the game is over and who the winner is
-      const isGameOver = newPlayerHp <= 0
-      // this determines the winner of the game if it is over
-      const winner = isGameOver ? 'ai' : null
+
+      const aiAfterPoison = { ...state.ai, currentHp: tick.hp }
+      // Simple AI: randomly picks between its two moves, if a second one exists
+      const move =
+        aiAfterPoison.species.attack_two != null && Math.random() < 0.5
+          ? 'two'
+          : 'one'
+      const result = resolveAttack(aiAfterPoison, state.player, move)
+
+      const newAiHp = Math.min(
+        aiAfterPoison.species.hp,
+        aiAfterPoison.currentHp + result.attackerHpGain,
+      )
+      const isGameOver = result.newDefenderHp <= 0
 
       return {
-        // return a new state object with the updated player HP, log, game over status, winner, and turn
         ...state,
-        player: { ...state.player, currentHp: newPlayerHp },
-        log: [...state.log, logEntry],
+        ai: { ...aiAfterPoison, currentHp: newAiHp },
+        player: { ...state.player, currentHp: result.newDefenderHp },
+        playerPoison: result.poisonInflicted ?? state.playerPoison,
+        aiPoison: tick.poison,
+        log: [...log, result.logEntry],
         isGameOver,
-        winner,
+        winner: isGameOver ? 'ai' : null,
         turn: isGameOver ? state.turn : 'player',
       }
     }
+
     case 'RESET': {
-      // reset the battle state to the initial state
       return {
         player: { ...state.player, currentHp: state.player.species.hp },
         ai: { ...state.ai, currentHp: state.ai.species.hp },
@@ -62,12 +219,16 @@ export const battleReducer = (
         log: [],
         isGameOver: false,
         winner: null,
+        playerPoison: null,
+        aiPoison: null,
       }
     }
+
     case 'SET_OPPONENT': {
       return {
         ...state,
         ai: { species: action.species, currentHp: action.species.hp },
+        aiPoison: null,
       }
     }
 
