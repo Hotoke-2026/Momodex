@@ -1,4 +1,5 @@
 import type { BattleState, BattleAction } from '../../models/battleTypes'
+import { getTypeMultiplier } from './typeChart'
 
 export const battleReducer = (
   state: BattleState,
@@ -9,11 +10,21 @@ export const battleReducer = (
       if (state.turn !== 'player' || state.isGameOver) {
         return state // ignore if it's not the player's turn or the game is over
       }
+      // determines the type-effectiveness multiplier for this attack
+      const multiplier = getTypeMultiplier(
+        state.player.species.type,
+        state.ai.species.type,
+      )
       // this determines how much damage the player does to the AI
-      const damage = state.player.species.attack
+      const damage = Math.round(state.player.species.attack * multiplier)
       // this determines the new HP of the AI after taking damage
       const newAiHp = Math.max(0, state.ai.currentHp - damage)
-      const logEntry = `${state.player.species.name} attacks ${state.ai.species.name} for ${damage} damage!`
+      let logEntry = `${state.player.species.name} attacks ${state.ai.species.name} for ${damage} damage!`
+      if (multiplier === 1.5) {
+        logEntry += " It's super effective!"
+      } else if (multiplier === 0.5) {
+        logEntry += ' Not very effective...'
+      }
       // this determines if the game is over and who the winner is
       const isGameOver = newAiHp <= 0
       // this determines the winner of the game if it is over
@@ -29,15 +40,26 @@ export const battleReducer = (
         turn: isGameOver ? state.turn : 'ai',
       }
     }
+
     case 'AI_COUNTER': {
       if (state.turn !== 'ai' || state.isGameOver) {
         return state // ignore if it's not the AI's turn or the game is over
       }
+      // determines the type-effectiveness multiplier for this attack
+      const multiplier = getTypeMultiplier(
+        state.ai.species.type,
+        state.player.species.type,
+      )
       // this determines how much damage the AI does to the player
-      const damage = state.ai.species.attack
+      const damage = Math.round(state.ai.species.attack * multiplier)
       // this determines the new HP of the player after taking damage
       const newPlayerHp = Math.max(0, state.player.currentHp - damage)
-      const logEntry = `${state.ai.species.name} attacks ${state.player.species.name} for ${damage} damage!`
+      let logEntry = `${state.ai.species.name} attacks ${state.player.species.name} for ${damage} damage!`
+      if (multiplier === 1.5) {
+        logEntry += " It's super effective!"
+      } else if (multiplier === 0.5) {
+        logEntry += ' Not very effective...'
+      }
       // this determines if the game is over and who the winner is
       const isGameOver = newPlayerHp <= 0
       // this determines the winner of the game if it is over
@@ -53,6 +75,7 @@ export const battleReducer = (
         turn: isGameOver ? state.turn : 'player',
       }
     }
+
     case 'RESET': {
       // reset the battle state to the initial state
       return {
