@@ -270,6 +270,32 @@ body {
   z-index: 50;
 }
 
+// Level 2 — Fern Gold
+.card-frame--level-2 {
+  border-color: #b08d57;
+}
+
+// Level 3 — Misty Teal
+.card-frame--level-3 {
+  border-color: #0d9488;
+  box-shadow: 0 0 8px rgba(13, 148, 136, 0.4);
+}
+
+// Level 4 — Glowworm (pulsing glow)
+.card-frame--level-4 {
+  border-color: #7c3aed;
+  animation: glowworm-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glowworm-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(124, 58, 237, 0.8);
+  }
+}
+
 // Battle Screen Layout
 .battle-container {
   background-color: var(--color-green);

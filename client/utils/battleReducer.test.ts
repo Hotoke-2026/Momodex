@@ -41,8 +41,8 @@ describe('battleReducer', () => {
   }
 
   const initialState: BattleState = {
-    player: { species: playerSpecies, currentHp: playerSpecies.hp },
-    ai: { species: aiSpecies, currentHp: aiSpecies.hp },
+    player: { species: playerSpecies, currentHp: playerSpecies.hp, level: 1 },
+    ai: { species: aiSpecies, currentHp: aiSpecies.hp, level: 1 },
     turn: 'player',
     log: [],
     isGameOver: false,
@@ -63,7 +63,7 @@ describe('battleReducer', () => {
   it('should handle AI_COUNTER action', () => {
     const stateAfterPlayerAttack: BattleState = {
       ...initialState,
-      ai: { species: aiSpecies, currentHp: 60 },
+      ai: { species: aiSpecies, currentHp: 60, level: 1 },
       turn: 'ai',
     }
 
@@ -80,8 +80,8 @@ describe('battleReducer', () => {
   it('should handle RESET action', () => {
     const stateAfterBattle: BattleState = {
       ...initialState,
-      player: { species: playerSpecies, currentHp: 50 },
-      ai: { species: aiSpecies, currentHp: 30 },
+      player: { species: playerSpecies, currentHp: 50, level: 1 },
+      ai: { species: aiSpecies, currentHp: 30, level: 1 },
       log: ['Some battle log'],
       isGameOver: true,
       winner: 'player',
@@ -96,6 +96,7 @@ describe('battleReducer', () => {
     expect(newState.isGameOver).toBe(false)
     expect(newState.winner).toBe(null)
   })
+
   it('should not mutate the original state object when ATTACK is dispatched', () => {
     // take a snapshot of the original values before dispatching
     const originalAiHp = initialState.ai.currentHp
@@ -114,7 +115,7 @@ describe('battleReducer', () => {
   it('should set isGameOver and winner when an attack brings HP to exactly 0', () => {
     const lowHpState: BattleState = {
       ...initialState,
-      ai: { species: aiSpecies, currentHp: 20 }, // exactly equal to player's attack (20)
+      ai: { species: aiSpecies, currentHp: 20, level: 1 }, // exactly equal to player's attack (20)
     }
 
     const action: BattleAction = { type: 'ATTACK' }
