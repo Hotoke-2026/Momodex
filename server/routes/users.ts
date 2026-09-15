@@ -18,47 +18,30 @@ router.get('/:id', checkJwt, async (req, res) => {
       return res.status(403).json({ error: 'Forbidden: You can only view your own profile' })
     }
 
-    const user = await db('users').where({ id: requestedId }).first()
+    const { name, picture } = req.query as { name?: string; picture?: string }
+
+    let user = await db('users').where({ id: requestedId }).first()
+
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      await db('users').insert({
+        id: requestedId,
+        name: name || requestedId,
+        avatar_url: picture ?? null,
+      })
+      user = await db('users').where({ id: requestedId }).first()
+    } else if (user.name === requestedId && name) {
+      // backfill accounts created before we had access to the real Auth0 profile
+      await db('users').where({ id: requestedId }).update({
+        name,
+        avatar_url: user.avatar_url ?? picture ?? null,
+      })
+      user = await db('users').where({ id: requestedId }).first()
     }
-    
+
     res.json(user)
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch user' })
   }
-})
-
-router.get('/:id/battle-stats', async (req, res) => {
-  const stats = await getOrCreateBattleStats(req.params.id)
-  res.json(stats)
-})
-
-router.get('/:id/last-capture', async (req, res) => {
-  const card = await db('cards')
-    .where({ user_id: req.params.id })
-    .orderBy('created_at', 'desc')
-    .select('created_at', 'location')
-    .first()
-  res.json(card ?? null)
-})
-
-router.patch('/:id', async (req, res) => {
-  const { favourite_species, currently_seeking } = req.body as {
-    favourite_species?: string
-    currently_seeking?: string
-  }
-
-  const updates: Record<string, string> = {}
-  if (favourite_species !== undefined) updates.favourite_species = favourite_species
-  if (currently_seeking !== undefined) updates.currently_seeking = currently_seeking
-
-  if (Object.keys(updates).length > 0) {
-    await db('users').where({ id: req.params.id }).update(updates)
-  }
-
-  const user = await db('users').where({ id: req.params.id }).first()
-  res.json(user)
 })
 
 router.get('/:id/battle-stats', async (req, res) => {

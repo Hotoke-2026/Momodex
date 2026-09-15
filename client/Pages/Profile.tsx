@@ -16,7 +16,11 @@ export function Profile() {
 
   const { data: user } = useQuery({
     queryKey: ['user', userId],
-    queryFn: () => getUserById(userId!, getAccessTokenSilently),
+    queryFn: () =>
+      getUserById(userId!, getAccessTokenSilently, {
+        name: auth0User?.name,
+        picture: auth0User?.picture,
+      }),
     enabled: isAuthenticated && !!userId,
   })
   

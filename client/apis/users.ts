@@ -15,6 +15,7 @@ const rootURL = new URL(`/api/v1`, document.baseURI)
 export async function getUserById(
   id: string,
   getAccessTokenSilently: (options?: object) => Promise<string>,
+  profile?: { name?: string | null; picture?: string | null },
 ) {
   const token = await getAccessTokenSilently({
     authorizationParams: {
@@ -24,6 +25,7 @@ export async function getUserById(
 
   const response = await request
     .get(`${rootURL}/users/${id}`)
+    .query({ name: profile?.name ?? undefined, picture: profile?.picture ?? undefined })
     .set('Authorization', `Bearer ${token}`)
 
   return response.body as User
