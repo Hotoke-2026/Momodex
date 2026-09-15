@@ -28,7 +28,7 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
 
   const { data: speciesList } = useQuery({
     queryKey: ['species-list'],
-    queryFn: () => getAllSpecies(getAccessTokenSilently),
+    queryFn: () => getAllSpecies(),
     enabled: isEditing,
   })
 

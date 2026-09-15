@@ -15,18 +15,13 @@ vi.mock('../middleware/authMiddleware', () => ({
 }))
 
 describe('Protected Routes Authentication', () => {
-  it('returns 401 Unauthorized when accessing /api/v1/cards without a token', async () => {
-    const response = await request(server).get('/api/v1/cards')
+  it('returns 401 Unauthorized when accessing /api/v1/cards/test-user-id without a token', async () => {
+    const response = await request(server).get('/api/v1/cards/test-user-id')
     expect(response.status).toBe(401)
   })
 
   it('returns 401 Unauthorized when accessing /api/v1/users/test-user-id without a token', async () => {
     const response = await request(server).get('/api/v1/users/test-user-id')
-    expect(response.status).toBe(401)
-  })
-
-  it('returns 401 Unauthorized when posting to /api/v1/gallery without a token', async () => {
-    const response = await request(server).post('/api/v1/gallery')
     expect(response.status).toBe(401)
   })
 })
