@@ -13,19 +13,31 @@ describe('battleReducer', () => {
     rarity: 'common',
     status: 'native',
     description: 'A test species',
-    fun_fact: ''
+    attack_name: 'Attack',
+    attack_two: null,
+    attack_two_name: null,
+    fun_fact: 'A test species',
+    effect_type: null,
+    effect_value: null,
+    effect_trigger: null,
   }
 
   const aiSpecies: Species = {
     id: 'test-ai',
     name: 'AISpecies',
-    type: 'mammal',
+    type: 'plant',
     hp: 80,
     attack: 15,
     rarity: 'common',
     status: 'invasive',
     description: 'A test species',
-    fun_fact: ''
+    attack_name: 'Attack',
+    attack_two: null,
+    attack_two_name: null,
+    fun_fact: 'A test species',
+    effect_type: null,
+    effect_value: null,
+    effect_trigger: null,
   }
 
   const initialState: BattleState = {
