@@ -11,10 +11,16 @@ export interface Species {
   type: string // 'bird' | 'insect' | 'plant' |
   hp: number
   attack: number
+  attack_name: string
+  attack_two: number | null
+  attack_two_name: string | null
   rarity: string // 'common' | 'rare' | 'legendary'
   status: string // 'native' | 'invasive'
   description: string
   fun_fact: string
+  effect_type: string | null
+  effect_value: number | null
+  effect_trigger: string | null
 }
 
 export interface Card {
