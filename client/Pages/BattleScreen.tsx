@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef } from 'react'
 import { battleReducer } from '../utils/battleReducer'
 import { useNavigate } from 'react-router'
 import { MatchResultLayout } from '../components/MatchResultLayout'
@@ -23,11 +23,17 @@ const tui: Species = {
   type: 'bird',
   hp: 20,
   attack: 14,
+  attack_name: 'Sharp Peck',
+  attack_two: 18,
+  attack_two_name: 'Aerial Dive',
   rarity: 'common',
   status: 'native',
   description: 'A native NZ bird known for its distinctive song.',
   fun_fact:
     'Tūī have two voice boxes, letting them sing two different notes at the same time.',
+  effect_type: null,
+  effect_value: null,
+  effect_trigger: null,
 }
 
 // starting AI species — immediately replaced once the real random opponent loads
@@ -37,11 +43,17 @@ const possum: Species = {
   type: 'mammal',
   hp: 32,
   attack: 17,
+  attack_name: 'Claw Swipe',
+  attack_two: 21,
+  attack_two_name: 'Vicious Bite',
   rarity: 'common',
   status: 'invasive',
   description: 'An invasive species that damages native forests.',
   fun_fact:
     'A single possum can eat around 21,000 leaves a year, stripping native trees bare over time.',
+  effect_type: null,
+  effect_value: null,
+  effect_trigger: null,
 }
 
 const placeholderCard: Card = {
@@ -68,29 +80,23 @@ const CURRENT_USER_ID = 'user1'
 export function BattleScreen() {
   const navigate = useNavigate()
 
-  // Step 1: get the full species pool
   const speciesListQuery = useQuery({
     queryKey: ['species'],
     queryFn: getAllSpecies,
   })
 
-  // Step 2: once the pool arrives, pick ONE random opponent id (only once)
-  const [opponentId, setOpponentId] = useState<string | null>(null)
-  useEffect(() => {
-    if (speciesListQuery.data && !opponentId) {
-      const picked = getRandomOpponent(speciesListQuery.data)
-      setOpponentId(picked.id)
-    }
-  }, [speciesListQuery.data, opponentId])
+  // pure derivation from already-loaded data — no effect/setState needed
+  const opponentId = useMemo(() => {
+    if (!speciesListQuery.data) return null
+    return getRandomOpponent(speciesListQuery.data).id
+  }, [speciesListQuery.data])
 
-  // Step 3: fetch full stats for that one chosen id
   const opponentSpeciesQuery = useQuery({
     queryKey: ['species', opponentId],
     queryFn: () => getSpeciesById(opponentId as string),
     enabled: !!opponentId,
   })
 
-  // Step 3c: fetch the user's cards so we can count captures per species
   const userCardsQuery = useQuery({
     queryKey: ['cards', CURRENT_USER_ID],
     queryFn: () => getCardsByUserId(CURRENT_USER_ID),
@@ -98,18 +104,18 @@ export function BattleScreen() {
 
   const [state, dispatch] = useReducer(battleReducer, initialState)
 
-  // Step 3b: once the real opponent's full data arrives, compute its level from
-  // how many times the player has already captured that species, then swap it
-  // into battle state — this is what makes the AI scale with player progress.
+  // Once the opponent's data AND the user's cards have both loaded, compute
+  // the PLAYER's level from real capture counts, derive the AI's level from
+  // that, and apply both to battle state.
   useEffect(() => {
     if (opponentSpeciesQuery.data && userCardsQuery.data) {
-      // count how many times the player has captured THEIR species (tui, for now)
       const playerCaptureCount = userCardsQuery.data.filter(
         (c) => c.card.species_id === tui.id,
       ).length
       const playerLevel = getCardLevel(playerCaptureCount)
       const aiLevel = getAiLevel(playerLevel)
 
+      dispatch({ type: 'SET_PLAYER_LEVEL', level: playerLevel })
       dispatch({
         type: 'SET_OPPONENT',
         species: opponentSpeciesQuery.data,
@@ -144,8 +150,6 @@ export function BattleScreen() {
     checkAchievementsMutation,
   ])
 
-  // Step 4: don't show the battle UI until the REAL opponent (with its real
-  // level) and the user's cards have both loaded
   if (
     speciesListQuery.isLoading ||
     !opponentSpeciesQuery.data ||

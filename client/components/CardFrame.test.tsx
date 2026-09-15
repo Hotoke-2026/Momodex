@@ -10,13 +10,21 @@ describe('CardFrame Component', () => {
     type: 'Alpine bird',
     hp: 70,
     attack: 20,
+    attack_name: 'Wing Attack',
+    attack_two: 25,
+    attack_two_name: 'Sharp Peck',
     rarity: 'rare',
     status: 'threatened',
     description: 'Pecks at anything shiny it can find.',
+    fun_fact: 'Kea are known for their intelligence and curiosity.',
+    effect_type: null,
+    effect_value: null,
+    effect_trigger: null,
   }
 
   const mockCard: Card = {
     id: 1,
+    card_name: 'Test Kea Card',
     user_id: 'user-123',
     species_id: 'sp-1',
     image_url: 'https://example.com/kea.jpg',
@@ -48,9 +56,11 @@ describe('CardFrame Component', () => {
     expect(screen.getByText('Alpine bird')).toBeInTheDocument()
     expect(screen.getByText('threatened')).toBeInTheDocument()
 
-    // Attack details
+    // Attack details — updated for the two-move system
     expect(screen.getByText('Wing Attack')).toBeInTheDocument()
-    expect(screen.getByText('Attack: 20')).toBeInTheDocument()
+    expect(screen.getByText('Damage: 20')).toBeInTheDocument()
+    expect(screen.getByText('Sharp Peck')).toBeInTheDocument()
+    expect(screen.getByText('Damage: 25')).toBeInTheDocument()
     expect(
       screen.getByText('Pecks at anything shiny it can find.'),
     ).toBeInTheDocument()
