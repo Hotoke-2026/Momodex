@@ -15,6 +15,7 @@ import type { Species } from '../../models/types'
 import { getCardsByUserId } from '../apis/cards'
 import { getCardLevel } from '../utils/getCardLevel'
 import { getAiLevel } from '../utils/getAiLevel'
+import { TypeChart } from '../components/TypeChart'
 
 const tui: Species = {
   id: 'tui',
@@ -94,6 +95,8 @@ export function BattleScreen() {
     queryKey: ['cards', CURRENT_USER_ID],
     queryFn: () => getCardsByUserId(CURRENT_USER_ID),
   })
+
+  const [showTypeChart, setShowTypeChart] = useState(false)
 
   const [selectedCardId, setSelectedCardId] = useState<number | null>(null)
 
@@ -189,9 +192,39 @@ export function BattleScreen() {
           <h1 className="battle-container__selection-title">
             Choose your card
           </h1>
+
+          {opponentSpeciesQuery.data ? (
+            <div className="battle-container__opponent-preview">
+              <p className="battle-container__opponent-preview-label">
+                Your opponent:
+              </p>
+              <p className="battle-container__opponent-preview-name">
+                {opponentSpeciesQuery.data.name}
+                <span className="battle-container__opponent-preview-type">
+                  {' '}
+                  ({opponentSpeciesQuery.data.type})
+                </span>
+              </p>
+            </div>
+          ) : (
+            <p className="battle-container__selection-subtitle">
+              Finding an opponent...
+            </p>
+          )}
+
+          <button
+            className="battle-container__type-chart-toggle"
+            onClick={() => setShowTypeChart((prev) => !prev)}
+          >
+            {showTypeChart ? 'Hide type chart' : 'View type chart'}
+          </button>
+
+          {showTypeChart && <TypeChart />}
+
           <p className="battle-container__selection-subtitle">
             Pick a species from your collection to battle with.
           </p>
+
           <div className="battle-container__selection-grid">
             {cardsQuery.data?.map(({ card, species }) => (
               <button
@@ -207,7 +240,6 @@ export function BattleScreen() {
       </div>
     )
   }
-
   if (
     speciesListQuery.isLoading ||
     !opponentSpeciesQuery.data ||
