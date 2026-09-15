@@ -27,7 +27,6 @@ export const CardFrame: React.FC<CardFrameProps> = ({
       <div className="card-frame__header">
         <div className="card-frame__title-group">
           <h3 className="card-frame__name">{species.name}</h3>
-          <span className="card-frame__rarity">☆ {species.rarity}</span>
         </div>
         {/* HP Bar - Updated for BATTLE!*/}
         <div className="card-frame__hp-section">
@@ -59,6 +58,7 @@ export const CardFrame: React.FC<CardFrameProps> = ({
       <div className="card-frame__badges">
         <span className="badge badge--type">{species.type}</span>
         <StatusBadge isNative={isNative} label={species.status} />
+        <span className="card-frame__rarity">☆ {species.rarity}</span>
       </div>
 
       {/* Main Move / Attack Details*/}
@@ -66,9 +66,20 @@ export const CardFrame: React.FC<CardFrameProps> = ({
         <div className="card-frame__moves">
           <div className="move-item">
             <div className="move-item__header">
-              <span className="move-item__name">Wing Attack</span>
+              <span className="move-item__name">{species.attack_name}</span>
               <span className="move-item__damage">
-                Attack: {species.attack}
+                Damage: {species.attack}
+              </span>
+            </div>
+            <div className="move-item__header">
+              <span className="move-item__name">{species.attack_two_name}</span>
+              <span className="move-item__damage">
+                Damage: {species.attack_two}
+              </span>
+            </div>
+            <div className="move-item__header">
+              <span className="move-item__name">
+                Effect: {species.effect_type}
               </span>
             </div>
             <p className="move-item__desc">{species.description}</p>
@@ -79,7 +90,7 @@ export const CardFrame: React.FC<CardFrameProps> = ({
       {/* Footer Location Info*/}
       {!compact && card.location && (
         <div className="card-frame__footer">
-          <span>{card.location}</span>
+          <span>Observed at: {card.location}</span>
         </div>
       )}
     </div>

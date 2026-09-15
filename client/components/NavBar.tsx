@@ -45,13 +45,24 @@ export function NavBar() {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* TODO: replace initial-letter placeholder with a real profile icon/avatar */}
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white">
-          {user?.name?.[0] ?? '?'}
-        </div>
-        <span className="text-sm font-medium text-(--color-text)">
-          {user?.name ?? 'Loading...'}
-        </span>
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            `flex items-center gap-3 rounded-md px-2 py-1 transition-colors ${
+              isActive
+                ? 'bg-(--color-green-tint) text-(--color-green)'
+                : 'text-(--color-text) hover:bg-(--color-base)'
+            }`
+          }
+        >
+          {/* TODO: replace initial-letter placeholder with a real profile icon/avatar */}
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-green) text-xs font-bold text-white">
+            {user?.name?.[0] ?? '?'}
+          </div>
+          <span className="text-sm font-medium text-(--color-text)">
+            {user?.name ?? 'Loading...'}
+          </span>
+        </NavLink>
         <button className="text-sm font-medium text-(--color-red)">
           Log out
         </button>
