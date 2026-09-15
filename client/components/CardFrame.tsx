@@ -58,7 +58,11 @@ export const CardFrame: React.FC<CardFrameProps> = ({
       <div className="card-frame__badges">
         <span className="badge badge--type">{species.type}</span>
         <StatusBadge isNative={isNative} label={species.status} />
-        <span className="card-frame__rarity">☆ {species.rarity}</span>
+        <span
+          className={`card-frame__rarity card-frame__rarity--${species.rarity}`}
+        >
+          ☆ {species.rarity}
+        </span>
       </div>
 
       {/* Main Move / Attack Details*/}
