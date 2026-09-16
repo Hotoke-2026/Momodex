@@ -5,8 +5,9 @@ import { CardFrame } from '../components/CardFrame.tsx'
 import { getCardLevel } from '../utils/getCardLevel'
 import { getCardsByUserId } from '../apis/cards.ts'
 import { NavBar } from '../components/NavBar'
-import '../styles/index.css'
 import { Footer } from '../components/Footer.tsx'
+import { useDeleteCard } from '../hooks/useDeleteCard'
+import '../styles/index.css'
 
 export function Deck() {
   const {
@@ -18,6 +19,9 @@ export function Deck() {
   const userId = auth0User?.sub
 
   const [typeFilter, setTypeFilter] = useState('all')
+  const [cardPendingDelete, setCardPendingDelete] = useState<number | null>(
+    null,
+  )
 
   const {
     data: cards,
@@ -29,6 +33,8 @@ export function Deck() {
     queryFn: () => getCardsByUserId(userId!, getAccessTokenSilently),
     enabled: isAuthenticated && !!userId,
   })
+
+  const deleteMutation = useDeleteCard(userId ?? '')
 
   const types = useMemo(
     () => Array.from(new Set(cards?.map((c) => c.species.type) ?? [])),
@@ -57,6 +63,13 @@ export function Deck() {
   const invasiveCount =
     cards?.filter((c) => c.species.status.toLowerCase() === 'invasive')
       .length ?? 0
+
+  const handleConfirmDelete = () => {
+    if (cardPendingDelete != null) {
+      deleteMutation.mutate(cardPendingDelete)
+      setCardPendingDelete(null)
+    }
+  }
 
   if (isAuthLoading) {
     return (
@@ -150,12 +163,23 @@ export function Deck() {
             ) : (
               <div className="grid grid-cols-1 gap-15 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredCards.map(({ card, species }) => (
-                  <CardFrame
-                    key={card.id}
-                    card={card}
-                    species={species}
-                    level={getCardLevel(captureCountBySpecies[species.id] ?? 1)}
-                  />
+                  <div key={card.id} className="group relative w-fit">
+                    <button
+                      onClick={() => setCardPendingDelete(card.id)}
+                      className="absolute right-3 bottom-3 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gray-400 text-sm font-bold text-white opacity-0 transition-opacity hover:bg-gray-500 group-hover:opacity-100"
+                      aria-label={`Delete ${species.name} card`}
+                    >
+                      ✕
+                    </button>
+                    <CardFrame
+                      key={card.id}
+                      card={card}
+                      species={species}
+                      level={getCardLevel(
+                        captureCountBySpecies[species.id] ?? 1,
+                      )}
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -163,6 +187,31 @@ export function Deck() {
         </div>
       </div>
       <Footer />
+
+      {cardPendingDelete != null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-xl bg-(--color-surface) p-6 text-center shadow-lg">
+            <p className="text-(--text-body-md) text-(--color-text)">
+              Are you sure you want to permanently delete this card?
+            </p>
+            <div className="mt-4 flex justify-center gap-3">
+              <button
+                onClick={() => setCardPendingDelete(null)}
+                className="rounded-md border border-(--color-tan) px-4 py-2 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="rounded-md bg-(--color-red) px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? 'Deleting...' : 'Yes, delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

@@ -35,3 +35,14 @@ export async function addCard(
 
   return response.body
 }
+
+// client/apis/cards.ts
+export async function deleteCard(
+  cardId: number,
+  getAccessTokenSilently: () => Promise<string>,
+) {
+  const token = await getAccessTokenSilently()
+  await request
+    .delete(`${rootURL}/cards/${cardId}`)
+    .set('Authorization', `Bearer ${token}`)
+}
