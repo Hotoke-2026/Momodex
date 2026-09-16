@@ -64,16 +64,8 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
 
   return (
     <div
-      className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-white/20 text-white"
-      style={{
-        background: `
-          radial-gradient(ellipse 80% 60% at 70% 85%, rgba(167, 243, 208, 0.22) 0%, transparent 70%),
-          radial-gradient(ellipse 70% 50% at 10% 50%, rgba(110, 231, 183, 0.18) 0%, transparent 75%),
-          radial-gradient(ellipse 65% 55% at 60% 15%, rgba(167, 243, 208, 0.2) 0%, transparent 70%),
-          linear-gradient(160deg, #1f5233 0%, #2f6b45 45%, #3d7d52 75%, #2a5f3c 100%)
-        `,
-      }}
-    >
+      className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-white/20 text-white bg-gradient-to-tl from-green-800 to-green-900"
+      >
       <div
         className="pointer-events-none absolute inset-0 opacity-20 mix-blend-overlay"
         style={{
