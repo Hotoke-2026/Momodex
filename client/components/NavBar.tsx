@@ -1,9 +1,10 @@
 // NavBar for all pages, with links to Home, Deck, Battle, and Map
+import { useState } from 'react'
 import { NavLink } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '../apis/users'
 import { useAuth0 } from '@auth0/auth0-react'
-import { Home, Layers, Swords, MapPin } from 'lucide-react'
+import { Home, Layers, Swords, MapPin, Sparkles } from 'lucide-react'
 
 const links = [
   { to: '/', label: 'Home', icon: Home },
@@ -13,6 +14,8 @@ const links = [
 ]
 
 export function NavBar() {
+  const [isLogoHovered, setIsLogoHovered] = useState(false)
+
   const {
     isAuthenticated,
     user: auth0User,
@@ -34,11 +37,29 @@ export function NavBar() {
   })
 
   return (
-    <nav className="relative flex items-center justify-between border-b border-(--color-tan) bg-(--color-surface) px-6 py-3">
-      {/* Brand Logo / Name */}
-      <span className="font-(--font-weight-heading-bold) text-lg text-(--color-text) z-10">
-        Momodex
-      </span>
+    <nav className="relative flex items-center justify-between border-b border-(--color-tan) bg-(--color-surface) px-6 py-3 overflow-hidden">
+      {/* Moving Hover Placeholder PNG/Icon */}
+      {/* Replace <Sparkles className="..." /> with <img src="/path-to-your.png" alt="" className="h-6 w-6 object-contain" /> when ready */}
+      <div
+        className={`aria-hidden pointer-events-none absolute top-1/2 -translate-y-1/2 z-20 transition-all duration-1000 ease-in-out ${
+          isLogoHovered
+            ? 'left-[calc(100%-2.5rem)] opacity-100 scale-100'
+            : 'left-2 opacity-0 scale-50'
+        }`}
+      >
+        <Sparkles className="h-6 w-6 text-(--color-green) animate-spin" />
+      </div>
+
+      {/* Brand Logo / Name with hover handlers */}
+      <div
+        onMouseEnter={() => setIsLogoHovered(true)}
+        onMouseLeave={() => setIsLogoHovered(false)}
+        className="z-10 cursor-pointer"
+      >
+        <span className="font-(--font-weight-heading-bold) text-lg text-(--color-text) transition-colors hover:text-(--color-green)">
+          Momodex
+        </span>
+      </div>
 
       {/* Centered Navigation Links */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-1 sm:gap-2">
