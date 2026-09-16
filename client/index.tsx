@@ -12,7 +12,8 @@ const router = createBrowserRouter(routes)
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID
-const audience = import.meta.env.VITE_AUTH0_AUDIENCE || 'https://api.momodex.com'
+const audience =
+  import.meta.env.VITE_AUTH0_AUDIENCE || 'https://api.momodex.com'
 
 document.addEventListener('DOMContentLoaded', () => {
   createRoot(document.getElementById('app') as HTMLElement).render(
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <QueryClientProvider client={queryClient}>
         <AchievementToastContainer />
         <RouterProvider router={router} />
-        <ReactQueryDevtools />
+        {/* <ReactQueryDevtools /> */}
       </QueryClientProvider>
     </Auth0Provider>,
   )
