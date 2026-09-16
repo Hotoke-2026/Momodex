@@ -29,11 +29,14 @@ function App() {
   useEffect(() => {
     const currentCardId = identifyMutation.data?.id ?? null
 
-    if (identifyMutation.isSuccess && currentCardId && currentCardId !== lastAchievementCheckRef.current) {
+    if (
+      identifyMutation.isSuccess &&
+      currentCardId &&
+      currentCardId !== lastAchievementCheckRef.current
+    ) {
       lastAchievementCheckRef.current = currentCardId
-      checkAchievementsMutation.mutate({})
     }
-  }, [identifyMutation.isSuccess, identifyMutation.data?.id, checkAchievementsMutation])
+  }, [identifyMutation.isSuccess, identifyMutation.data?.id])
 
   // Chained query: only runs once we actually have a card back
   const speciesQuery = useQuery({
@@ -52,13 +55,20 @@ function App() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedFile) return
-    identifyMutation.mutate({
+
+    const result = await identifyMutation.mutateAsync({
       file: selectedFile,
       location: location || undefined,
     })
+
+    const currentCardId = result?.id ?? null
+    if (currentCardId && currentCardId !== lastAchievementCheckRef.current) {
+      lastAchievementCheckRef.current = currentCardId
+      checkAchievementsMutation.mutate({})
+    }
   }
 
   const scrollToForm = () => {
