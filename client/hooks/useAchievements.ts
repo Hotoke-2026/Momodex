@@ -5,6 +5,11 @@ import {
   checkAchievements,
   type CheckAchievementsPayload,
 } from '../apis/achievements'
+import { showAchievementToast } from '../components/AchievementToast'
+
+function getAchievementIcon(type: string) {
+  return `/Images/achievements/${type}.png` || '/Images/achievements/default.png'
+}
 
 export function useAchievements(userId: string) {
   const { getAccessTokenSilently } = useAuth0()
@@ -23,8 +28,17 @@ export function useCheckAchievements(userId: string) {
   return useMutation({
     mutationFn: (payload: CheckAchievementsPayload = {}) =>
       checkAchievements(payload, getAccessTokenSilently),
-    onSuccess: () => {
+    onSuccess: (newlyUnlocked) => {
       queryClient.invalidateQueries({ queryKey: ['achievements', userId] })
+
+      newlyUnlocked.forEach((achievement) => {
+        showAchievementToast({
+          name: achievement.name,
+          description: `You unlocked ${achievement.name}.`,
+          icon: getAchievementIcon(achievement.type),
+          href: '/profile',
+        })
+      })
     },
   })
 }

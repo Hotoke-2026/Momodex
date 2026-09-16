@@ -1,14 +1,14 @@
 import type { AchievementWithStatus } from '../../models/types'
 
 const BADGE_ICONS: Record<string, string> = {
-  first_find: '🔍',
-  starter_bird: '🐦',
-  starter_insect: '🐛',
-  starter_plant: '🌿',
-  ten_observations: '🔟',
-  first_legendary: '🌟',
-  first_win: '🏆',
-  first_invasive_defeated: '🛡️',
+  first_find: '/Images/achievements/first_find.png',
+  starter_bird: '/Images/achievements/starter_bird.png',
+  starter_insect: '/Images/achievements/starter_insect.png',
+  starter_plant: '/Images/achievements/starter_plant.png',
+  ten_observations: '/Images/achievements/ten_observations.png',
+  first_legendary: '/Images/achievements/first_legendary.png',
+  first_win: '/Images/achievements/first_win.png',
+  first_invasive_defeated: '/Images/achievements/first_invasive_defeated.png',
 }
 
 interface AchievementBadgeProps {
@@ -17,6 +17,7 @@ interface AchievementBadgeProps {
 
 export function AchievementBadge({ achievement }: AchievementBadgeProps) {
   const unlocked = achievement.unlocked
+  const icon = BADGE_ICONS[achievement.type] ?? '/Images/achievements/default.png'
 
   return (
     <div
@@ -28,13 +29,15 @@ export function AchievementBadge({ achievement }: AchievementBadgeProps) {
     >
       <div
         aria-hidden="true"
-        className={`mb-3 flex h-16 w-16 items-center justify-center rounded-full text-2xl ${
-          unlocked ? 'bg-[var(--color-green)]' : 'bg-[var(--color-tan)]'
-        }`}
+        className="mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-transparent"
       >
-        <span className={unlocked ? '' : 'opacity-70 grayscale'}>
-          {BADGE_ICONS[achievement.type] ?? '🎖️'}
-        </span>
+        <img
+          src={icon}
+          alt={achievement.name}
+          className={`h-full w-full object-cover ${
+            unlocked ? '' : 'opacity-40 grayscale saturate-0'
+          }`}
+        />
       </div>
 
       <h3 className="mb-1 font-[family-name:var(--font-display)] text-[length:var(--text-heading-sm)] font-[var(--font-weight-heading-bold)] text-[var(--color-text)]">
