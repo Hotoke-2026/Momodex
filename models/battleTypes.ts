@@ -14,6 +14,11 @@ export interface BattleState {
   winner: 'player' | 'ai' | null // null if the battle is still ongoing
   playerPoison: PoisonStatus | null
   aiPoison: PoisonStatus | null
+  lastEvent: Array<{
+    target: 'player' | 'ai'
+    cause: 'attack' | 'poison'
+    attackerType?: string
+  }>
 }
 
 export type BattleAction =
