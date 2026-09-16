@@ -71,7 +71,10 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
   </p>
 </div>
 
-      <h1 className="mt-4 font-[family-name:var(--font-display)] text-[length:var(--text-heading-lg)] font-black text-[var(--color-surface)]">
+      <h1
+        title={user?.name ?? undefined}
+        className="mt-4 max-w-full truncate font-[family-name:var(--font-display)] text-[length:var(--text-heading-lg)] font-black text-[var(--color-surface)]"
+      >
         {user?.name ?? 'Loading...'}
       </h1>
 
