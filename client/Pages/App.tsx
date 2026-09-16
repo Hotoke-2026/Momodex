@@ -7,6 +7,14 @@ import { useIdentifyPhoto } from '../hooks/useIdentifyPhoto'
 import { useCheckAchievements } from '../hooks/useAchievements'
 import { getSpeciesById } from '../apis/species.ts'
 import { CardFrame } from '../components/CardFrame.tsx'
+import { 
+  SquareStack, 
+  Swords, 
+  Gamepad2, 
+  TreePine, 
+  ShieldCheck, 
+  Users 
+} from 'lucide-react'
 import '../styles/index.css'
 
 function App() {
@@ -155,116 +163,69 @@ function App() {
         </header>
 
         {/* --- CONSERVATION SECTION --- */}
-        <section
-          id="conservation"
-          className="bg-(--color-surface) border-b border-(--color-tan)/30 py-12 px-6 sm:px-8"
-        >
-          <div className="mx-auto max-w-5xl">
-            <div className="text-center max-w-2xl mx-auto mb-10">
-              <span className="text-xs font-bold tracking-widest text-(--color-green) uppercase">
-                Kaitiakitanga & Protection
-              </span>
-              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-(--color-text) mt-1">
-                Conservation in Aotearoa
-              </h2>
-              <p className="text-sm text-(--color-text-soft) mt-2 leading-relaxed">
-                New Zealand&apos;s long isolation produced unique ecosystems.
-                Over 80% of native insects, birds, and plants are found nowhere
-                else on Earth.
+      <section
+        id="conservation"
+        className="py-16 px-6 sm:px-8 bg-(--color-base) border-t border-(--color-tan)/30"
+      >
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest text-(--color-green) bg-(--color-green-tint) border border-(--color-green)/20 uppercase mb-3">
+              Conservation Impact
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-(--color-text) mt-1">
+              Protecting Native Ecosystems
+            </h2>
+            <p className="text-sm text-(--color-text-soft) mt-2 leading-relaxed">
+              Every data point collected helps researchers and local environmental groups
+              track species health and manage habitat restoration.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Habitat Restoration */}
+            <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-surface) flex flex-col gap-3">
+              <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
+                <TreePine className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-(--color-text)">
+                Habitat Restoration
+              </h3>
+              <p className="text-xs text-(--color-text-soft) leading-relaxed">
+                Mapping native plant distributions helps ecological teams prioritize 
+                reforestation areas and restore natural habitats efficiently.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
-                <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-base text-(--color-text)">
-                  Predator Control
-                </h3>
-                <p className="text-xs text-(--color-text-soft) leading-relaxed">
-                  Introduced pests like possums, rats, and stoats threaten
-                  native wildlife. Active predator management protects breeding
-                  grounds across millions of hectares.
-                </p>
+            {/* Species Protection */}
+            <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-surface) flex flex-col gap-3">
+              <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
+                <ShieldCheck className="w-5 h-5" />
               </div>
+              <h3 className="font-bold text-base text-(--color-text)">
+                Species Monitoring
+              </h3>
+              <p className="text-xs text-(--color-text-soft) leading-relaxed">
+                Tracking sightings of endangered wildlife creates clear population density maps,
+                helping target pest control where it is needed most.
+              </p>
+            </div>
 
-              <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
-                <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-base text-(--color-text)">
-                  Endemic Species
-                </h3>
-                <p className="text-xs text-(--color-text-soft) leading-relaxed">
-                  From the flightless Kākāpō to ancient Tuatara, Aotearoa’s
-                  flora and fauna require ongoing sanctuary management to
-                  rebound and thrive.
-                </p>
+            {/* Community Science */}
+            <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-surface) flex flex-col gap-3">
+              <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
+                <Users className="w-5 h-5" />
               </div>
-
-              <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
-                <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-base text-(--color-text)">
-                  Community Logging
-                </h3>
-                <p className="text-xs text-(--color-text-soft) leading-relaxed">
-                  Logging species observations helps map distribution networks,
-                  identify biodiversity corridors, and directly support
-                  localized conservation.
-                </p>
-              </div>
+              <h3 className="font-bold text-base text-(--color-text)">
+                Community Action
+              </h3>
+              <p className="text-xs text-(--color-text-soft) leading-relaxed">
+                Connecting local communities directly with environmental projects, turning 
+                outdoor enthusiasts into active caretakers of nature.
+              </p>
             </div>
           </div>
-        </section>
-
+        </div>
+      </section>
         {/* --- FIELD OBSERVATION SECTION (FLOATING CARD DESIGN) --- */}
         <section
           id="observation-form"
@@ -477,71 +438,74 @@ function App() {
         </section>
 
         {/* --- CARDS & BATTLE GAMIFICATION SECTION (FLAT LAYOUT) --- */}
-        <section
-          id="gamification"
-          className="py-16 px-6 sm:px-8 bg-(--color-surface) border-t border-(--color-tan)/30"
-        >
-          <div className="mx-auto max-w-5xl">
-            <div className="text-center max-w-2xl mx-auto mb-10">
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest text-(--color-green) bg-(--color-green-tint) border border-(--color-green)/20 uppercase mb-3">
-                Collect & Defend
-              </span>
-              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-(--color-text) mt-1">
-                Turn Observations into Battle Cards
-              </h2>
-              <p className="text-sm text-(--color-text-soft) mt-2 leading-relaxed">
-                Gamifying conservation efforts by converting real-world wildlife
-                encounters into powerful tools to protect native biodiversity.
-              </p>
-            </div>
+<section
+  id="gamification"
+  className="py-16 px-6 sm:px-8 bg-(--color-surface) border-t border-(--color-tan)/30"
+>
+  <div className="mx-auto max-w-5xl">
+    <div className="text-center max-w-2xl mx-auto mb-10">
+      <span className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest text-(--color-green) bg-(--color-green-tint) border border-(--color-green)/20 uppercase mb-3">
+        Collect & Defend
+      </span>
+      <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-(--color-text) mt-1">
+        Turn Observations into Battle Cards
+      </h2>
+      <p className="text-sm text-(--color-text-soft) mt-2 leading-relaxed">
+        Gamifying conservation efforts by converting real-world wildlife
+        encounters into powerful tools to protect native biodiversity.
+      </p>
+    </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
-                <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold text-lg">
-                  🎴
-                </div>
-                <h3 className="font-bold text-base text-(--color-text)">
-                  Card Creation
-                </h3>
-                <p className="text-xs text-(--color-text-soft) leading-relaxed">
-                  Every photo of native fauna or flora you log is transformed
-                  into a unique collectible card populated with stats based on
-                  real species data.
-                </p>
-              </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Card Creation */}
+      <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
+        <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
+          <SquareStack className="w-5 h-5" />
+        </div>
+        <h3 className="font-bold text-base text-(--color-text)">
+          Card Creation
+        </h3>
+        <p className="text-xs text-(--color-text-soft) leading-relaxed">
+          Every photo of native fauna or flora you log is transformed
+          into a unique collectible card populated with stats based on
+          real species data.
+        </p>
+      </div>
 
-              <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
-                <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold text-lg">
-                  ⚔️
-                </div>
-                <h3 className="font-bold text-base text-(--color-text)">
-                  Invasive Pests Battle
-                </h3>
-                <p className="text-xs text-(--color-text-soft) leading-relaxed">
-                  Deploy your collected deck into battle arenas to fight back
-                  against invasive species like stoats, possums, and rats
-                  threatening local ecosystems.
-                </p>
-              </div>
+      {/* Invasive Pests Battle */}
+      <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
+        <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
+          <Swords className="w-5 h-5" />
+        </div>
+        <h3 className="font-bold text-base text-(--color-text)">
+          Invasive Pests Battle
+        </h3>
+        <p className="text-xs text-(--color-text-soft) leading-relaxed">
+          Deploy your collected deck into battle arenas to fight back
+          against invasive species like stoats, possums, and rats
+          threatening local ecosystems.
+        </p>
+      </div>
 
-              <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
-                <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold text-lg">
-                  🌱
-                </div>
-                <h3 className="font-bold text-base text-(--color-text)">
-                  Gamified Impact
-                </h3>
-                <p className="text-xs text-(--color-text-soft) leading-relaxed">
-                  By turning field data into interactive gameplay, everyday
-                  citizen science directly fuels engagement and awareness for
-                  New Zealand&apos;s biodiversity.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+      {/* Gamified Impact */}
+      <div className="p-6 rounded-xl border border-(--color-tan)/40 bg-(--color-base)/50 flex flex-col gap-3">
+        <div className="w-10 h-10 rounded-lg bg-(--color-green-tint) text-(--color-green) flex items-center justify-center font-bold">
+          <Gamepad2 className="w-5 h-5" />
+        </div>
+        <h3 className="font-bold text-base text-(--color-text)">
+          Gamified Impact
+        </h3>
+        <p className="text-xs text-(--color-text-soft) leading-relaxed">
+          By turning field data into interactive gameplay, everyday
+          citizen science directly fuels engagement and awareness for
+          New Zealand&apos;s biodiversity.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <section className="relative overflow-hidden border-t border-b border-white/10 py-20 px-6 sm:px-8">
+        <section className="relative overflow-hidden border-t border-b border-white/10 py-34 px-6 sm:px-8">
           <div className="absolute inset-0 z-0">
             <img
               src="/Images/kakapo.jpg"
