@@ -40,8 +40,20 @@ function resolveAttack(
   const isSecondMove = move === 'two'
   const baseDamage = isSecondMove ? (species.attack_two ?? 0) : species.attack
   const moveName = isSecondMove ? species.attack_two_name : species.attack_name
+  const missChance = isSecondMove
+    ? (species.attack_two_miss_chance ?? 0)
+    : species.attack_miss_chance
   const hasOnAttackEffect =
     isSecondMove && species.effect_trigger === 'on_attack'
+
+  if (Math.random() * 100 < missChance) {
+    return {
+      newDefenderHp: defender.currentHp,
+      attackerHpGain: 0,
+      poisonInflicted: null,
+      logEntry: `${species.name} used ${moveName}, but it missed!`,
+    }
+  }
 
   // Level bonus applies to the raw stat first
   const leveledDamage = getLeveledStat(baseDamage, attacker.level)
