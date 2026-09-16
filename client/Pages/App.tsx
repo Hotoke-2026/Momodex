@@ -15,12 +15,7 @@ function App() {
   const [location, setLocation] = useState('')
   const lastAchievementCheckRef = useRef<number | null>(null)
 
-  const {
-    isAuthenticated,
-    user: auth0User,
-    getAccessTokenSilently,
-    loginWithRedirect,
-  } = useAuth0()
+  const { user: auth0User } = useAuth0()
   const userId = auth0User?.sub ?? 'test'
 
   const identifyMutation = useIdentifyPhoto(userId)
