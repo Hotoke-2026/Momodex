@@ -90,7 +90,7 @@ export const MatchResultLayout: React.FC<MatchResultLayoutProps> = ({
           {/* Species Fact Note */}
           {speciesFact && (
             <div className="mt-6 w-full rounded-2xl border border-white/20 bg-black/25 backdrop-blur-md p-4 text-left shadow-lg">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-200">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
                 <BookOpen className="h-4 w-4 shrink-0" />
                 <span>Field Note {speciesName ? `— ${speciesName}` : ''}</span>
               </div>
