@@ -11,9 +11,63 @@ export interface AchievementToastData {
 let toastQueue: AchievementToastData[] = []
 let toastSubscribers = new Set<(toasts: AchievementToastData[]) => void>()
 
+// --- Sound ---
+// A shared AudioContext, resumed on the first user interaction so browser
+// autoplay restrictions don't silently swallow the sound.
+let audioContext: AudioContext | null = null
+
+function getAudioContext(): AudioContext | null {
+  if (typeof window === 'undefined') return null
+  const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+  if (!AudioContextClass) return null
+
+  if (!audioContext) {
+    audioContext = new AudioContextClass()
+    const resume = () => {
+      audioContext?.resume().catch(() => {})
+    }
+    window.addEventListener('pointerdown', resume, { once: true })
+    window.addEventListener('keydown', resume, { once: true })
+  }
+
+  return audioContext
+}
+
+function playAchievementSound() {
+  const ctx = getAudioContext()
+  if (!ctx) return
+
+  try {
+    const now = ctx.currentTime
+
+    // Quick ascending two-note chime (C6 -> G6)
+    ;[1046.5, 1568.0].forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      osc.type = 'sine'
+      osc.frequency.value = freq
+
+      const start = now + i * 0.1
+      gain.gain.setValueAtTime(0, start)
+      gain.gain.linearRampToValueAtTime(0.25, start + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+
+      osc.start(start)
+      osc.stop(start + 0.4)
+    })
+  } catch {
+    // Web Audio blocked or unavailable — fail silently, toast still shows
+  }
+}
+
 export function showAchievementToast(toast: AchievementToastData) {
   toastQueue = [...toastQueue, toast]
   toastSubscribers.forEach((subscriber) => subscriber(toastQueue))
+  playAchievementSound()
 }
 
 export function AchievementToastContainer() {
@@ -21,13 +75,13 @@ export function AchievementToastContainer() {
   const [isHovered, setIsHovered] = useState(false)
 
   useEffect(() => {
-  setToasts(toastQueue)
-  const subscriber = (nextToasts: AchievementToastData[]) => setToasts(nextToasts)
-  toastSubscribers.add(subscriber)
-  return () => {
-    toastSubscribers.delete(subscriber)
-  }
-}, [])
+    setToasts(toastQueue)
+    const subscriber = (nextToasts: AchievementToastData[]) => setToasts(nextToasts)
+    toastSubscribers.add(subscriber)
+    return () => {
+      toastSubscribers.delete(subscriber)
+    }
+  }, [])
 
   useEffect(() => {
     if (toasts.length === 0 || isHovered) return
@@ -44,7 +98,7 @@ export function AchievementToastContainer() {
 
   const content = (
     <div
-      className="fixed right-5 top-24 z-[9999] flex w-[min(92vw,360px)] flex-col gap-3 pointer-events-none"
+      className="fixed right-5 top-5 z-[9999] flex w-[min(92vw,360px)] flex-col gap-3 pointer-events-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
