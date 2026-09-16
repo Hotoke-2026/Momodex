@@ -10,7 +10,7 @@ export function AchievementCompletionBar({
   const percent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0
 
   return (
-    <div className="rounded-2xl border border-[var(--color-tan)] bg-[var(--color-surface)] p-5">
+    <div className="rounded-2xl border border-[var(--color-tan)] bg-[var(--color-surface)] p-5 drop-shadow-md">
       <h3 className="mb-3 font-[family-name:var(--font-display)] text-[length:var(--text-body-lg)] font-[var(--font-weight-heading-bold)] text-[var(--color-text)]">
         Achievement Completion
       </h3>
@@ -23,7 +23,7 @@ export function AchievementCompletionBar({
         aria-label="Achievements unlocked"
       >
         <div
-          className="h-full rounded-full bg-[var(--color-green)] transition-[width]"
+          className="h-full rounded-full bg-gradient-to-r from-emerald-800 to-green-800 transition-[width]"
           style={{ width: `${percent}%` }}
         />
       </div>

@@ -64,7 +64,7 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
 
   return (
     <div
-      className="relative overflow-hidden rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 text-white"
+      className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-white/20 text-white"
       style={{
         background: `
           radial-gradient(ellipse 80% 60% at 70% 85%, rgba(167, 243, 208, 0.22) 0%, transparent 70%),
@@ -74,7 +74,6 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
         `,
       }}
     >
-      {/* Fine film-grain texture overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-20 mix-blend-overlay"
         style={{
@@ -83,8 +82,6 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
         }}
       />
 
-      {/* Soft Ambient Light Glow */}
-      <div className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-emerald-300/10 blur-3xl" />
 
       {/* Edit Button */}
       <button
@@ -102,7 +99,7 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
 
       <div className="flex items-start gap-4 pr-14 relative z-10">
         <ProfileAvatar name={user?.name} avatarUrl={user?.avatar_url} size={72} />
-        <p className="mt-4 text-[length:var(--text-body-md)] italic text-emerald-100 font-medium">
+        <p className="mt-4 text-[length:var(--text-body-md)] italic text-white font-medium">
           Momo Collecting since {formatDate(user?.created_at) ?? '—'}
         </p>
       </div>
@@ -137,7 +134,7 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
               <select
                 value={seekingDraft}
                 onChange={(e) => setSeekingDraft(e.target.value)}
-                className="rounded-xl border border-white/30 bg-black/30 backdrop-blur-md px-3.5 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white"
+                className="rounded-xl border border-white/30 bg-black/30 backdrop-blur-md px-3.5 py-2 text-white"
               >
                 <option value="" className="bg-emerald-900 text-white">
                   Choose a species...
