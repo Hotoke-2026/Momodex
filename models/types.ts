@@ -16,8 +16,10 @@ export interface Species {
   hp: number
   attack: number
   attack_name: string
+  attack_miss_chance: number
   attack_two: number | null
   attack_two_name: string | null
+  attack_two_miss_chance: number | null
   rarity: string // 'common' | 'rare' | 'legendary'
   status: string // 'native' | 'invasive'
   description: string

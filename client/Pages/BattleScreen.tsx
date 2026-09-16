@@ -26,8 +26,10 @@ const tui: Species = {
   hp: 20,
   attack: 14,
   attack_name: 'Sharp Peck',
+  attack_miss_chance: 5,
   attack_two: 18,
   attack_two_name: 'Aerial Dive',
+  attack_two_miss_chance: 15,
   rarity: 'common',
   status: 'native',
   description: 'A native NZ bird known for its distinctive song.',
@@ -45,8 +47,10 @@ const possum: Species = {
   hp: 32,
   attack: 17,
   attack_name: 'Claw Swipe',
+  attack_miss_chance: 5,
   attack_two: 21,
   attack_two_name: 'Vicious Bite',
+  attack_two_miss_chance: 15,
   rarity: 'common',
   status: 'invasive',
   description: 'An invasive species that damages native forests.',
@@ -499,6 +503,9 @@ export function BattleScreen() {
                 <div className="move-dmg">
                   {state.player.species.attack} DMG
                 </div>
+                <div className="move-miss-chance">
+                  {state.player.species.attack_miss_chance}% miss
+                </div>
               </button>
 
               {state.player.species.attack_two != null && (
@@ -512,6 +519,9 @@ export function BattleScreen() {
                   </div>
                   <div className="move-dmg">
                     {state.player.species.attack_two} DMG
+                  </div>
+                  <div className="move-miss-chance">
+                    {state.player.species.attack_two_miss_chance}% miss
                   </div>
                   {state.player.species.effect_type && (
                     <div className="move-effect">
