@@ -6,6 +6,7 @@ import { ProfileAvatar } from './ProfileAvatar'
 import { BattleStatsCard } from './BattleStatsCard'
 import type { User, BattleStats, LastCapture } from '../../models/types'
 import { useAuth0 } from '@auth0/auth0-react'
+import { Edit2, X } from 'lucide-react'
 
 interface ProfileCardProps {
   userId: string
@@ -17,6 +18,13 @@ interface ProfileCardProps {
 function formatDate(value?: string | null) {
   if (!value) return null
   return new Date(value).toLocaleDateString()
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function getDisplayName(name?: string | null) {
+  if (!name) return name
+  return EMAIL_PATTERN.test(name) ? name.split('@')[0] : name
 }
 
 export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileCardProps) {
@@ -33,20 +41,20 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
   })
 
   const saveMutation = useMutation({
-  mutationFn: () =>
-    updateProfileFields(
-      userId,
-      {
-        favourite_species: favouriteDraft || user?.favourite_species || '',
-        currently_seeking: seekingDraft || user?.currently_seeking || '',
-      },
-      getAccessTokenSilently
-    ),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['user', userId] })
-    setIsEditing(false)
-  },
-})
+    mutationFn: () =>
+      updateProfileFields(
+        userId,
+        {
+          favourite_species: favouriteDraft || user?.favourite_species || '',
+          currently_seeking: seekingDraft || user?.currently_seeking || '',
+        },
+        getAccessTokenSilently
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', userId] })
+      setIsEditing(false)
+    },
+  })
 
   const startEditing = () => {
     setFavouriteDraft(user?.favourite_species ?? '')
@@ -55,27 +63,44 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
   }
 
   return (
-    <div className="relative rounded-3xl bg-[var(--color-dark)] p-6">
+    <div
+      className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-white/20 text-white bg-gradient-to-tl from-green-800 to-green-900"
+      >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-20 mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+      />
+
+
+      {/* Edit Button */}
       <button
+        type="button"
         onClick={() => (isEditing ? setIsEditing(false) : startEditing())}
         aria-label={isEditing ? 'Cancel editing profile' : 'Edit profile'}
-        className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-surface)] text-[var(--color-text)]"
+        className="group absolute right-4 top-4 sm:right-6 sm:top-6 flex h-11 w-11 items-center justify-center rounded-full bg-black/25 backdrop-blur-md border border-white/30 text-white shadow-md hover:bg-white hover:text-emerald-800 hover:border-white hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200 cursor-pointer z-20"
       >
-        {isEditing ? '✕' : '✎'}
+        {isEditing ? (
+          <X className="h-5 w-5 transition-transform duration-200 group-hover:rotate-90" />
+        ) : (
+          <Edit2 className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
+        )}
       </button>
 
-      <div className="flex items-start gap-4 pr-12">
-  <ProfileAvatar name={user?.name} avatarUrl={user?.avatar_url} size={72} />
-  <p className="mt-4 text-[length:var(--text-body-md)] italic text-[var(--color-green-tint)]">
-    Momo Collecting since {formatDate(user?.created_at) ?? '—'}
-  </p>
-</div>
+      <div className="flex items-start gap-4 pr-14 relative z-10">
+        <ProfileAvatar name={user?.name} avatarUrl={user?.avatar_url} size={72} />
+        <p className="mt-4 text-[length:var(--text-body-md)] italic text-white font-medium">
+          Momo Collecting since {formatDate(user?.created_at) ?? '—'}
+        </p>
+      </div>
 
-      <h1 className="mt-4 font-[family-name:var(--font-display)] text-[length:var(--text-heading-lg)] font-black text-[var(--color-surface)]">
-        {user?.name ?? 'Loading...'}
+      <h1 className="mt-4 max-w-full truncate font-display text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-sm relative z-10">
+        {getDisplayName(user?.name) ?? 'Loading...'}
       </h1>
 
-      <div className="mt-4 flex flex-col gap-2 text-[length:var(--text-body-md)] text-[var(--color-surface)]">
+      <div className="mt-4 flex flex-col gap-2 text-[length:var(--text-body-md)] text-emerald-50 font-medium relative z-10">
         {isEditing ? (
           <>
             <label className="flex flex-col gap-1">
@@ -83,11 +108,13 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
               <select
                 value={favouriteDraft}
                 onChange={(e) => setFavouriteDraft(e.target.value)}
-                className="rounded-lg bg-[var(--color-surface)] px-3 py-1.5 text-[var(--color-text)]"
+                className="rounded-xl border border-white/30 bg-black/30 backdrop-blur-md px-3.5 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white"
               >
-                <option value="">Choose a species...</option>
+                <option value="" className="bg-emerald-900 text-white">
+                  Choose a species...
+                </option>
                 {speciesList?.map((species) => (
-                  <option key={species.id} value={species.name}>
+                  <option key={species.id} value={species.name} className="bg-emerald-900 text-white">
                     {species.name}
                   </option>
                 ))}
@@ -99,11 +126,13 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
               <select
                 value={seekingDraft}
                 onChange={(e) => setSeekingDraft(e.target.value)}
-                className="rounded-lg bg-[var(--color-surface)] px-3 py-1.5 text-[var(--color-text)]"
+                className="rounded-xl border border-white/30 bg-black/30 backdrop-blur-md px-3.5 py-2 text-white"
               >
-                <option value="">Choose a species...</option>
+                <option value="" className="bg-emerald-900 text-white">
+                  Choose a species...
+                </option>
                 {speciesList?.map((species) => (
-                  <option key={species.id} value={species.name}>
+                  <option key={species.id} value={species.name} className="bg-emerald-900 text-white">
                     {species.name}
                   </option>
                 ))}
@@ -113,20 +142,26 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
             <button
               onClick={() => saveMutation.mutate()}
               disabled={saveMutation.isPending}
-              className="mt-2 self-start rounded-lg bg-[var(--color-green-tint)] px-4 py-1.5 font-bold text-[var(--color-dark)] disabled:opacity-50"
+              className="mt-2 self-start rounded-xl bg-white px-5 py-2 font-bold text-emerald-800 shadow-md hover:bg-emerald-50 active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
             >
               {saveMutation.isPending ? 'Saving...' : 'Save'}
             </button>
           </>
         ) : (
           <>
-            <p>Favourite Momo: {user?.favourite_species || '—'}</p>
-            <p>Currently Seeking: {user?.currently_seeking || '—'}</p>
+            <p>
+              <span className="text-white font-semibold">Favourite Momo:</span>{' '}
+              {user?.favourite_species || '—'}
+            </p>
+            <p>
+              <span className="text-white font-semibold">Currently Seeking:</span>{' '}
+              {user?.currently_seeking || '—'}
+            </p>
           </>
         )}
 
         <p>
-          Last capture:{' '}
+          <span className="text-white font-semibold">Last capture:</span>{' '}
           {lastCapture
             ? `${formatDate(lastCapture.created_at)} in ${lastCapture.location ?? 'an unknown location'}`
             : '—'}
@@ -134,7 +169,7 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
       </div>
 
       {battleStats && (
-        <div className="mt-5">
+        <div className="mt-5 border-t border-white/20 pt-5 relative z-10">
           <BattleStatsCard stats={battleStats} />
         </div>
       )}
