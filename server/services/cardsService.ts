@@ -67,3 +67,10 @@ export async function getCardsByUserId(userId: string) {
     },
   }))
 }
+
+export async function deleteCard(cardId: number, userId: string) {
+  const deletedCount = await db('cards')
+    .where({ id: cardId, user_id: userId })
+    .del()
+  return deletedCount > 0
+}
