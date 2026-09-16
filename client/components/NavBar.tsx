@@ -39,7 +39,7 @@ export function NavBar() {
   return (
     <nav className="relative flex items-center justify-between border-b border-(--color-tan) bg-(--color-surface) px-6 py-3 overflow-hidden">
       <div
-        className={`aria-hidden pointer-events-none absolute top-1/2 -translate-y-1/2 z-20 transition-all duration-1000 ease-in-out ${
+        className={`aria-hidden pointer-events-none absolute top-1/2 -translate-y-1/2 z-20 transition-all duration-2000 ease-out ${
           isLogoHovered
             ? 'left-[calc(100%-2.5rem)] opacity-100 scale-100'
             : 'left-2 opacity-0 scale-50'
