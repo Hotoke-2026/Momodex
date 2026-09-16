@@ -25,6 +25,8 @@ export interface Species {
   effect_type: string | null
   effect_value: number | null
   effect_trigger: string | null
+  attack_miss_chance: number
+  attack_two_miss_chance: number | null
 }
 
 export interface Card {

@@ -130,6 +130,9 @@ export function BattleView({
                 {state.player.species.attack_name || 'Attack'}
               </div>
               <div className="move-dmg">{state.player.species.attack} DMG</div>
+              <div className="move-miss-chance">
+                {state.player.species.attack_miss_chance}% miss
+              </div>
             </button>
 
             {state.player.species.attack_two != null && (
@@ -143,6 +146,9 @@ export function BattleView({
                 </div>
                 <div className="move-dmg">
                   {state.player.species.attack_two} DMG
+                </div>
+                <div className="move-miss-chance">
+                  {state.player.species.attack_two_miss_chance}% miss
                 </div>
                 {state.player.species.effect_type && (
                   <div className="move-effect">

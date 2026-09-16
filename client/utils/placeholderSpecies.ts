@@ -19,6 +19,8 @@ export const placeholderPlayerSpecies: Species = {
   effect_type: null,
   effect_value: null,
   effect_trigger: null,
+  attack_miss_chance: 5,
+  attack_two_miss_chance: 15,
 }
 
 export const placeholderOpponentSpecies: Species = {
@@ -38,4 +40,6 @@ export const placeholderOpponentSpecies: Species = {
   effect_type: null,
   effect_value: null,
   effect_trigger: null,
+  attack_miss_chance: 5,
+  attack_two_miss_chance: 15,
 }
