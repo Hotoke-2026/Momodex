@@ -19,6 +19,9 @@ describe('AchievementBadge', () => {
     expect(screen.getByText('Fledgling Flight')).toBeInTheDocument()
     expect(screen.getByText('Unlocked your first bird')).toBeInTheDocument()
     expect(screen.getByText(/Unlocked\s+9\/14\/2026/i)).toBeInTheDocument()
-    expect(screen.getByText('🐦')).toBeInTheDocument()
+    expect(screen.getByAltText('Fledgling Flight')).toHaveAttribute(
+      'src',
+      '/Images/achievements/starter_bird-unlocked.png',
+    )
   })
 })
