@@ -548,7 +548,7 @@ function App() {
               alt="Kākāpō in native sanctuary"
               className="w-full h-full object-center object-cover"
             />
-            <div className="absolute inset-0 bg-radial from-transparent via-black/40 to-black/90" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black/90" />
           </div>
 
           <div className="relative z-10 mx-auto max-w-3xl text-center flex flex-col items-center">
@@ -556,7 +556,7 @@ function App() {
               Every Log Counts for Aotearoa’s Wildlife
             </h2>
 
-            <p className="mt-3 text-sm sm:text-base text-slate-200 leading-relaxed font-medium drop-shadow-sm max-w-xl">
+            <p className="mt-3 text-sm sm:text-base text-white leading-relaxed font-medium drop-shadow-md max-w-xl">
               Critically endangered species like the flightless Kākāpō rely on
               intensive sanctuary preservation. Your observations help build
               broader awareness and protection networks for vulnerable species
