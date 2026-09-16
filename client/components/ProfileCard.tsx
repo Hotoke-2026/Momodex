@@ -19,6 +19,14 @@ function formatDate(value?: string | null) {
   return new Date(value).toLocaleDateString()
 }
 
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function getDisplayName(name?: string | null) {
+  if (!name) return name
+  return EMAIL_PATTERN.test(name) ? name.split('@')[0] : name
+}
+
 export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [favouriteDraft, setFavouriteDraft] = useState('')
@@ -71,11 +79,8 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
   </p>
 </div>
 
-      <h1
-        title={user?.name ?? undefined}
-        className="mt-4 max-w-full truncate font-[family-name:var(--font-display)] text-[length:var(--text-heading-lg)] font-black text-[var(--color-surface)]"
-      >
-        {user?.name ?? 'Loading...'}
+      <h1 className="mt-4 max-w-full truncate font-[family-name:var(--font-display)] text-[length:var(--text-heading-lg)] font-black text-[var(--color-surface)]">
+        {getDisplayName(user?.name) ?? 'Loading...'}
       </h1>
 
       <div className="mt-4 flex flex-col gap-2 text-[length:var(--text-body-md)] text-[var(--color-surface)]">
