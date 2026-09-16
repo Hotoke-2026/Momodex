@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth0 } from '@auth0/auth0-react'
 import { CardFrame } from '../components/CardFrame.tsx'
+import { getCardLevel } from '../utils/getCardLevel'
 import { getCardsByUserId } from '../apis/cards.ts'
 import { NavBar } from '../components/NavBar'
 import { Footer } from '../components/Footer.tsx'
@@ -46,6 +47,15 @@ export function Deck() {
       ? cards
       : cards.filter((c) => c.species.type === typeFilter)
   }, [cards, typeFilter])
+
+  // Count captures per species so we can derive each card's level
+  const captureCountBySpecies = useMemo(() => {
+    const counts: Record<string, number> = {}
+    cards?.forEach((c) => {
+      counts[c.species.id] = (counts[c.species.id] ?? 0) + 1
+    })
+    return counts
+  }, [cards])
 
   const nativeCount =
     cards?.filter((c) => c.species.status.toLowerCase() === 'native').length ??
@@ -161,7 +171,14 @@ export function Deck() {
                     >
                       ✕
                     </button>
-                    <CardFrame card={card} species={species} />
+                    <CardFrame
+                      key={card.id}
+                      card={card}
+                      species={species}
+                      level={getCardLevel(
+                        captureCountBySpecies[species.id] ?? 1,
+                      )}
+                    />
                   </div>
                 ))}
               </div>
