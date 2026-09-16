@@ -17,6 +17,8 @@ export async function seed(knex) {
       attack_name: 'Peck',
       attack_two: 18,
       attack_two_name: 'Burrow Strike',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'native',
       description:
@@ -36,6 +38,8 @@ export async function seed(knex) {
       attack_name: 'Song Blast',
       attack_two: 12,
       attack_two_name: 'Wing Buffet',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -55,6 +59,8 @@ export async function seed(knex) {
       attack_name: 'Sharp Peck',
       attack_two: 16,
       attack_two_name: 'Aerial Dive',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'native',
       description:
@@ -74,6 +80,8 @@ export async function seed(knex) {
       attack_name: 'Gentle Peck',
       attack_two: 19,
       attack_two_name: 'Startling Boom',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -93,6 +101,8 @@ export async function seed(knex) {
       attack_name: 'Powerful Beak',
       attack_two: 13,
       attack_two_name: 'Territorial Charge',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -112,6 +122,8 @@ export async function seed(knex) {
       attack_name: 'Nectar Peck',
       attack_two: 17,
       attack_two_name: 'Aggressive Screech',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'invasive',
       description:
@@ -131,6 +143,8 @@ export async function seed(knex) {
       attack_name: 'Quick Snap',
       attack_two: 13,
       attack_two_name: 'Aerial Loop',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -150,6 +164,8 @@ export async function seed(knex) {
       attack_name: 'Peck',
       attack_two: 15,
       attack_two_name: 'Flock Mob',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -169,6 +185,8 @@ export async function seed(knex) {
       attack_name: 'Sharp Trill',
       attack_two: 12,
       attack_two_name: 'Nest Raid',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -188,6 +206,8 @@ export async function seed(knex) {
       attack_name: 'Stomp',
       attack_two: 16,
       attack_two_name: 'Territorial Charge',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -207,6 +227,8 @@ export async function seed(knex) {
       attack_name: 'Silent Swoop',
       attack_two: 11,
       attack_two_name: 'Talon Grip',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -226,6 +248,8 @@ export async function seed(knex) {
       attack_name: 'Aggressive Peck',
       attack_two: 14,
       attack_two_name: 'Mob Screech',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -245,6 +269,8 @@ export async function seed(knex) {
       attack_name: 'Dive Swoop',
       attack_two: 10,
       attack_two_name: 'Warning Call',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -266,6 +292,8 @@ export async function seed(knex) {
       attack_name: 'Claw Swipe',
       attack_two: 13,
       attack_two_name: 'Night Raid',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -285,6 +313,8 @@ export async function seed(knex) {
       attack_name: 'Claw Rake',
       attack_two: 10,
       attack_two_name: 'Ambush Bite',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'invasive',
       description:
@@ -304,6 +334,8 @@ export async function seed(knex) {
       attack_name: 'Kick',
       attack_two: 16,
       attack_two_name: 'Nibble Frenzy',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -325,6 +357,8 @@ export async function seed(knex) {
       attack_name: 'Spiny Kick',
       attack_two: 4,
       attack_two_name: 'Mandible Snap',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -344,6 +378,8 @@ export async function seed(knex) {
       attack_name: 'Wing Flutter',
       attack_two: 6,
       attack_two_name: 'Toxic Scales',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -363,6 +399,8 @@ export async function seed(knex) {
       attack_name: 'Sting',
       attack_two: 3,
       attack_two_name: 'Swarm Sting',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -382,6 +420,8 @@ export async function seed(knex) {
       attack_name: 'Bite',
       attack_two: 7,
       attack_two_name: 'Colony Swarm',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -401,6 +441,8 @@ export async function seed(knex) {
       attack_name: 'Chomp',
       attack_two: 4,
       attack_two_name: 'Larvae Burst',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -420,6 +462,8 @@ export async function seed(knex) {
       attack_name: 'Buzz Sting',
       attack_two: 6,
       attack_two_name: 'Deafening Chorus',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -439,6 +483,8 @@ export async function seed(knex) {
       attack_name: 'Sting',
       attack_two: 5,
       attack_two_name: 'Pollen Storm',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -458,6 +504,8 @@ export async function seed(knex) {
       attack_name: 'Raptor Strike',
       attack_two: 3,
       attack_two_name: 'Ambush Snap',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -477,6 +525,8 @@ export async function seed(knex) {
       attack_name: 'Wing Flutter',
       attack_two: 7,
       attack_two_name: 'Flutter Swarm',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -498,6 +548,8 @@ export async function seed(knex) {
       attack_name: 'Frond Whip',
       attack_two: 9,
       attack_two_name: 'Silver Shine Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -517,6 +569,8 @@ export async function seed(knex) {
       attack_name: 'Root Slam',
       attack_two: 5,
       attack_two_name: 'Falling Branch Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -536,6 +590,8 @@ export async function seed(knex) {
       attack_name: 'Root Grip',
       attack_two: 8,
       attack_two_name: 'Crimson Bloom Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'native',
       description:
@@ -555,6 +611,8 @@ export async function seed(knex) {
       attack_name: 'Thorn Jab',
       attack_two: 8,
       attack_two_name: 'Root Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -574,6 +632,8 @@ export async function seed(knex) {
       attack_name: 'Smother',
       attack_two: 9,
       attack_two_name: 'Vine Choke Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -593,6 +653,8 @@ export async function seed(knex) {
       attack_name: 'Frond Lash',
       attack_two: 8,
       attack_two_name: 'Root Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -612,6 +674,8 @@ export async function seed(knex) {
       attack_name: 'Leaf Slice',
       attack_two: 9,
       attack_two_name: 'Fibre Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -631,6 +695,8 @@ export async function seed(knex) {
       attack_name: 'Branch Whip',
       attack_two: 7,
       attack_two_name: 'Sap Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -650,6 +716,8 @@ export async function seed(knex) {
       attack_name: 'Blade Cut',
       attack_two: 6,
       attack_two_name: 'Root Choke Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -669,6 +737,8 @@ export async function seed(knex) {
       attack_name: 'Vine Lash',
       attack_two: 8,
       attack_two_name: 'Nectar Drain',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -690,6 +760,8 @@ export async function seed(knex) {
       attack_name: 'Spore Puff',
       attack_two: 4,
       attack_two_name: 'Toxic Bloom',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -709,6 +781,8 @@ export async function seed(knex) {
       attack_name: 'Foul Odor',
       attack_two: 4,
       attack_two_name: 'Lattice Poison',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'native',
       description:
@@ -728,6 +802,8 @@ export async function seed(knex) {
       attack_name: 'Sap Drain',
       attack_two: 5,
       attack_two_name: 'Parasitic Spores',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -747,6 +823,8 @@ export async function seed(knex) {
       attack_name: 'Spore Release',
       attack_two: 4,
       attack_two_name: 'Slow Decay',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -766,6 +844,8 @@ export async function seed(knex) {
       attack_name: 'Spore Burst',
       attack_two: 3,
       attack_two_name: 'Choking Cloud',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -785,6 +865,8 @@ export async function seed(knex) {
       attack_name: 'Hard Knock',
       attack_two: 4,
       attack_two_name: 'Rot Spread',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -804,6 +886,8 @@ export async function seed(knex) {
       attack_name: 'Gel Slap',
       attack_two: 5,
       attack_two_name: 'Fungal Rot',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -823,6 +907,8 @@ export async function seed(knex) {
       attack_name: 'Toxic Bite',
       attack_two: 4,
       attack_two_name: 'Hallucinogenic Spores',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'invasive',
       description:
@@ -842,6 +928,8 @@ export async function seed(knex) {
       attack_name: 'Root Invasion',
       attack_two: 3,
       attack_two_name: 'Slow Strangle',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'invasive',
       description:
@@ -861,6 +949,8 @@ export async function seed(knex) {
       attack_name: 'Silent Strike',
       attack_two: 4,
       attack_two_name: 'Lethal Toxin',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'invasive',
       description:
@@ -882,6 +972,8 @@ export async function seed(knex) {
       attack_name: 'Bite',
       attack_two: 8,
       attack_two_name: 'Ancient Snap',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -901,6 +993,8 @@ export async function seed(knex) {
       attack_name: 'Quick Bite',
       attack_two: 5,
       attack_two_name: 'Camouflage Snap',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'native',
       description:
@@ -920,6 +1014,8 @@ export async function seed(knex) {
       attack_name: 'Powerful Bite',
       attack_two: 4,
       attack_two_name: 'Tail Whip',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -939,6 +1035,8 @@ export async function seed(knex) {
       attack_name: 'Snap Bite',
       attack_two: 6,
       attack_two_name: 'Bark Blend',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -958,6 +1056,8 @@ export async function seed(knex) {
       attack_name: 'Quick Nip',
       attack_two: 7,
       attack_two_name: 'Rock Dash',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -977,6 +1077,8 @@ export async function seed(knex) {
       attack_name: 'Quick Bite',
       attack_two: 6,
       attack_two_name: 'Leaf Litter Dash',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'native',
       description:
@@ -996,6 +1098,8 @@ export async function seed(knex) {
       attack_name: 'Nip',
       attack_two: 5,
       attack_two_name: 'Rapid Scatter',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:
@@ -1015,6 +1119,8 @@ export async function seed(knex) {
       attack_name: 'Weak Kick',
       attack_two: 7,
       attack_two_name: 'Motionless Freeze',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -1034,6 +1140,8 @@ export async function seed(knex) {
       attack_name: 'Damp Hop',
       attack_two: 6,
       attack_two_name: 'Stream Vanish',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'rare',
       status: 'native',
       description:
@@ -1053,6 +1161,8 @@ export async function seed(knex) {
       attack_name: 'Timid Hop',
       attack_two: 8,
       attack_two_name: 'Rock Crevice Hide',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'legendary',
       status: 'native',
       description:
@@ -1072,6 +1182,8 @@ export async function seed(knex) {
       attack_name: 'Croak Lunge',
       attack_two: 5,
       attack_two_name: 'Pond Dash',
+      attack_miss_chance: 5,
+      attack_two_miss_chance: 15,
       rarity: 'common',
       status: 'invasive',
       description:

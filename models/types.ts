@@ -16,8 +16,10 @@ export interface Species {
   hp: number
   attack: number
   attack_name: string
+  attack_miss_chance: number
   attack_two: number | null
   attack_two_name: string | null
+  attack_two_miss_chance: number | null
   rarity: string // 'common' | 'rare' | 'legendary'
   status: string // 'native' | 'invasive'
   description: string
@@ -25,8 +27,6 @@ export interface Species {
   effect_type: string | null
   effect_value: number | null
   effect_trigger: string | null
-  attack_miss_chance: number
-  attack_two_miss_chance: number | null
 }
 
 export interface Card {
