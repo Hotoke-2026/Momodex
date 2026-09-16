@@ -13,7 +13,9 @@ function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [location, setLocation] = useState('')
+  const [isHeroHovered, setIsHeroHovered] = useState(false)
   const lastAchievementCheckRef = useRef<number | null>(null)
+  const heroVideoRef = useRef<HTMLVideoElement>(null)
 
   const {
     isAuthenticated,
@@ -26,24 +28,24 @@ function App() {
   const identifyMutation = useIdentifyPhoto(userId)
   const checkAchievementsMutation = useCheckAchievements(userId ?? '')
 
-  useEffect(() => {
-    const currentCardId = identifyMutation.data?.id ?? null
-
-    if (
-      identifyMutation.isSuccess &&
-      currentCardId &&
-      currentCardId !== lastAchievementCheckRef.current
-    ) {
-      lastAchievementCheckRef.current = currentCardId
-    }
-  }, [identifyMutation.isSuccess, identifyMutation.data?.id])
-
   // Chained query: only runs once we actually have a card back
   const speciesQuery = useQuery({
     queryKey: ['species', identifyMutation.data?.species_id],
     queryFn: () => getSpeciesById(identifyMutation.data!.species_id),
     enabled: !!identifyMutation.data,
   })
+
+  useEffect(() => {
+    const video = heroVideoRef.current
+    if (!video) return
+
+    if (isHeroHovered) {
+      video.currentTime = 0
+      video.play().catch(() => {})
+    } else {
+      video.pause()
+    }
+  }, [isHeroHovered])
 
   const handleFileChange = (file: File | null) => {
     setSelectedFile(file)
@@ -84,12 +86,30 @@ function App() {
       {/* Main Content Area */}
       <div className="grow">
         {/* --- HERO SECTION --- */}
-        <header className="relative overflow-hidden border-b border-white/10 pt-16 pb-20 px-6 sm:px-8">
+        <header
+          className="relative overflow-hidden border-b border-white/10 pt-16 pb-20 px-6 sm:px-8"
+          onMouseEnter={() => setIsHeroHovered(true)}
+          onMouseLeave={() => setIsHeroHovered(false)}
+        >
           <div className="absolute inset-0 z-0">
             <img
-              src="/Images/tui.jpg"
+              src="public/Images/tui.jpg"
               alt="Tūī on Kowhai flower background"
-              className="w-full h-full object-center object-cover"
+              className={`w-full h-full object-center object-cover transition-opacity duration-500 ${
+                isHeroHovered ? 'opacity-0' : 'opacity-100'
+              }`}
+            />
+            <video
+              ref={heroVideoRef}
+              src="public/Videos/hero.mp4"
+              muted
+              loop
+              playsInline
+              preload="none"
+              aria-hidden="true"
+              className={`absolute inset-0 w-full h-full object-center object-cover transition-opacity duration-500 ${
+                isHeroHovered ? 'opacity-100' : 'opacity-0'
+              }`}
             />
             <div className="absolute inset-0 bg-radial from-transparent via-black/40 to-black/90" />
           </div>
