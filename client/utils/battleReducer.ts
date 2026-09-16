@@ -100,7 +100,13 @@ function resolveAttack(
     logEntry += ` ${defender.species.name} was poisoned!`
   }
 
-  return { newDefenderHp, attackerHpGain, poisonInflicted, logEntry }
+  return {
+    newDefenderHp,
+    attackerHpGain,
+    poisonInflicted,
+    logEntry,
+    wasAvoided,
+  }
 }
 
 function tickPoison(hp: number, poison: BattleState['playerPoison']) {
@@ -126,12 +132,16 @@ export const battleReducer = (
 
       const tick = tickPoison(state.player.currentHp, state.playerPoison)
       const log = tick.logEntry ? [...state.log, tick.logEntry] : [...state.log]
+      const poisonEvents = tick.logEntry
+        ? [{ target: 'player' as const, cause: 'poison' as const }]
+        : []
 
       if (tick.hp <= 0) {
         return {
           ...state,
           player: { ...state.player, currentHp: 0 },
           playerPoison: tick.poison,
+          lastEvent: poisonEvents,
           log,
           isGameOver: true,
           winner: 'ai',
@@ -148,12 +158,23 @@ export const battleReducer = (
       )
       const isGameOver = result.newDefenderHp <= 0
 
+      const attackEvents = result.wasAvoided
+        ? []
+        : [
+            {
+              target: 'ai' as const,
+              cause: 'attack' as const,
+              attackerType: state.player.species.type,
+            },
+          ]
+
       return {
         ...state,
         player: { ...playerAfterPoison, currentHp: newPlayerHp },
         ai: { ...state.ai, currentHp: result.newDefenderHp },
         aiPoison: result.poisonInflicted ?? state.aiPoison,
         playerPoison: tick.poison,
+        lastEvent: [...poisonEvents, ...attackEvents],
         log: [...log, result.logEntry],
         isGameOver,
         winner: isGameOver ? 'player' : null,
@@ -166,12 +187,16 @@ export const battleReducer = (
 
       const tick = tickPoison(state.ai.currentHp, state.aiPoison)
       const log = tick.logEntry ? [...state.log, tick.logEntry] : [...state.log]
+      const poisonEvents = tick.logEntry
+        ? [{ target: 'ai' as const, cause: 'poison' as const }]
+        : []
 
       if (tick.hp <= 0) {
         return {
           ...state,
           ai: { ...state.ai, currentHp: 0 },
           aiPoison: tick.poison,
+          lastEvent: poisonEvents,
           log,
           isGameOver: true,
           winner: 'player',
@@ -191,12 +216,23 @@ export const battleReducer = (
       )
       const isGameOver = result.newDefenderHp <= 0
 
+      const attackEvents = result.wasAvoided
+        ? []
+        : [
+            {
+              target: 'player' as const,
+              cause: 'attack' as const,
+              attackerType: state.ai.species.type,
+            },
+          ]
+
       return {
         ...state,
         ai: { ...aiAfterPoison, currentHp: newAiHp },
         player: { ...state.player, currentHp: result.newDefenderHp },
         playerPoison: result.poisonInflicted ?? state.playerPoison,
         aiPoison: tick.poison,
+        lastEvent: [...poisonEvents, ...attackEvents],
         log: [...log, result.logEntry],
         isGameOver,
         winner: isGameOver ? 'ai' : null,
@@ -223,6 +259,7 @@ export const battleReducer = (
         winner: null,
         playerPoison: null,
         aiPoison: null,
+        lastEvent: [],
       }
     }
 

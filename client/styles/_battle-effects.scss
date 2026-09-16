@@ -1,0 +1,785 @@
+// ============================================================
+// BATTLE HIT EFFECTS
+// Attack impact animations, themed per species type, plus
+// battle-log entry styling. Wraps around CardFrame — does not
+// set its own size/background, since CardFrame already has that.
+// ============================================================
+
+.card-hit-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem; // matches .card-frame's radius so effects clip cleanly
+}
+
+.card-hit-wrapper.hit-active {
+  animation: hit-shake 0.6s ease-in-out;
+}
+
+/// ============================================================
+// BIRD — FEATHER SWIPE
+// (needs child elements: .feather.feather-1 through .feather-4)
+// ============================================================
+
+.feather {
+  position: absolute;
+  width: 90px;
+  height: 24px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(
+    90deg,
+    rgba(156, 163, 175, 0),
+    rgba(156, 163, 175, 0.9) 30%,
+    rgba(107, 114, 128, 0.95) 60%,
+    rgba(156, 163, 175, 0)
+  );
+  clip-path: polygon(0% 50%, 18% 15%, 45% 4%, 75% 22%, 100% 50%, 75% 78%, 45% 96%, 18% 85%);
+  box-shadow:
+    inset 0 0 0 1px rgba(75, 85, 99, 0.5),
+    0 0 6px rgba(75, 85, 99, 0.35);
+  filter: blur(0.3px);
+}
+
+.feather-1 {
+  left: -100px;
+  top: 22px;
+  transform: rotate(-6deg);
+}
+.feather-2 {
+  left: -100px;
+  top: 46px;
+  transform: rotate(3deg);
+}
+.feather-3 {
+  left: -100px;
+  top: 68px;
+  transform: rotate(-2deg);
+}
+.feather-4 {
+  left: -100px;
+  top: 90px;
+  transform: rotate(5deg);
+}
+
+.card-hit-wrapper.hit-active.attack-effect--bird .feather {
+  animation: feather-swipe 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.feather-2 {
+  animation-delay: 0.05s;
+}
+.feather-3 {
+  animation-delay: 0.1s;
+}
+.feather-4 {
+  animation-delay: 0.15s;
+}
+
+// ============================================================
+// MAMMAL — CLAW SWIPE
+// ============================================================
+
+.card-hit-wrapper.attack-effect--mammal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(105deg, transparent 25%, rgba(176, 58, 24, 0.9) 29%, transparent 33%),
+    linear-gradient(105deg, transparent 40%, rgba(176, 58, 24, 0.9) 44%, transparent 48%),
+    linear-gradient(105deg, transparent 55%, rgba(176, 58, 24, 0.9) 59%, transparent 63%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--mammal::after {
+  animation: effect-flash 0.5s ease-out;
+}
+
+// ============================================================
+// PLANT — WRIGGLING EARTH VINES
+// (needs child elements: .vine.vine-1/2/3, .leaf.leaf-1..4,
+//  .thorn.thorn-1..4 — rendered only when this type is active)
+// ============================================================
+
+.vine {
+  position: absolute;
+  width: 145px;
+  height: 145px;
+  border: 5px solid #3d7c3b;
+  border-radius: 58% 42% 60% 40%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 0 6px rgba(34, 90, 34, 0.3));
+}
+
+.vine-1 {
+  left: -74px;
+  top: 18px;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  transform-origin: right center;
+  transform: scale(0.05) rotate(5deg);
+}
+
+.vine-2 {
+  right: -74px;
+  top: 6px;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  transform-origin: left center;
+  transform: scale(0.05) rotate(-5deg);
+}
+
+.vine-3 {
+  left: 28px;
+  bottom: -78px;
+  border-top-color: transparent;
+  transform-origin: center top;
+  transform: scale(0.05) rotate(0deg);
+}
+
+.card-hit-wrapper.hit-active.attack-effect--plant .vine {
+  animation: vine-wriggle-grow 0.85s cubic-bezier(0.22, 0.9, 0.25, 1) forwards;
+}
+
+.vine-2 {
+  animation-delay: 0.08s;
+}
+.vine-3 {
+  animation-delay: 0.16s;
+}
+
+.leaf {
+  position: absolute;
+  width: 20px;
+  height: 12px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(135deg, #8fdf74, #2d7a36);
+  border-radius: 100% 0 100% 0;
+  box-shadow: 0 0 5px rgba(45, 120, 45, 0.25);
+  transform: scale(0);
+}
+
+.leaf::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  width: 2px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateX(-50%) rotate(22deg);
+}
+
+.leaf-1 {
+  left: 28px;
+  top: 20px;
+  transform: rotate(-35deg) scale(0);
+}
+.leaf-2 {
+  right: 28px;
+  top: 24px;
+  transform: rotate(38deg) scale(0);
+}
+.leaf-3 {
+  left: 56px;
+  bottom: 18px;
+  transform: rotate(-18deg) scale(0);
+}
+.leaf-4 {
+  right: 54px;
+  bottom: 18px;
+  transform: rotate(20deg) scale(0);
+}
+
+.card-hit-wrapper.hit-active.attack-effect--plant .leaf {
+  animation: leaf-sprout 0.55s ease-out forwards;
+}
+
+.leaf-2 {
+  animation-delay: 0.12s;
+}
+.leaf-3 {
+  animation-delay: 0.22s;
+}
+.leaf-4 {
+  animation-delay: 0.3s;
+}
+
+.thorn {
+  position: absolute;
+  width: 10px;
+  height: 18px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(#a47a4d, #5c4128);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.thorn-1 {
+  left: 48px;
+  top: 28px;
+  transform: rotate(-30deg) scale(0);
+}
+.thorn-2 {
+  right: 48px;
+  top: 40px;
+  transform: rotate(35deg) scale(0);
+}
+.thorn-3 {
+  left: 82px;
+  bottom: 22px;
+  transform: rotate(-12deg) scale(0);
+}
+.thorn-4 {
+  right: 76px;
+  bottom: 28px;
+  transform: rotate(15deg) scale(0);
+}
+
+.card-hit-wrapper.hit-active.attack-effect--plant .thorn {
+  animation: thorn-burst 0.45s ease-out forwards;
+}
+
+.card-hit-wrapper.attack-effect--plant::after {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  background: radial-gradient(
+    circle,
+    rgba(88, 60, 35, 0.18) 0%,
+    rgba(53, 120, 45, 0.15) 35%,
+    rgba(108, 222, 95, 0.35) 58%,
+    rgba(170, 255, 160, 0.28) 72%,
+    transparent 85%
+  );
+  opacity: 0;
+  transform: scale(0.35);
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--plant::after {
+  animation: earth-life-pulse 0.9s ease-out forwards;
+}
+
+// ============================================================
+// INSECT — SWARM
+// (needs child elements: .bug.bug-1 through .bug-12)
+// ============================================================
+
+.bug {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #facc15;
+  opacity: 0;
+  z-index: 4;
+  pointer-events: none;
+  box-shadow: 0 0 5px rgba(250, 204, 21, 0.9);
+  left: 50%;
+  top: 50%;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--insect .bug {
+  animation: bug-swarm 0.8s ease-out forwards;
+}
+
+.bug-1 {
+  --x: -85px;
+  --y: -45px;
+}
+.bug-2 {
+  --x: -65px;
+  --y: -10px;
+}
+.bug-3 {
+  --x: -90px;
+  --y: 35px;
+}
+.bug-4 {
+  --x: -45px;
+  --y: 55px;
+}
+.bug-5 {
+  --x: -10px;
+  --y: -65px;
+}
+.bug-6 {
+  --x: 30px;
+  --y: -55px;
+}
+.bug-7 {
+  --x: 70px;
+  --y: -35px;
+}
+.bug-8 {
+  --x: 90px;
+  --y: 5px;
+}
+.bug-9 {
+  --x: 80px;
+  --y: 40px;
+}
+.bug-10 {
+  --x: 45px;
+  --y: 60px;
+}
+.bug-11 {
+  --x: 10px;
+  --y: 45px;
+}
+.bug-12 {
+  --x: -30px;
+  --y: -40px;
+}
+
+.card-hit-wrapper.attack-effect--insect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.55), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--insect::after {
+  animation: insect-glow 0.6s ease-out;
+}
+
+// ============================================================
+// HERP — WATER + MUD
+// ============================================================
+
+.card-hit-wrapper.attack-effect--herp::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%) scale(0.2);
+  border-radius: 50%;
+  border: 4px solid rgba(56, 189, 198, 0.9);
+  box-shadow:
+    0 0 0 8px rgba(45, 125, 135, 0.35),
+    0 0 25px rgba(34, 211, 238, 0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--herp::before {
+  animation: herp-water-ripple 0.9s ease-out;
+}
+
+.card-hit-wrapper.attack-effect--herp::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(68, 48, 32, 0.95) 0%, rgba(105, 75, 45, 0.8) 15%, transparent 32%),
+    radial-gradient(ellipse at 50% 55%, rgba(45, 130, 140, 0.7), transparent 55%),
+    radial-gradient(circle at 18% 25%, #725033 0%, transparent 5%),
+    radial-gradient(circle at 82% 22%, #5c402b 0%, transparent 4%),
+    radial-gradient(circle at 15% 75%, #805a38 0%, transparent 6%),
+    radial-gradient(circle at 85% 72%, #63452d 0%, transparent 5%),
+    radial-gradient(circle at 25% 15%, rgba(103, 232, 249, 0.9) 0%, transparent 4%),
+    radial-gradient(circle at 75% 15%, rgba(103, 232, 249, 0.8) 0%, transparent 4%),
+    radial-gradient(circle at 90% 50%, rgba(56, 189, 198, 0.8) 0%, transparent 5%),
+    radial-gradient(circle at 10% 50%, rgba(56, 189, 198, 0.8) 0%, transparent 5%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--herp::after {
+  animation: herp-mud-water 0.9s ease-out;
+}
+
+// ============================================================
+// FUNGI — PURPLE SPORES
+// ============================================================
+
+.card-hit-wrapper.attack-effect--fungi::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d8b4fe;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 -20px 0 2px #c084fc,
+    15px -35px 0 1px #a855f7,
+    35px -20px 0 3px #9333ea,
+    48px 5px 0 1px #d8b4fe,
+    32px 30px 0 2px #7e22ce,
+    10px 48px 0 2px #a855f7,
+    -15px 38px 0 1px #c084fc,
+    -38px 28px 0 3px #9333ea,
+    -50px 0 0 2px #d8b4fe,
+    -38px -28px 0 1px #a855f7,
+    -18px -42px 0 2px #7e22ce,
+    5px -60px 0 0 #e9d5ff,
+    42px -45px 0 0 #c084fc,
+    62px 18px 0 0 #a855f7,
+    42px 48px 0 0 #d8b4fe,
+    -5px 62px 0 0 #c084fc,
+    -45px 48px 0 0 #e9d5ff,
+    -65px 15px 0 0 #a855f7,
+    -48px -45px 0 0 #c084fc;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--fungi::before {
+  animation: fungi-spore-burst 0.9s ease-out forwards;
+}
+
+.card-hit-wrapper.attack-effect--fungi::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(216, 180, 254, 0.9) 0%,
+    rgba(168, 85, 247, 0.65) 20%,
+    rgba(124, 58, 237, 0.3) 45%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-hit-wrapper.hit-active.attack-effect--fungi::after {
+  animation: fungi-cloud 0.9s ease-out;
+}
+
+// ============================================================
+// ANIMATIONS
+// ============================================================
+
+@keyframes hit-shake {
+  0% {
+    transform: translate(0, 0) rotate(0);
+  }
+  15% {
+    transform: translate(-10px, 3px) rotate(-2deg);
+  }
+  30% {
+    transform: translate(10px, -3px) rotate(2deg);
+  }
+  45% {
+    transform: translate(-8px, 2px) rotate(-1.5deg);
+  }
+  60% {
+    transform: translate(7px, -2px) rotate(1.5deg);
+  }
+  75% {
+    transform: translate(-4px, 1px);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+}
+
+@keyframes effect-flash {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes bird-feather-soft {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%) rotate(-18deg) scale(0.8);
+  }
+  20% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(120%) rotate(10deg) scale(1.15);
+  }
+}
+
+@keyframes bird-feather-sharp {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%) rotate(-18deg) scale(0.85);
+  }
+  18% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(-8%) rotate(-5deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(120%) rotate(8deg) scale(1.05);
+  }
+}
+
+@keyframes vine-wriggle-grow {
+  0% {
+    opacity: 0;
+    transform: scale(0.05) rotate(0deg);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  35% {
+    transform: scale(0.55) rotate(12deg);
+  }
+  52% {
+    transform: scale(0.72) rotate(-8deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(8deg);
+  }
+  86% {
+    transform: scale(1.02) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes leaf-sprout {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.15) rotate(12deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes thorn-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0) translateY(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.2) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes earth-life-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+    filter: blur(14px);
+  }
+  45% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  60% {
+    opacity: 0.8;
+    transform: scale(1.05);
+    filter: blur(10px);
+  }
+  78% {
+    opacity: 0.55;
+    transform: scale(1.18);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+    filter: blur(16px);
+  }
+}
+
+@keyframes bug-swarm {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x) * 1.3), calc(-50% + var(--y) * 1.3)) scale(0.4);
+  }
+}
+
+@keyframes insect-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes herp-water-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes herp-mud-water {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(0.7);
+  }
+  35% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  65% {
+    opacity: 0.65;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes fungi-spore-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes fungi-cloud {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  55% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes feather-swipe {
+  0% {
+    opacity: 0;
+    transform: translateX(0) scale(0.85);
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(220px) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(420px) scale(0.95);
+  }
+}
+
+// ============================================================
+// BATTLE LOG ENTRY STYLING
+// ============================================================
+
+.log-entry {
+  padding: 0.15rem 0;
+  opacity: 1;
+
+  &--new {
+    animation: log-fade-in 0.3s ease-out;
+  }
+
+  &--super {
+    color: #86efac;
+    font-weight: 700;
+  }
+
+  &--weak {
+    color: #9ca3af;
+  }
+
+  &--poison {
+    color: #c4b5fd;
+  }
+
+  &--lifesteal {
+    color: #86efac;
+  }
+
+  &--faint {
+    color: #fca5a5;
+    font-weight: 700;
+  }
+}
+
+@keyframes log-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
