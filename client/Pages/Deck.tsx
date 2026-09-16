@@ -191,7 +191,7 @@ export function Deck() {
       {cardPendingDelete != null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="rounded-xl bg-(--color-surface) p-6 text-center shadow-lg">
-            <p className="text-(--text-body-md) text-(--color-text)">
+            <p className="text-(--color-text)">
               Are you sure you want to permanently delete this card?
             </p>
             <div className="mt-4 flex justify-center gap-3">
