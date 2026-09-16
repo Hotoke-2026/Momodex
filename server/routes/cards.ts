@@ -1,5 +1,5 @@
 import express from 'express'
-import { getCardsByUserId } from '../services/cardsService'
+import { deleteCard, getCardsByUserId } from '../services/cardsService'
 import { insertCard } from '../db/cards'
 import { checkJwt } from '../middleware/authMiddleware'
 
@@ -15,7 +15,9 @@ router.get('/:userId', checkJwt, async (req, res) => {
     }
 
     if (authenticatedUserId !== requestedId) {
-      return res.status(403).json({ error: 'Forbidden: You can only view your own cards' })
+      return res
+        .status(403)
+        .json({ error: 'Forbidden: You can only view your own cards' })
     }
 
     const cards = await getCardsByUserId(requestedId)
@@ -28,7 +30,7 @@ router.get('/:userId', checkJwt, async (req, res) => {
 router.post('/', checkJwt, async (req, res) => {
   try {
     const userId = req.auth?.payload?.sub
-    
+
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
@@ -39,6 +41,21 @@ router.post('/', checkJwt, async (req, res) => {
     console.error('SERVER ERROR:', error)
     res.status(500).json({ message: 'Failed to save card' })
   }
+})
+
+router.delete('/:id', checkJwt, async (req, res) => {
+  const cardId = Number(req.params.id)
+  const userId = req.auth?.payload.sub // the real, verified user from the token — not client-supplied
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+
+  const wasDeleted = await deleteCard(cardId, userId)
+  if (!wasDeleted) {
+    return res.status(404).json({ error: 'Card not found' })
+  }
+  res.status(204).send()
 })
 
 export default router
