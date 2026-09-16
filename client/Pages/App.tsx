@@ -553,7 +553,7 @@ function App() {
 
           <div className="relative z-10 mx-auto max-w-3xl text-center flex flex-col items-center">
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
-              Every Log Counts for Aotearoa’s Wildlife
+              Every Log Counts for Aotearoa&apos;s Wildlife
             </h2>
 
             <p className="mt-3 text-sm sm:text-base text-white leading-relaxed font-medium drop-shadow-md max-w-xl">
