@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth0 } from '@auth0/auth0-react'
 import { NavBar } from '../components/NavBar'
 import { Footer } from '../components/Footer'
 import { useIdentifyPhoto } from '../hooks/useIdentifyPhoto'
+import { useCheckAchievements } from '../hooks/useAchievements'
 import { getSpeciesById } from '../apis/species.ts'
 import { CardFrame } from '../components/CardFrame.tsx'
 import '../styles/index.css'
@@ -12,6 +13,7 @@ function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [location, setLocation] = useState('')
+  const lastAchievementCheckRef = useRef<number | null>(null)
 
   const {
     isAuthenticated,
@@ -21,7 +23,17 @@ function App() {
   } = useAuth0()
   const userId = auth0User?.sub ?? 'test'
 
-  const identifyMutation = useIdentifyPhoto()
+  const identifyMutation = useIdentifyPhoto(userId)
+  const checkAchievementsMutation = useCheckAchievements(userId ?? '')
+
+  useEffect(() => {
+    const currentCardId = identifyMutation.data?.id ?? null
+
+    if (identifyMutation.isSuccess && currentCardId && currentCardId !== lastAchievementCheckRef.current) {
+      lastAchievementCheckRef.current = currentCardId
+      checkAchievementsMutation.mutate({})
+    }
+  }, [identifyMutation.isSuccess, identifyMutation.data?.id, checkAchievementsMutation])
 
   // Chained query: only runs once we actually have a card back
   const speciesQuery = useQuery({
