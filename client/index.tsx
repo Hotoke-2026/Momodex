@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import { Auth0Provider } from '@auth0/auth0-react'
 
 import routes from './routes.tsx'
+import { AchievementToastContainer } from './components/AchievementToast'
 
 const queryClient = new QueryClient()
 const router = createBrowserRouter(routes)
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }}
     >
       <QueryClientProvider client={queryClient}>
+        <AchievementToastContainer />
         <RouterProvider router={router} />
         <ReactQueryDevtools />
       </QueryClientProvider>
