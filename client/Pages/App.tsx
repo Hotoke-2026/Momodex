@@ -87,7 +87,7 @@ function App() {
         <header className="relative overflow-hidden border-b border-white/10 pt-16 pb-20 px-6 sm:px-8">
           <div className="absolute inset-0 z-0">
             <img
-              src="public/Images/tui.jpg"
+              src="/Images/tui.jpg"
               alt="Tūī on Kowhai flower background"
               className="w-full h-full object-center object-cover"
             />
@@ -524,7 +524,7 @@ function App() {
         <section className="relative overflow-hidden border-t border-b border-white/10 py-20 px-6 sm:px-8">
           <div className="absolute inset-0 z-0">
             <img
-              src="public/Images/kakapo.jpg"
+              src="/Images/kakapo.jpg"
               alt="Kākāpō in native sanctuary"
               className="w-full h-full object-center object-cover"
             />
