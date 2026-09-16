@@ -66,6 +66,7 @@ const initialState: BattleState = {
   winner: null,
   playerPoison: null,
   aiPoison: null,
+  lastEvent: [],
 }
 
 type BattleAction =
@@ -88,6 +89,77 @@ const screenBattleReducer = (
   return battleReducer(state, action)
 }
 
+// Maps a species' type to its themed hit-effect class — falls back to
+// 'bird' styling for any type not explicitly listed.
+const typeEffectClass: Record<string, string> = {
+  bird: 'attack-effect--bird',
+  mammal: 'attack-effect--mammal',
+  plant: 'attack-effect--plant',
+  insect: 'attack-effect--insect',
+  reptile: 'attack-effect--herp',
+  amphibian: 'attack-effect--herp',
+  fungi: 'attack-effect--fungi',
+}
+
+function getAttackEffectClass(type: string): string {
+  return typeEffectClass[type] ?? 'attack-effect--bird'
+}
+
+function getLogEntryClass(entry: string): string {
+  if (entry.includes('super effective')) return 'log-entry log-entry--super'
+  if (entry.includes('Not very effective')) return 'log-entry log-entry--weak'
+  if (entry.toLowerCase().includes('poison'))
+    return 'log-entry log-entry--poison'
+  if (entry.toLowerCase().includes('lifesteal'))
+    return 'log-entry log-entry--lifesteal'
+  if (entry.toLowerCase().includes('fainted'))
+    return 'log-entry log-entry--faint'
+  return 'log-entry'
+}
+
+// Plant and insect effects need extra child elements for their
+// vine/leaf/thorn or swarming-bug animations. Other types only use
+// ::before/::after, so they render nothing extra.
+function AttackEffectExtras({ type }: { type: string }) {
+  if (type === 'bird') {
+    return (
+      <>
+        <div className="feather feather-1" />
+        <div className="feather feather-2" />
+        <div className="feather feather-3" />
+        <div className="feather feather-4" />
+      </>
+    )
+  }
+  if (type === 'plant') {
+    return (
+      <>
+        <div className="vine vine-1" />
+        <div className="vine vine-2" />
+        <div className="vine vine-3" />
+        <div className="leaf leaf-1" />
+        <div className="leaf leaf-2" />
+        <div className="leaf leaf-3" />
+        <div className="leaf leaf-4" />
+        <div className="thorn thorn-1" />
+        <div className="thorn thorn-2" />
+        <div className="thorn thorn-3" />
+        <div className="thorn thorn-4" />
+      </>
+    )
+  }
+  if (type === 'insect') {
+    return (
+      <>
+        {Array.from({ length: 12 }, (_, i) => (
+          <div key={i} className={`bug bug-${i + 1}`} />
+        ))}
+      </>
+    )
+  }
+  return null
+}
+
 export function BattleScreen() {
   const navigate = useNavigate()
 
@@ -102,10 +174,9 @@ export function BattleScreen() {
   const cardsQuery = useQuery({
     queryKey: ['cards', userId],
     queryFn: () => getCardsByUserId(userId as string, getAccessTokenSilently),
-    enabled: !!userId, // don't attempt to fetch before we actually know who's logged in
+    enabled: !!userId,
   })
 
-  // Count captures per species so we can derive each card's level here too
   const captureCountBySpecies = useMemo(() => {
     const counts: Record<string, number> = {}
     cardsQuery.data?.forEach((c) => {
@@ -166,6 +237,38 @@ export function BattleScreen() {
   const hasSentBattleResult = useRef(false)
   useAiTurn(state, dispatch)
   const isPlayerTurn = state.turn === 'player' && !state.isGameOver
+
+  // --- Hit-effect state: driven by the reducer's explicit lastEvent list,
+  // not by diffing HP — HP alone can't tell "attacked" apart from "poison
+  // ticked" apart from "healed by lifesteal" when several change at once.
+  const [aiHit, setAiHit] = useState(false)
+  const [playerHit, setPlayerHit] = useState(false)
+  const [aiAttackerType, setAiAttackerType] = useState<string | null>(null)
+  const [playerAttackerType, setPlayerAttackerType] = useState<string | null>(
+    null,
+  )
+
+  useEffect(() => {
+    if (state.lastEvent.length === 0) return
+
+    const timers: ReturnType<typeof setTimeout>[] = []
+
+    state.lastEvent.forEach((event) => {
+      if (event.cause !== 'attack') return // poison ticks get no shake/flash for now
+
+      if (event.target === 'ai') {
+        setAiAttackerType(event.attackerType ?? null)
+        setAiHit(true)
+        timers.push(setTimeout(() => setAiHit(false), 600))
+      } else {
+        setPlayerAttackerType(event.attackerType ?? null)
+        setPlayerHit(true)
+        timers.push(setTimeout(() => setPlayerHit(false), 600))
+      }
+    })
+
+    return () => timers.forEach(clearTimeout)
+  }, [state.lastEvent])
 
   useEffect(() => {
     if (!state.isGameOver || !state.winner) {
@@ -331,28 +434,54 @@ export function BattleScreen() {
               <span>OPPONENT</span>
             </div>
             <div className="battle-container__grid">
-              <CardFrame
-                card={selectedEntry.card}
-                species={state.player.species}
-                currentHp={state.player.currentHp}
-                compact={true}
-                level={state.player.level}
-              />
-              <CardFrame
-                card={{
-                  id: 0,
-                  card_name: state.ai.species.name,
-                  user_id: 'ai',
-                  species_id: state.ai.species.id,
-                  image_url: '',
-                  location: null,
-                  created_at: new Date().toISOString(),
-                }}
-                species={state.ai.species}
-                currentHp={state.ai.currentHp}
-                compact={true}
-                level={state.ai.level}
-              />
+              <div
+                className={`card-hit-wrapper ${
+                  playerHit
+                    ? `hit-active ${getAttackEffectClass(playerAttackerType ?? state.ai.species.type)}`
+                    : ''
+                }`}
+              >
+                <CardFrame
+                  card={selectedEntry.card}
+                  species={state.player.species}
+                  currentHp={state.player.currentHp}
+                  compact={true}
+                  level={state.player.level}
+                />
+                {playerHit && (
+                  <AttackEffectExtras
+                    type={playerAttackerType ?? state.ai.species.type}
+                  />
+                )}
+              </div>
+              <div
+                className={`card-hit-wrapper ${
+                  aiHit
+                    ? `hit-active ${getAttackEffectClass(aiAttackerType ?? state.player.species.type)}`
+                    : ''
+                }`}
+              >
+                <CardFrame
+                  card={{
+                    id: 0,
+                    card_name: state.ai.species.name,
+                    user_id: 'ai',
+                    species_id: state.ai.species.id,
+                    image_url: '',
+                    location: null,
+                    created_at: new Date().toISOString(),
+                  }}
+                  species={state.ai.species}
+                  currentHp={state.ai.currentHp}
+                  compact={true}
+                  level={state.ai.level}
+                />
+                {aiHit && (
+                  <AttackEffectExtras
+                    type={aiAttackerType ?? state.player.species.type}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
@@ -403,7 +532,14 @@ export function BattleScreen() {
             <h3>BATTLE LOG</h3>
             <div className="log-entries">
               {state.log.map((entry, i) => (
-                <div key={i}>{entry}</div>
+                <div
+                  key={i}
+                  className={`${getLogEntryClass(entry)} ${
+                    i === state.log.length - 1 ? 'log-entry--new' : ''
+                  }`}
+                >
+                  {entry}
+                </div>
               ))}
             </div>
           </div>

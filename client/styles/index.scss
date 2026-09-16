@@ -1,5 +1,7 @@
+@use 'battle-effects';
+@use 'index.css';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap');
-@import 'index.css'; 
+
 html,
 body {
   font-family: 'Montserrat', sans-serif;
