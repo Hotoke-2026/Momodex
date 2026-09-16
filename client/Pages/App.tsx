@@ -25,12 +25,7 @@ function App() {
   const lastAchievementCheckRef = useRef<number | null>(null)
   const heroVideoRef = useRef<HTMLVideoElement>(null)
 
-  const {
-    isAuthenticated,
-    user: auth0User,
-    getAccessTokenSilently,
-    loginWithRedirect,
-  } = useAuth0()
+  const { user: auth0User } = useAuth0()
   const userId = auth0User?.sub ?? 'test'
 
   const identifyMutation = useIdentifyPhoto(userId)
