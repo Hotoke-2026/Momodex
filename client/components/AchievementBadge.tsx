@@ -29,14 +29,12 @@ export function AchievementBadge({ achievement }: AchievementBadgeProps) {
     >
       <div
         aria-hidden="true"
-        className={`mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full ${
-          unlocked ? 'bg-[var(--color-green)]' : 'bg-[var(--color-tan)]'
-        }`}
+        className="mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-transparent"
       >
         <img
           src={icon}
           alt={achievement.name}
-          className={`h-10 w-10 object-contain ${
+          className={`h-full w-full object-cover ${
             unlocked ? '' : 'opacity-40 grayscale saturate-0'
           }`}
         />
