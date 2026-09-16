@@ -38,8 +38,6 @@ export function NavBar() {
 
   return (
     <nav className="relative flex items-center justify-between border-b border-(--color-tan) bg-(--color-surface) px-6 py-3 overflow-hidden">
-      {/* Moving Hover Placeholder PNG/Icon */}
-      {/* Replace <Sparkles className="..." /> with <img src="/path-to-your.png" alt="" className="h-6 w-6 object-contain" /> when ready */}
       <div
         className={`aria-hidden pointer-events-none absolute top-1/2 -translate-y-1/2 z-20 transition-all duration-1000 ease-in-out ${
           isLogoHovered
@@ -47,7 +45,7 @@ export function NavBar() {
             : 'left-2 opacity-0 scale-50'
         }`}
       >
-        <Sparkles className="h-6 w-6 text-(--color-green) animate-spin" />
+        <img src="/Images/jimbo.png" alt="Logo" className="h-6 w-6 text-(--color-green) " />
       </div>
 
       {/* Brand Logo / Name with hover handlers */}
