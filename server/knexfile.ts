@@ -8,10 +8,6 @@ const config: { [key: string]: Knex.Config } = {
       filename: path.resolve(__dirname, './dev.sqlite3'),
     },
     useNullAsDefault: true,
-    migrations: {
-      directory: './src/db/migrations',
-      extension: 'ts',
-    },
   },
   test: {
     client: 'sqlite3',
@@ -19,10 +15,14 @@ const config: { [key: string]: Knex.Config } = {
       filename: ':memory:',
     },
     useNullAsDefault: true,
-    migrations: {
-      directory: './src/db/migrations',
-      extension: 'ts',
-    },
+  },
+  production: {
+    client: 'sqlite3',
+    useNullAsDefault: true,
+    connection: {
+      filename: process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || '',
+      authToken: process.env.DATABASE_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN || '',
+    } as any,
   },
 };
 
