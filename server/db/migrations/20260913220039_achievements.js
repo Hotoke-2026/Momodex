@@ -8,7 +8,8 @@ export async function up() {
       type TEXT NOT NULL,
       name TEXT NOT NULL,
       unlocked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      UNIQUE(user_id, type)
     )
   `)
 }
