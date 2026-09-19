@@ -10,7 +10,7 @@ export async function handleSaveCard(req: Request, res: Response) {
 
     const { card_name, image_url, species_id, location } = req.body
 
-    const result = await db.execute({
+    const result = await (db as any).execute({
       sql: `INSERT INTO cards (card_name, image_url, species_id, location, user_id) 
             VALUES (?, ?, ?, ?, ?) 
             RETURNING *`,

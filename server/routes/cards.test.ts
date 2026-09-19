@@ -10,19 +10,21 @@ vi.mock('../middleware/authMiddleware', () => ({
   },
 }))
 
+const rawDb = db as any
+
 describe('POST /api/v1/cards', () => {
   beforeEach(async () => {
-    await db.execute('DROP TABLE IF EXISTS cards;')
-    await db.execute('DROP TABLE IF EXISTS users;')
+    await rawDb.execute('DROP TABLE IF EXISTS cards;')
+    await rawDb.execute('DROP TABLE IF EXISTS users;')
 
-    await db.execute(`
+    await rawDb.execute(`
       CREATE TABLE users (
         id TEXT PRIMARY KEY,
         name TEXT
       );
     `)
 
-    await db.execute(`
+    await rawDb.execute(`
       CREATE TABLE cards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         card_name TEXT,
@@ -33,7 +35,7 @@ describe('POST /api/v1/cards', () => {
       );
     `)
 
-    await db.execute({
+    await rawDb.execute({
       sql: 'INSERT INTO users (id, name) VALUES (?, ?)',
       args: ['auth0|test-user-id', 'Test User']
     })
@@ -54,7 +56,7 @@ describe('POST /api/v1/cards', () => {
     expect(res.status).toBe(201)
     expect(res.body.card_name).toBe('Test Card')
 
-    const dbResult = await db.execute({
+    const dbResult = await rawDb.execute({
       sql: 'SELECT * FROM cards WHERE card_name = ?',
       args: ['Test Card']
     })

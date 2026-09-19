@@ -1,15 +1,17 @@
-import { createClient } from "@libsql/client";
+import { createClient } from '@libsql/client'
+import { knex } from 'knex'
 
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
+const client = createClient({
+  url: process.env.DATABASE_URL || '',
+  authToken: process.env.DATABASE_AUTH_TOKEN || '',
+})
 
-if (!url) {
-  throw new Error("TURSO_DATABASE_URL environment variable is missing");
-}
+const db = knex({
+  client: 'sqlite3',
+  connection: {
+    filename: process.env.DATABASE_URL || './sqlite.db',
+  },
+  useNullAsDefault: true,
+})
 
-const db = createClient({
-  url,
-  authToken,
-});
-
-export default db;
+export default db
