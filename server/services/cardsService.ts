@@ -3,36 +3,51 @@ import db from '../db/connection'
 import { NewCard } from '../../models/types'
 
 export async function insertCard(newCard: NewCard) {
-  const [card] = await db('cards').insert(newCard).returning('*')
-  return card
+  const result = await db.execute({
+    sql: `INSERT INTO cards (card_name, user_id, species_id, image_url, location) 
+          VALUES (?, ?, ?, ?, ?) 
+          RETURNING *`,
+    args: [
+      newCard.card_name,
+      newCard.user_id,
+      newCard.species_id,
+      newCard.image_url,
+      newCard.location ?? null,
+    ],
+  })
+  return result.rows[0]
 }
 
 export async function getCardsByUserId(userId: string) {
-  const rows = await db('cards')
-    .join('species', 'cards.species_id', 'species.id')
-    .where('cards.user_id', userId)
-    .select(
-      'cards.id as card_id',
-      'cards.user_id',
-      'cards.species_id',
-      'cards.image_url',
-      'cards.location',
-      'cards.created_at',
-      'species.name',
-      'species.type',
-      'species.hp',
-      'species.attack',
-      'species.attack_name',
-      'species.attack_two',
-      'species.attack_two_name',
-      'species.effect_type',
-      'species.effect_value',
-      'species.effect_trigger',
-      'species.rarity',
-      'species.status',
-      'species.description',
-      'species.fun_fact',
-    )
+  const result = await db.execute({
+    sql: `SELECT 
+            cards.id as card_id,
+            cards.user_id,
+            cards.species_id,
+            cards.image_url,
+            cards.location,
+            cards.created_at,
+            species.name,
+            species.type,
+            species.hp,
+            species.attack,
+            species.attack_name,
+            species.attack_two,
+            species.attack_two_name,
+            species.effect_type,
+            species.effect_value,
+            species.effect_trigger,
+            species.rarity,
+            species.status,
+            species.description,
+            species.fun_fact
+          FROM cards
+          JOIN species ON cards.species_id = species.id
+          WHERE cards.user_id = ?`,
+    args: [userId],
+  })
+
+  const rows = result.rows
 
   // The join gives us one FLAT row per card, mixing card + species columns
   // together. We reshape it here into the { card, species } pairs your
@@ -69,8 +84,10 @@ export async function getCardsByUserId(userId: string) {
 }
 
 export async function deleteCard(cardId: number, userId: string) {
-  const deletedCount = await db('cards')
-    .where({ id: cardId, user_id: userId })
-    .del()
-  return deletedCount > 0
+  const result = await db.execute({
+    sql: 'DELETE FROM cards WHERE id = ? AND user_id = ?',
+    args: [cardId, userId],
+  })
+  // rowsAffected tells us how many rows were deleted
+  return (result.rowsAffected ?? 0) > 0
 }

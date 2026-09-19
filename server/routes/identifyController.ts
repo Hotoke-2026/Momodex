@@ -38,7 +38,7 @@ export async function identifyController(req: Request, res: Response) {
     // and your teammate's hardcoded data both key off an ID.
     // This lookup is the bridge between "what the AI said" and "what our data knows."
     const matchedSpecies = shortlist.find(
-      (s) => s.name.toLowerCase() === speciesName.toLowerCase(),
+      (s: { name: string }) => s.name.toLowerCase() === speciesName.toLowerCase(),
     )
 
     if (!matchedSpecies) {
@@ -52,7 +52,7 @@ export async function identifyController(req: Request, res: Response) {
 
     // Step 4: build the Card row.
     const card = await insertCard({
-      card_name: matchedSpecies.name,
+      card_name: String(matchedSpecies.name),
       user_id: userId,
       species_id: matchedSpecies.id,
       image_url: imageUrl,

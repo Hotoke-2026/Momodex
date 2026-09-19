@@ -1,23 +1,29 @@
 import { beforeAll, beforeEach, afterAll, it, expect } from 'vitest'
 import request from 'supertest'
 import server from '../server.ts'
-import connection from '../db/connection.ts'
+import db from '../db/connection.ts'
 
 const userId = 'test-user'
 
 beforeAll(async () => {
-  await connection.migrate.latest()
-  await connection.seed.run()
+  // If you have migration/seed files, run them via libSQL statements 
+  // or setup your test database schema beforehand.
 })
 
 beforeEach(async () => {
-  await connection('achievements').where({ user_id: userId }).del()
-  await connection('cards').where({ user_id: userId }).del()
-  await connection('users').where({ id: userId }).del()
-  await connection('users').insert({ id: userId, name: 'Test User' })
+  await db.execute({ sql: 'DELETE FROM achievements WHERE user_id = ?', args: [userId] })
+  await db.execute({ sql: 'DELETE FROM cards WHERE user_id = ?', args: [userId] })
+  await db.execute({ sql: 'DELETE FROM users WHERE id = ?', args: [userId] })
+  await db.execute({
+    sql: 'INSERT INTO users (id, name) VALUES (?, ?)',
+    args: [userId, 'Test User'],
+  })
 })
 
-afterAll(async () => connection.destroy())
+afterAll(async () => {
+  // libSQL client doesn't need explicit destroy like knex, but close if supported
+  await db.close?.()
+})
 
 it('GET /api/v1/achievements returns all achievements as locked for a new user', async () => {
   const res = await request(server).get('/api/v1/achievements').query({ userId })
@@ -30,25 +36,25 @@ it('GET /api/v1/achievements returns all achievements as locked for a new user',
 })
 
 it('unlocks and persists "First Find" once a user has collected at least one species', async () => {
-  const allSpecies = await connection('species').select('id')
+  const speciesResult = await db.execute('SELECT id FROM species')
+  const allSpecies = speciesResult.rows
 
-  await connection('cards').insert(
-    allSpecies.map((species, index) => ({
-      card_name: `Card ${index}`,
-      user_id: userId,
-      species_id: species.id,
-      image_url: 'http://example.com/img.png',
-    })),
-  )
+  for (const [index, species] of allSpecies.entries()) {
+    await db.execute({
+      sql: 'INSERT INTO cards (card_name, user_id, species_id, image_url) VALUES (?, ?, ?, ?)',
+      args: [`Card ${index}`, userId, species.id as string, 'http://example.com/img.png'],
+    })
+  }
 
   const checkRes = await request(server).post('/api/v1/achievements/check').send({ userId })
   expect(checkRes.status).toBe(200)
   expect(checkRes.body.some((a: { type: string }) => a.type === 'first_find')).toBe(true)
 
-  const stored = await connection('achievements')
-    .where({ user_id: userId, type: 'first_find' })
-    .first()
-  expect(stored).toBeDefined()
+  const storedResult = await db.execute({
+    sql: 'SELECT * FROM achievements WHERE user_id = ? AND type = ?',
+    args: [userId, 'first_find'],
+  })
+  expect(storedResult.rows[0]).toBeDefined()
 
   const getRes = await request(server).get('/api/v1/achievements').query({ userId })
   const firstFind = getRes.body.find((a: { type: string }) => a.type === 'first_find')
@@ -56,22 +62,24 @@ it('unlocks and persists "First Find" once a user has collected at least one spe
 })
 
 it('does not duplicate an achievement if checked again after already unlocked', async () => {
-  const allSpecies = await connection('species').select('id')
+  const speciesResult = await db.execute('SELECT id FROM species')
+  const allSpecies = speciesResult.rows
 
-  await connection('cards').insert(
-    allSpecies.map((species, index) => ({
-      card_name: `Card ${index}`,
-      user_id: userId,
-      species_id: species.id,
-      image_url: 'http://example.com/img.png',
-    })),
-  )
+  for (const [index, species] of allSpecies.entries()) {
+    await db.execute({
+      sql: 'INSERT INTO cards (card_name, user_id, species_id, image_url) VALUES (?, ?, ?, ?)',
+      args: [`Card ${index}`, userId, species.id as string, 'http://example.com/img.png'],
+    })
+  }
 
   await request(server).post('/api/v1/achievements/check').send({ userId })
   await request(server).post('/api/v1/achievements/check').send({ userId })
 
-  const rows = await connection('achievements').where({ user_id: userId, type: 'first_find' })
-  expect(rows.length).toBe(1)
+  const rowsResult = await db.execute({
+    sql: 'SELECT * FROM achievements WHERE user_id = ? AND type = ?',
+    args: [userId, 'first_find'],
+  })
+  expect(rowsResult.rows.length).toBe(1)
 })
 
 it('unlocks battle achievements when a battle result is provided', async () => {

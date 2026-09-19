@@ -1,4 +1,4 @@
-import { Router, Response } from 'express'
+import { Router } from 'express'
 import db from '../db/connection'
 import { getOrCreateBattleStats } from '../db/battleStats'
 import { checkJwt } from '../middleware/authMiddleware'
@@ -20,26 +20,38 @@ router.get('/:id', checkJwt, async (req, res) => {
 
     const { name, picture } = req.query as { name?: string; picture?: string }
 
-    let user = await db('users').where({ id: requestedId }).first()
+    let userResult = await db.execute({
+      sql: 'SELECT * FROM users WHERE id = ?',
+      args: [requestedId],
+    })
+    let user = userResult.rows[0]
 
     if (!user) {
-      await db('users').insert({
-        id: requestedId,
-        name: name || requestedId,
-        avatar_url: picture ?? null,
+      await db.execute({
+        sql: 'INSERT INTO users (id, name, avatar_url) VALUES (?, ?, ?)',
+        args: [requestedId, name || requestedId, picture ?? null],
       })
-      user = await db('users').where({ id: requestedId }).first()
+      userResult = await db.execute({
+        sql: 'SELECT * FROM users WHERE id = ?',
+        args: [requestedId],
+      })
+      user = userResult.rows[0]
     } else if (user.name === requestedId && name) {
       // backfill accounts created before we had access to the real Auth0 profile
-      await db('users').where({ id: requestedId }).update({
-        name,
-        avatar_url: user.avatar_url ?? picture ?? null,
+      await db.execute({
+        sql: 'UPDATE users SET name = ?, avatar_url = COALESCE(avatar_url, ?) WHERE id = ?',
+        args: [name, picture ?? null, requestedId],
       })
-      user = await db('users').where({ id: requestedId }).first()
+      userResult = await db.execute({
+        sql: 'SELECT * FROM users WHERE id = ?',
+        args: [requestedId],
+      })
+      user = userResult.rows[0]
     }
 
     res.json(user)
   } catch (error) {
+    console.error('Failed to fetch user:', error)
     res.status(500).json({ error: 'Failed to fetch user' })
   }
 })
@@ -50,12 +62,11 @@ router.get('/:id/battle-stats', async (req, res) => {
 })
 
 router.get('/:id/last-capture', async (req, res) => {
-  const card = await db('cards')
-    .where({ user_id: req.params.id })
-    .orderBy('created_at', 'desc')
-    .select('created_at', 'location')
-    .first()
-  res.json(card ?? null)
+  const cardResult = await db.execute({
+    sql: 'SELECT created_at, location FROM cards WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+    args: [req.params.id],
+  })
+  res.json(cardResult.rows[0] ?? null)
 })
 
 router.patch('/:id', async (req, res) => {
@@ -64,16 +75,31 @@ router.patch('/:id', async (req, res) => {
     currently_seeking?: string
   }
 
-  const updates: Record<string, string> = {}
-  if (favourite_species !== undefined) updates.favourite_species = favourite_species
-  if (currently_seeking !== undefined) updates.currently_seeking = currently_seeking
+  const updates: string[] = []
+  const args: any[] = []
 
-  if (Object.keys(updates).length > 0) {
-    await db('users').where({ id: req.params.id }).update(updates)
+  if (favourite_species !== undefined) {
+    updates.push('favourite_species = ?')
+    args.push(favourite_species)
+  }
+  if (currently_seeking !== undefined) {
+    updates.push('currently_seeking = ?')
+    args.push(currently_seeking)
   }
 
-  const user = await db('users').where({ id: req.params.id }).first()
-  res.json(user)
+  if (updates.length > 0) {
+    args.push(req.params.id)
+    await db.execute({
+      sql: `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+      args,
+    })
+  }
+
+  const userResult = await db.execute({
+    sql: 'SELECT * FROM users WHERE id = ?',
+    args: [req.params.id],
+  })
+  res.json(userResult.rows[0])
 })
 
 export default router
