@@ -31,7 +31,7 @@ export function HeroSection() {
     >
       <div className="absolute inset-0 z-0">
         <img
-          src="public/Images/tui.jpg"
+          src="/Images/tui.jpg"
           alt="Tūī on Kowhai flower background"
           className={`w-full h-full object-center object-cover transition-opacity duration-500 ${
             isHeroHovered ? 'opacity-0' : 'opacity-100'
@@ -39,7 +39,7 @@ export function HeroSection() {
         />
         <video
           ref={heroVideoRef}
-          src="public/Videos/hero.mp4"
+          src="/Videos/hero.mp4"
           muted
           loop
           playsInline
