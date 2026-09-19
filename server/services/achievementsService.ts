@@ -40,7 +40,6 @@ export async function getAchievementsForUser(userId: string): Promise<Achievemen
   })
 }
 
-
 async function unlockIfNeeded(userId: string, type: string, name: string, newlyUnlocked: Achievement[]) {
   if (!(await hasAchievement(userId, type))) {
     newlyUnlocked.push(await insertAchievement(userId, type, name))
@@ -53,38 +52,30 @@ export async function checkAchievements(
 ): Promise<Achievement[]> {
   const newlyUnlocked: Achievement[] = []
 
- const [cardCount, hasBird, hasInsect, hasPlant, isLegendary] = await Promise.all([
-  getCardCount(userId),
-  hasCardOfType(userId, 'bird'),
-  hasCardOfType(userId, 'insect'),
-  hasCardOfType(userId, 'plant'),
-  hasLegendaryCard(userId),
-])
+  const [cardCount, hasBird, hasInsect, hasPlant, isLegendary] = await Promise.all([
+    getCardCount(userId),
+    hasCardOfType(userId, 'bird'),
+    hasCardOfType(userId, 'insect'),
+    hasCardOfType(userId, 'plant'),
+    hasLegendaryCard(userId),
+  ])
 
-if (battleResult?.winner) {
-  await recordBattleOutcome(userId, battleResult.winner === 'player')
-}
-
-if (cardCount >= 1) {
-  await unlockIfNeeded(userId, 'first_find', 'First Find', newlyUnlocked)
-}
-
-if (hasBird) {
-  await unlockIfNeeded(userId, 'starter_bird', 'Fledgling Flight', newlyUnlocked)
-}
-if (hasInsect) {
-  await unlockIfNeeded(userId, 'starter_insect', 'The Larval Stage', newlyUnlocked)
-}
-if (hasPlant) {
-  await unlockIfNeeded(userId, 'starter_plant', 'Turning Over a New Leaf', newlyUnlocked)
-}
-
-    if (battleResult?.winner) {
+  if (battleResult?.winner) {
     await recordBattleOutcome(userId, battleResult.winner === 'player')
   }
 
   if (cardCount >= 1) {
     await unlockIfNeeded(userId, 'first_find', 'First Find', newlyUnlocked)
+  }
+
+  if (hasBird) {
+    await unlockIfNeeded(userId, 'starter_bird', 'Fledgling Flight', newlyUnlocked)
+  }
+  if (hasInsect) {
+    await unlockIfNeeded(userId, 'starter_insect', 'The Larval Stage', newlyUnlocked)
+  }
+  if (hasPlant) {
+    await unlockIfNeeded(userId, 'starter_plant', 'Turning Over a New Leaf', newlyUnlocked)
   }
 
   if (cardCount >= 10) {
@@ -107,7 +98,6 @@ if (hasPlant) {
       newlyUnlocked,
     )
   }
-  
 
   return newlyUnlocked
 }
