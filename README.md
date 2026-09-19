@@ -1,4 +1,4 @@
-# 🥝 Momodex
+# 🥝 Momodex on Render
 
 A gamified citizen-science app that turns real-world nature observations into a collectible card and battle game — built to get more people outside, observing New Zealand's native and invasive species, and (eventually) contributing that data back to real conservation research.
 
@@ -65,7 +65,7 @@ Momodex only works if the underlying observations are made safely and respectful
 
 **Backend**
 - Node.js + Express
-- Knex.js + SQLite
+- Turso/libSQL(`@libsql/client`)
 - Auth0 JWT validation (`express-oauth2-jwt-bearer`)
 - Cloudinary SDK
 - Superagent
@@ -100,6 +100,7 @@ Momodex only works if the underlying observations are made safely and respectful
 - A free [Cloudinary](https://cloudinary.com/) account
 - A free [Google AI Studio](https://aistudio.google.com/) API key (for Gemini)
 - A free [Auth0](https://auth0.com/) application (Single Page App + API configured)
+- A [Turso](https://turso.tech/) database instance (or local SQLite/libSQL file connection)
 
 ### Installation
 
@@ -117,6 +118,11 @@ npm install
 Create a `.env` file in the project root with the following:
 
 ```dotenv
+
+# --- Database ---
+DATABASE_URL=libsql://your-turso-database-url.turso.io
+DATABASE_AUTH_TOKEN=your_turso_auth_token
+
 # --- Server-side only (never exposed to the browser) ---
 
 # Gemini API
@@ -145,11 +151,11 @@ VITE_AUTH0_AUDIENCE=your_vite_auth0_audience
 ### Database setup
 
 ```bash
-# Run migrations
-npx knex --knexfile ./server/db/knexfile.js migrate:latest
+# Run database migrations
+npm run db:migrate
 
 # Seed the database with species and user data
-npm run knex seed:run
+npm run db:seed
 ```
 
 ### Running the app
