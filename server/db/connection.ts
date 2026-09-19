@@ -1,9 +1,15 @@
-import knex from 'knex'
-import config from './knexfile.js'
+import { createClient } from "@libsql/client";
 
-type Environment = 'development' | 'production' | 'test'
-const env = (process.env.NODE_ENV as Environment) || 'development'
+const url = process.env.TURSO_DATABASE_URL;
+const authToken = process.env.TURSO_AUTH_TOKEN;
 
-const connection = knex(config[env])
+if (!url) {
+  throw new Error("TURSO_DATABASE_URL environment variable is missing");
+}
 
-export default connection
+const db = createClient({
+  url,
+  authToken,
+});
+
+export default db;

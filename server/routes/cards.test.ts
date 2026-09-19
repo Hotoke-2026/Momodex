@@ -12,20 +12,34 @@ vi.mock('../middleware/authMiddleware', () => ({
 
 describe('POST /api/v1/cards', () => {
   beforeEach(async () => {
-    await db.migrate.rollback()
-    await db.migrate.latest()
-    await db.seed.run()
+    await db.execute('DROP TABLE IF EXISTS cards;')
+    await db.execute('DROP TABLE IF EXISTS users;')
 
-    await db('users')
-      .insert({
-        id: 'auth0|test-user-id',
-        name: 'Test User',
-      })
-      .onConflict('id')
-      .ignore()
+    await db.execute(`
+      CREATE TABLE users (
+        id TEXT PRIMARY KEY,
+        name TEXT
+      );
+    `)
+
+    await db.execute(`
+      CREATE TABLE cards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        card_name TEXT,
+        species_id TEXT,
+        image_url TEXT,
+        location TEXT,
+        user_id TEXT
+      );
+    `)
+
+    await db.execute({
+      sql: 'INSERT INTO users (id, name) VALUES (?, ?)',
+      args: ['auth0|test-user-id', 'Test User']
+    })
   })
 
-  it('saves a card to SQLite', async () => {
+  it('saves a card to Turso/libSQL', async () => {
     const payload = {
       card_name: 'Test Card',
       species_id: 'tui',
@@ -40,9 +54,12 @@ describe('POST /api/v1/cards', () => {
     expect(res.status).toBe(201)
     expect(res.body.card_name).toBe('Test Card')
 
-    const dbRecord = await db('cards')
-      .where({ card_name: 'Test Card' })
-      .first()
-    expect(dbRecord).toBeDefined()
+    const dbResult = await db.execute({
+      sql: 'SELECT * FROM cards WHERE card_name = ?',
+      args: ['Test Card']
+    })
+    
+    expect(dbResult.rows.length).toBeGreaterThan(0)
+    expect(dbResult.rows[0].card_name).toBe('Test Card')
   })
 })
