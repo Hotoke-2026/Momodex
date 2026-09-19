@@ -6,10 +6,11 @@ const client = createClient({
   authToken: process.env.DATABASE_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN || '',
 })
 
+
 const db = knex({
-  client: 'sqlite3',
+  client: 'pg',
   connection: {
-    filename: ':memory:',
+    connectionString: 'postgres://localhost:5432/dummy',
   },
   useNullAsDefault: true,
 })
