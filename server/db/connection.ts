@@ -1,5 +1,5 @@
 import { createClient } from '@libsql/client'
-import { knex } from 'knex'
+import knex from 'knex'
 
 const client = createClient({
   url: process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || 'file:./dev.sqlite',
