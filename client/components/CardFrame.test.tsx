@@ -19,7 +19,9 @@ describe('CardFrame Component', () => {
     fun_fact: '',
     effect_type: null,
     effect_value: null,
-    effect_trigger: null
+    effect_trigger: null,
+    attack_miss_chance: 0,
+    attack_two_miss_chance: null
   }
 
   const mockCard: Card = {

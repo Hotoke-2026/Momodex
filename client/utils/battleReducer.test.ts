@@ -53,6 +53,7 @@ describe('battleReducer', () => {
     winner: null,
     playerPoison: null,
     aiPoison: null,
+    lastEvent: []
   }
 
   afterEach(() => {

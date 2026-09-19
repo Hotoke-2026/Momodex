@@ -23,6 +23,14 @@ describe('useAiTurn', () => {
     status: 'native',
     description: 'A test species',
     fun_fact: 'This is a fun fact about the player species.',
+    attack_name: '',
+    attack_miss_chance: 0,
+    attack_two: null,
+    attack_two_name: null,
+    attack_two_miss_chance: null,
+    effect_type: null,
+    effect_value: null,
+    effect_trigger: null
   }
 
   const aiSpecies: Species = {
@@ -35,17 +43,34 @@ describe('useAiTurn', () => {
     status: 'invasive',
     description: 'A test species',
     fun_fact: 'This is a fun fact about the AI species.',
+    attack_name: '',
+    attack_miss_chance: 0,
+    attack_two: null,
+    attack_two_name: null,
+    attack_two_miss_chance: null,
+    effect_type: null,
+    effect_value: null,
+    effect_trigger: null
   }
 
   it('dispatches AI_COUNTER after a 1.5s delay when it becomes the AI turn', () => {
     const dispatch = vi.fn()
     const state: BattleState = {
-      player: { species: playerSpecies, currentHp: 100 },
-      ai: { species: aiSpecies, currentHp: 80 },
+      player: {
+        species: playerSpecies, currentHp: 100,
+        level: 0
+      },
+      ai: {
+        species: aiSpecies, currentHp: 80,
+        level: 0
+      },
       turn: 'ai',
       log: [],
       isGameOver: false,
       winner: null,
+      playerPoison: null,
+      aiPoison: null,
+      lastEvent: []
     }
 
     renderHook(() => useAiTurn(state, dispatch))
@@ -64,12 +89,21 @@ describe('useAiTurn', () => {
   it('does NOT dispatch AI_COUNTER when it is the player turn', () => {
     const dispatch = vi.fn()
     const state: BattleState = {
-      player: { species: playerSpecies, currentHp: 100 },
-      ai: { species: aiSpecies, currentHp: 80 },
+      player: {
+        species: playerSpecies, currentHp: 100,
+        level: 0
+      },
+      ai: {
+        species: aiSpecies, currentHp: 80,
+        level: 0
+      },
       turn: 'player', // not the AI's turn
       log: [],
       isGameOver: false,
       winner: null,
+      playerPoison: null,
+      aiPoison: null,
+      lastEvent: []
     }
 
     renderHook(() => useAiTurn(state, dispatch))
@@ -81,12 +115,21 @@ describe('useAiTurn', () => {
   it('does NOT dispatch AI_COUNTER when the game is already over', () => {
     const dispatch = vi.fn()
     const state: BattleState = {
-      player: { species: playerSpecies, currentHp: 100 },
-      ai: { species: aiSpecies, currentHp: 0 },
+      player: {
+        species: playerSpecies, currentHp: 100,
+        level: 0
+      },
+      ai: {
+        species: aiSpecies, currentHp: 0,
+        level: 0
+      },
       turn: 'ai',
       log: [],
       isGameOver: true, // game already ended
       winner: 'player',
+      playerPoison: null,
+      aiPoison: null,
+      lastEvent: []
     }
 
     renderHook(() => useAiTurn(state, dispatch))
@@ -98,12 +141,21 @@ describe('useAiTurn', () => {
   it('cancels the pending timer on unmount, so dispatch never fires afterward', () => {
     const dispatch = vi.fn()
     const state: BattleState = {
-      player: { species: playerSpecies, currentHp: 100 },
-      ai: { species: aiSpecies, currentHp: 80 },
+      player: {
+        species: playerSpecies, currentHp: 100,
+        level: 0
+      },
+      ai: {
+        species: aiSpecies, currentHp: 80,
+        level: 0
+      },
       turn: 'ai',
       log: [],
       isGameOver: false,
       winner: null,
+      playerPoison: null,
+      aiPoison: null,
+      lastEvent: []
     }
 
     const { unmount } = renderHook(() => useAiTurn(state, dispatch))
