@@ -1,21 +1,18 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- *
- **/
+import db from '../connection.js'
 
-export async function up(knex) {
-  await knex.schema.createTable('achievements', (table) => {
-    table.string('id').primary()
-    table.string('user_id').notNullable()
-    table.string('type').notNullable() // e.g. "full_deck"
-    table.string('name').notNullable() // e.g. "Full Deck"
-    table.timestamp('unlocked_at').defaultTo(knex.fn.now())
-
-    table.foreign('user_id').references('id').inTable('users')
-  })
+export async function up() {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS achievements (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      name TEXT NOT NULL,
+      unlocked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `)
 }
 
-export async function down(knex) {
-  await knex.schema.dropTable('achievements')
+export async function down() {
+  await db.execute(`DROP TABLE IF EXISTS achievements`)
 }

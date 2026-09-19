@@ -1,17 +1,14 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- *
- **/
+import db from '../connection.js'
 
-export async function up(knex) {
-  await knex.schema.alterTable('species', (table) => {
-    table.string('fun_fact')
-  })
+export async function up() {
+  await db.execute(`
+    ALTER TABLE species ADD COLUMN fun_fact TEXT
+  `)
 }
 
-export async function down(knex) {
-  await knex.schema.alterTable('species', (table) => {
-    table.dropColumn('fun_fact')
-  })
+export async function down() {
+
+  await db.execute(`
+    ALTER TABLE species DROP COLUMN fun_fact
+  `)
 }

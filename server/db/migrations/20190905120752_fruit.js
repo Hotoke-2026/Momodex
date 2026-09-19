@@ -1,10 +1,14 @@
-export async function up(knex) {
-  return knex.schema.createTable('fruit', (table) => {
-    table.increments('id')
-    table.string('name')
-  })
+import db from '../connection.js'
+
+export async function up() {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS fruit (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT
+    )
+  `)
 }
 
-export async function down(knex) {
-  return knex.schema.dropTable('fruit')
+export async function down() {
+  await db.execute(`DROP TABLE IF EXISTS fruit`)
 }

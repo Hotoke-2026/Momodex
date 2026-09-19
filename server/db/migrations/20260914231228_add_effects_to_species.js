@@ -1,15 +1,13 @@
-export async function up(knex) {
-  await knex.schema.alterTable('species', (table) => {
-    table.string('effect_type') // 'dodge' | 'intimidate' | 'slippery' | 'poison' | 'lifesteal' | 'swarm'
-    table.integer('effect_value') // meaning depends on effect_type
-    table.string('effect_trigger') // 'passive' | 'on_attack'
-  })
+import db from '../connection.js'
+
+export async function up() {
+  await db.execute(`ALTER TABLE species ADD COLUMN effect_type TEXT`)
+  await db.execute(`ALTER TABLE species ADD COLUMN effect_value INTEGER`)
+  await db.execute(`ALTER TABLE species ADD COLUMN effect_trigger TEXT`)
 }
 
-export async function down(knex) {
-  await knex.schema.alterTable('species', (table) => {
-    table.dropColumn('effect_type')
-    table.dropColumn('effect_value')
-    table.dropColumn('effect_trigger')
-  })
+export async function down() {
+  await db.execute(`ALTER TABLE species DROP COLUMN effect_type`)
+  await db.execute(`ALTER TABLE species DROP COLUMN effect_value`)
+  await db.execute(`ALTER TABLE species DROP COLUMN effect_trigger`)
 }

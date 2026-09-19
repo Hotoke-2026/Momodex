@@ -1,16 +1,14 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- *
- **/
+import db from '../connection.js'
 
-export async function up(knex) {
-  await knex.schema.createTable('users', (table) => {
-    table.string('id').primary()
-    table.string('name').notNullable()
-  })
+export async function up() {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL
+    )
+  `)
 }
 
-export async function down(knex) {
-  await knex.schema.dropTable('users')
+export async function down() {
+  await db.execute(`DROP TABLE IF EXISTS users`)
 }

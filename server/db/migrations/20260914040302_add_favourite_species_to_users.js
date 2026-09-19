@@ -1,17 +1,13 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- *
- **/
+import db from '../connection.js'
 
-export async function up(knex) {
-  await knex.schema.alterTable('users', (table) => {
-    table.string('favourite_species').nullable()
-  })
+export async function up() {
+  await db.execute(`
+    ALTER TABLE users ADD COLUMN favourite_species TEXT
+  `)
 }
 
-export async function down(knex) {
-  await knex.schema.alterTable('users', (table) => {
-    table.dropColumn('favourite_species')
-  })
+export async function down() {
+  await db.execute(`
+    ALTER TABLE users DROP COLUMN favourite_species
+  `)
 }

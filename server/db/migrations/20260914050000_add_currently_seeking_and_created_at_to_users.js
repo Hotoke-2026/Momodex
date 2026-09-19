@@ -1,19 +1,19 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- *
- **/
+import db from '../connection.js'
 
-export async function up(knex) {
-  await knex.schema.alterTable('users', (table) => {
-    table.string('currently_seeking').nullable()
-    table.timestamp('created_at').nullable()
-  })
+export async function up() {
+  await db.execute(`
+    ALTER TABLE users ADD COLUMN currently_seeking TEXT;
+  `)
+  await db.execute(`
+    ALTER TABLE users ADD COLUMN created_at DATETIME;
+  `)
 }
 
-export async function down(knex) {
-  await knex.schema.alterTable('users', (table) => {
-    table.dropColumn('currently_seeking')
-    table.dropColumn('created_at')
-  })
+export async function down() {
+  await db.execute(`
+    ALTER TABLE users DROP COLUMN currently_seeking;
+  `)
+  await db.execute(`
+    ALTER TABLE users DROP COLUMN created_at;
+  `)
 }

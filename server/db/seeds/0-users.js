@@ -1,16 +1,18 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
+import db from '../connection.js'
 
-export async function seed(knex) {
-  await knex('achievements').del()
-  await knex('battle_stats').del()
-  await knex('cards').del()
-  await knex('users').del()
+export async function seed() {
+  // Delete records in reverse order of foreign key dependencies
+  await db.execute('DELETE FROM achievements')
+  await db.execute('DELETE FROM battle_stats')
+  await db.execute('DELETE FROM cards')
+  await db.execute('DELETE FROM users')
 
-  await knex('users').insert([
-    { id: 'user1', name: 'David' },
-    { id: 'guest', name: 'Guest' },
-  ])
+  // Insert initial users
+  await db.execute({
+    sql: `
+      INSERT INTO users (id, name) VALUES 
+      ('user1', 'David'),
+      ('guest', 'Guest')
+    `,
+  })
 }

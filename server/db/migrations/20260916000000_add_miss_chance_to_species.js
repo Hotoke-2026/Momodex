@@ -1,17 +1,11 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function up(knex) {
-  await knex.schema.alterTable('species', (table) => {
-    table.integer('attack_miss_chance').notNullable().defaultTo(5) // % chance the basic attack misses
-    table.integer('attack_two_miss_chance') // % chance the special attack misses, null if there's no second move
-  })
+import db from '../connection.js'
+
+export async function up() {
+  await db.execute(`ALTER TABLE species ADD COLUMN attack_miss_chance INTEGER NOT NULL DEFAULT 5`)
+  await db.execute(`ALTER TABLE species ADD COLUMN attack_two_miss_chance INTEGER`)
 }
 
-export async function down(knex) {
-  await knex.schema.alterTable('species', (table) => {
-    table.dropColumn('attack_miss_chance')
-    table.dropColumn('attack_two_miss_chance')
-  })
+export async function down() {
+  await db.execute(`ALTER TABLE species DROP COLUMN attack_miss_chance`)
+  await db.execute(`ALTER TABLE species DROP COLUMN attack_two_miss_chance`)
 }

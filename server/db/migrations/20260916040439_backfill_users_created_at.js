@@ -1,29 +1,41 @@
-/**
- * One-off backfill for users whose created_at is NULL (accounts created
- * before created_at was set on insert). Uses each user's earliest card
- * as a proxy for signup date, since the real signup timestamp was never
- * recorded. Users with no cards yet fall back to "now" at migration time.
- *
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
+import db from '../connection.js'
 
-export async function up(knex) {
-  const usersMissingDate = await knex('users').whereNull('created_at').select('id')
+export async function up() {
+  // Get all users where created_at is NULL
+  const result = await db.execute(`
+    SELECT id FROM users WHERE created_at IS NULL
+  `)
+  const usersMissingDate = result.rows
 
-  for (const { id } of usersMissingDate) {
-    const earliestCard = await knex('cards')
-      .where({ user_id: id })
-      .orderBy('created_at', 'asc')
-      .select('created_at')
-      .first()
+  for (const row of usersMissingDate) {
+    const id = row.id
 
-    await knex('users')
-      .where({ id })
-      .update({ created_at: earliestCard?.created_at ?? knex.fn.now() })
+    // Find the user's earliest card
+    const cardResult = await db.execute({
+      sql: `
+        SELECT created_at FROM cards 
+        WHERE user_id = ? 
+        ORDER BY created_at ASC 
+        LIMIT 1
+      `,
+      args: [id]
+    })
+
+    const earliestCard = cardResult.rows[0]
+    const createdAtValue = earliestCard?.created_at ?? new Date().toISOString()
+
+    // Update the user's created_at timestamp
+    await db.execute({
+      sql: `
+        UPDATE users 
+        SET created_at = ? 
+        WHERE id = ?
+      `,
+      args: [createdAtValue, id]
+    })
   }
 }
 
-export async function down(knex) {
+export async function down() {
   // no-op
 }

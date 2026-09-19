@@ -1,22 +1,20 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- *
- **/
+import db from '../connection.js'
 
-export async function up(knex) {
-  await knex.schema.createTable('species', (table) => {
-    table.string('id').primary()
-    table.string('name').notNullable()
-    table.string('type').notNullable() // bird / insect / plant
-    table.integer('hp').notNullable()
-    table.integer('attack').notNullable()
-    table.string('rarity').notNullable()
-    table.string('status').notNullable() // native / invasive
-    table.string('description').notNullable()
-  })
+export async function up() {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS species (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      hp INTEGER NOT NULL,
+      attack INTEGER NOT NULL,
+      rarity TEXT NOT NULL,
+      status TEXT NOT NULL,
+      description TEXT NOT NULL
+    )
+  `)
 }
 
-export async function down(knex) {
-  await knex.schema.dropTable('species')
+export async function down() {
+  await db.execute(`DROP TABLE IF EXISTS species`)
 }

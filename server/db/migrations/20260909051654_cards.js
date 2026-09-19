@@ -1,24 +1,21 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- *
- **/
+import db from '../connection.js'
 
-export async function up(knex) {
-  await knex.schema.createTable('cards', (table) => {
-    table.increments('id').primary()
-    table.string('card_name').notNullable()
-    table.string('user_id').notNullable()
-    table.string('species_id').notNullable()
-    table.string('image_url').notNullable()
-    table.string('location')
-    table.timestamp('created_at').defaultTo(knex.fn.now()) // default time created to 'now'
-
-    table.foreign('user_id').references('id').inTable('users')
-    table.foreign('species_id').references('id').inTable('species')
-  })
+export async function up() {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS cards (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      card_name TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      species_id TEXT NOT NULL,
+      image_url TEXT NOT NULL,
+      location TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (species_id) REFERENCES species(id)
+    )
+  `)
 }
 
-export async function down(knex) {
-  await knex.schema.dropTable('cards')
+export async function down() {
+  await db.execute(`DROP TABLE IF EXISTS cards`)
 }
