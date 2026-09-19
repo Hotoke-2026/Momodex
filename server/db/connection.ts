@@ -9,16 +9,33 @@ const client = createClient({
 const db = knex({
   client: 'sqlite3',
   connection: {
-    filename: process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || './dev.sqlite',
-  },
-  pool: {
-    afterCreate: (conn: any, done: Function) => {
-      done()
-    },
+    filename: ':memory:',
   },
   useNullAsDefault: true,
 })
 
-;(db as any).client.driver = client
+;(db as any).client.runner = function (builder: any) {
+  const query = builder.toSQL()
+  return {
+    async then(resolve: any, reject: any) {
+      try {
+        const result = await client.execute({
+          sql: query.sql,
+          args: query.bindings,
+        })
+        
+        if (query.method === 'select' || query.method === 'first') {
+          resolve(result.rows)
+        } else if (query.method === 'insert') {
+          resolve([Number(result.lastInsertRowid)])
+        } else {
+          resolve(result.rows)
+        }
+      } catch (err) {
+        reject(err)
+      }
+    },
+  }
+}
 
 export default db
