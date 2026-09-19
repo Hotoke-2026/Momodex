@@ -1,7 +1,5 @@
 import { createClient } from '@libsql/client'
-import knex from 'knex'
-
-const isProduction = process.env.NODE_ENV === 'production' || Boolean(process.env.DATABASE_URL)
+import { knex } from 'knex'
 
 const client = createClient({
   url: process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || 'file:./dev.sqlite',
@@ -9,15 +7,18 @@ const client = createClient({
 })
 
 const db = knex({
-  client: isProduction ? 'sqlite3' : 'sqlite3',
-  connection: isProduction
-    ? {
-        filename: ':memory:', 
-      }
-    : {
-        filename: './dev.sqlite',
-      },
+  client: 'sqlite3',
+  connection: {
+    filename: process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || './dev.sqlite',
+  },
+  pool: {
+    afterCreate: (conn: any, done: Function) => {
+      done()
+    },
+  },
   useNullAsDefault: true,
 })
+
+;(db as any).client.driver = client
 
 export default db
