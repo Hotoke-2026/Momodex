@@ -92,7 +92,7 @@ export function ProfileCard({ userId, user, battleStats, lastCapture }: ProfileC
       <div className="flex items-start gap-4 pr-14 relative z-10">
         <ProfileAvatar name={user?.name} avatarUrl={user?.avatar_url} size={72} />
         <p className="mt-4 text-[length:var(--text-body-md)] italic text-white font-medium">
-          Momo Collecting since {formatDate(user?.created_at) ?? '—'}
+          Momo collecting since {formatDate(user?.created_at ?? lastCapture?.created_at) || 'Today'}
         </p>
       </div>
 
