@@ -10,6 +10,8 @@ interface Species {
 export async function identifySpecies(
   imageUrl: string,
   shortlist: Species[],
+  retries = 3,
+  delayMs = 2000
 ): Promise<string> {
   const imageResponse = await fetch(imageUrl)
   const imageBuffer = await imageResponse.arrayBuffer()
@@ -29,10 +31,22 @@ If none of them match, respond with exactly: NO_MATCH
     { text: promptText },
   ]
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents,
-  })
-  
-  return response.text?.trim() ?? 'NO_MATCH'
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents,
+      })
+      return response.text?.trim() ?? 'NO_MATCH'
+    } catch (error: any) {
+      if (error?.status === 503 && attempt < retries) {
+        console.warn(`Gemini 503 high demand encountered. Retrying attempt ${attempt + 1} in ${delayMs}ms...`)
+        await new Promise((resolve) => setTimeout(resolve, delayMs))
+        continue
+      }
+      throw error
+    }
+  }
+
+  return 'NO_MATCH'
 }
