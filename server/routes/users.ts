@@ -49,57 +49,79 @@ router.get('/:id', checkJwt, async (req, res) => {
       user = userResult.rows[0]
     }
 
-    res.json(user)
+    return res.json(user)
   } catch (error) {
     console.error('Failed to fetch user:', error)
-    res.status(500).json({ error: 'Failed to fetch user' })
+    return res.status(500).json({ error: 'Failed to fetch user' })
   }
 })
 
 router.get('/:id/battle-stats', checkJwt, async (req, res) => {
-  const stats = await getOrCreateBattleStats(req.params.id)
-  res.json(stats)
+  try {
+    const stats = await getOrCreateBattleStats(req.params.id)
+    return res.json(stats)
+  } catch (error) {
+    console.error('Failed to fetch battle stats:', error)
+    return res.status(500).json({ error: 'Failed to fetch battle stats' })
+  }
 })
 
 router.get('/:id/last-capture', checkJwt, async (req, res) => {
-  const cardResult = await db.execute({
-    sql: 'SELECT created_at, location FROM cards WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
-    args: [req.params.id],
-  })
-  res.json(cardResult.rows[0] ?? null)
+  try {
+    const cardResult = await db.execute({
+      sql: 'SELECT created_at, location FROM cards WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+      args: [req.params.id],
+    })
+    return res.json(cardResult.rows[0] ?? null)
+  } catch (error) {
+    console.error('Failed to fetch last capture:', error)
+    return res.status(500).json({ error: 'Failed to fetch last capture' })
+  }
 })
 
 router.patch('/:id', checkJwt, async (req, res) => {
-  const { favourite_species, currently_seeking } = req.body as {
-    favourite_species?: string
-    currently_seeking?: string
-  }
+  try {
+    const authenticatedUserId = req.auth?.payload?.sub
+    const requestedId = req.params.id
 
-  const updates: string[] = []
-  const args: any[] = []
+    if (!authenticatedUserId || authenticatedUserId !== requestedId) {
+      return res.status(403).json({ error: 'Forbidden: You can only edit your own profile' })
+    }
 
-  if (favourite_species !== undefined) {
-    updates.push('favourite_species = ?')
-    args.push(favourite_species)
-  }
-  if (currently_seeking !== undefined) {
-    updates.push('currently_seeking = ?')
-    args.push(currently_seeking)
-  }
+    const { favourite_species, currently_seeking } = req.body as {
+      favourite_species?: string
+      currently_seeking?: string
+    }
 
-  if (updates.length > 0) {
-    args.push(req.params.id)
-    await db.execute({
-      sql: `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
-      args,
+    const updates: string[] = []
+    const args: any[] = []
+
+    if (favourite_species !== undefined) {
+      updates.push('favourite_species = ?')
+      args.push(favourite_species)
+    }
+    if (currently_seeking !== undefined) {
+      updates.push('currently_seeking = ?')
+      args.push(currently_seeking)
+    }
+
+    if (updates.length > 0) {
+      args.push(requestedId)
+      await db.execute({
+        sql: `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+        args,
+      })
+    }
+
+    const userResult = await db.execute({
+      sql: 'SELECT * FROM users WHERE id = ?',
+      args: [requestedId],
     })
+    return res.json(userResult.rows[0])
+  } catch (error) {
+    console.error('Failed to update user profile:', error)
+    return res.status(500).json({ error: 'Failed to update user profile' })
   }
-
-  const userResult = await db.execute({
-    sql: 'SELECT * FROM users WHERE id = ?',
-    args: [req.params.id],
-  })
-  res.json(userResult.rows[0])
 })
 
 export default router

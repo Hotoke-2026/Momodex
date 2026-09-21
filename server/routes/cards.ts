@@ -44,18 +44,23 @@ router.post('/', checkJwt, async (req, res) => {
 })
 
 router.delete('/:id', checkJwt, async (req, res) => {
-  const cardId = Number(req.params.id)
-  const userId = req.auth?.payload.sub // the real, verified user from the token — not client-supplied
+  try {
+    const cardId = Number(req.params.id)
+    const userId = req.auth?.payload.sub // the real, verified user from the token — not client-supplied
 
-  if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' })
-  }
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
 
-  const wasDeleted = await deleteCard(cardId, userId)
-  if (!wasDeleted) {
-    return res.status(404).json({ error: 'Card not found' })
+    const wasDeleted = await deleteCard(cardId, userId)
+    if (!wasDeleted) {
+      return res.status(404).json({ error: 'Card not found' })
+    }
+    return res.status(204).send()
+  } catch (error) {
+    console.error('SERVER ERROR deleting card:', error)
+    return res.status(500).json({ error: 'Failed to delete card' })
   }
-  res.status(204).send()
 })
 
 export default router

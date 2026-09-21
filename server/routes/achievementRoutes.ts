@@ -11,8 +11,13 @@ router.get('/', checkJwt, async (req, res) => {
     return res.status(400).json({ error: 'userId query parameter is required' })
   }
 
-  const achievements = await getAchievementsForUser(userId)
-  res.json(achievements)
+  try {
+    const achievements = await getAchievementsForUser(userId)
+    res.json(achievements)
+  } catch (error) {
+    console.error('Error fetching achievements:', error)
+    res.status(500).json({ error: 'Failed to fetch achievements' })
+  }
 })
 
 // Re-evaluates a user's achievements against their current card collection.
