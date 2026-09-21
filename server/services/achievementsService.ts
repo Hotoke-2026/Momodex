@@ -42,7 +42,10 @@ export async function getAchievementsForUser(userId: string): Promise<Achievemen
 
 async function unlockIfNeeded(userId: string, type: string, name: string, newlyUnlocked: Achievement[]) {
   if (!(await hasAchievement(userId, type))) {
-    newlyUnlocked.push(await insertAchievement(userId, type, name))
+    const achievement = await insertAchievement(userId, type, name)
+    if (achievement) {
+      newlyUnlocked.push(achievement)
+    }
   }
 }
 
