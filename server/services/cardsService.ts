@@ -8,27 +8,36 @@ export async function insertCard(cardData: {
   image_url: string
   location?: string | null
 }) {
-  const result = await db.execute({
-    sql: `
-      INSERT INTO cards (user_id, species_id, image_url, location) 
-      VALUES (?, ?, ?, ?)
-    `,
-    args: [
-      cardData.user_id,
-      cardData.species_id,
-      cardData.image_url,
-      cardData.location ?? null,
-    ],
-  })
+  try {
+    const result = await db.execute({
+      sql: `
+        INSERT INTO cards (user_id, species_id, image_url, location) 
+        VALUES (?, ?, ?, ?)
+      `,
+      args: [
+        cardData.user_id,
+        cardData.species_id,
+        cardData.image_url,
+        cardData.location ?? null,
+      ],
+    })
 
-  const newCardId = result.lastInsertRowid !== undefined ? Number(result.lastInsertRowid) : 0
+    const newCardId = result.lastInsertRowid
 
-  const fetchResult = await db.execute({
-    sql: `SELECT * FROM cards WHERE id = ?`,
-    args: [newCardId],
-  })
+    const fetchResult = await db.execute({
+      sql: `SELECT * FROM cards WHERE id = ?`,
+      args: [newCardId !== undefined ? Number(newCardId) : 0],
+    })
 
-  return fetchResult.rows[0]
+    if (!fetchResult.rows || fetchResult.rows.length === 0) {
+      throw new Error('Failed to retrieve newly inserted card record')
+    }
+
+    return fetchResult.rows[0]
+  } catch (dbError) {
+    console.error('Database error inside insertCard:', dbError)
+    throw dbError // Propagates to identifyController's catch block
+  }
 }
 
 export async function getCardsByUserId(userId: string) {
