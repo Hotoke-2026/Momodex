@@ -1,3 +1,4 @@
+// server/db/cards.ts
 import db from './connection'
 import { Card, NewCardPayload } from '../../models/types'
 
@@ -12,9 +13,8 @@ export async function getCardsByUserId(userId: string): Promise<Card[]> {
 export async function insertCard(newCard: NewCardPayload, userId: string): Promise<Card> {
   const result = await db.execute({
     sql: `
-      INSERT INTO cards (user_id, card_name, species_id, image_url, location)
+      INSERT INTO cards (user_id, card_name, species_id, image_url, location) 
       VALUES (?, ?, ?, ?, ?)
-      RETURNING *
     `,
     args: [
       userId,
@@ -25,5 +25,12 @@ export async function insertCard(newCard: NewCardPayload, userId: string): Promi
     ],
   })
 
-  return result.rows[0] as unknown as Card
+  const newCardId = result.lastInsertRowid !== undefined ? Number(result.lastInsertRowid) : 0
+
+  const fetchResult = await db.execute({
+    sql: `SELECT * FROM cards WHERE id = ?`,
+    args: [newCardId],
+  })
+
+  return fetchResult.rows[0] as unknown as Card
 }
