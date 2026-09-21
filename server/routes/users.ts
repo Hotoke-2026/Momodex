@@ -56,12 +56,12 @@ router.get('/:id', checkJwt, async (req, res) => {
   }
 })
 
-router.get('/:id/battle-stats', async (req, res) => {
+router.get('/:id/battle-stats', checkJwt, async (req, res) => {
   const stats = await getOrCreateBattleStats(req.params.id)
   res.json(stats)
 })
 
-router.get('/:id/last-capture', async (req, res) => {
+router.get('/:id/last-capture', checkJwt, async (req, res) => {
   const cardResult = await db.execute({
     sql: 'SELECT created_at, location FROM cards WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
     args: [req.params.id],
@@ -69,7 +69,7 @@ router.get('/:id/last-capture', async (req, res) => {
   res.json(cardResult.rows[0] ?? null)
 })
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', checkJwt, async (req, res) => {
   const { favourite_species, currently_seeking } = req.body as {
     favourite_species?: string
     currently_seeking?: string
