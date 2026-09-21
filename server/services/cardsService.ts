@@ -1,32 +1,34 @@
 // server/services/cardsService.ts
 import db from '../db/connection'
 
-export async function insertCard(rawPayload: any) {
-  const { card_name, user_id, species_id, image_url, location } = rawPayload
-
-  const cleanCardData = {
-    card_name,
-    user_id,
-    species_id,
-    image_url,
-    location: location ?? null,
-  }
-
+export async function insertCard(cardData: {
+  card_name: string
+  user_id: string
+  species_id: number
+  image_url: string
+  location?: string | null
+}) {
   const result = await db.execute({
     sql: `
-      INSERT INTO cards (card_name, user_id, species_id, image_url, location)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO cards (user_id, species_id, image_url, location) 
+      VALUES (?, ?, ?, ?)
     `,
     args: [
-      cleanCardData.card_name,
-      cleanCardData.user_id,
-      cleanCardData.species_id,
-      cleanCardData.image_url,
-      cleanCardData.location,
+      cardData.user_id,
+      cardData.species_id,
+      cardData.image_url,
+      cardData.location ?? null,
     ],
   })
 
-  return result
+  const newCardId = result.lastInsertRowid !== undefined ? Number(result.lastInsertRowid) : 0
+
+  const fetchResult = await db.execute({
+    sql: `SELECT * FROM cards WHERE id = ?`,
+    args: [newCardId],
+  })
+
+  return fetchResult.rows[0]
 }
 
 export async function getCardsByUserId(userId: string) {

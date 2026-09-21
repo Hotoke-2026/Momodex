@@ -54,7 +54,7 @@ export async function identifyController(req: Request, res: Response) {
     const card = await insertCard({
       card_name: String(matchedSpecies.name),
       user_id: userId,
-      species_id: matchedSpecies.id,
+      species_id: Number(matchedSpecies.id),
       image_url: imageUrl,
       location: location ?? null,
     })
