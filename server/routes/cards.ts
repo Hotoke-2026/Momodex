@@ -36,17 +36,17 @@ router.post('/', checkJwt, async (req, res) => {
     }
 
     const newCard = await insertCard(req.body, userId)
-    res.status(201).json(newCard)
+    return res.status(201).json(newCard)
   } catch (error) {
     console.error('SERVER ERROR:', error)
-    res.status(500).json({ message: 'Failed to save card' })
+    return res.status(500).json({ message: 'Failed to save card' })
   }
 })
 
 router.delete('/:id', checkJwt, async (req, res) => {
   try {
     const cardId = Number(req.params.id)
-    const userId = req.auth?.payload.sub // the real, verified user from the token — not client-supplied
+    const userId = req.auth?.payload.sub
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' })

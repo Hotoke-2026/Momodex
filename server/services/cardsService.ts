@@ -1,21 +1,32 @@
 // server/services/cardsService.ts
 import db from '../db/connection'
-import { NewCard } from '../../models/types'
 
-export async function insertCard(newCard: NewCard) {
+export async function insertCard(rawPayload: any) {
+  const { card_name, user_id, species_id, image_url, location } = rawPayload
+
+  const cleanCardData = {
+    card_name,
+    user_id,
+    species_id,
+    image_url,
+    location: location ?? null,
+  }
+
   const result = await db.execute({
-    sql: `INSERT INTO cards (card_name, user_id, species_id, image_url, location) 
-          VALUES (?, ?, ?, ?, ?) 
-          RETURNING *`,
+    sql: `
+      INSERT INTO cards (card_name, user_id, species_id, image_url, location)
+      VALUES (?, ?, ?, ?, ?)
+    `,
     args: [
-      newCard.card_name,
-      newCard.user_id,
-      newCard.species_id,
-      newCard.image_url,
-      newCard.location ?? null,
+      cleanCardData.card_name,
+      cleanCardData.user_id,
+      cleanCardData.species_id,
+      cleanCardData.image_url,
+      cleanCardData.location,
     ],
   })
-  return result.rows[0]
+
+  return result
 }
 
 export async function getCardsByUserId(userId: string) {
