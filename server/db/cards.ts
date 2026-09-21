@@ -25,7 +25,12 @@ export async function insertCard(newCard: NewCardPayload, userId: string): Promi
     ],
   })
 
-  const newCardId = result.lastInsertRowid !== undefined ? Number(result.lastInsertRowid) : 0
+  const rawId = result.lastInsertRowid
+  const newCardId = typeof rawId === 'bigint' || typeof rawId === 'number' ? Number(rawId) : NaN
+
+  if (!Number.isFinite(newCardId)) {
+    throw new Error('Invalid lastInsertRowid returned from database insert')
+  }
 
   const fetchResult = await db.execute({
     sql: `SELECT * FROM cards WHERE id = ?`,
