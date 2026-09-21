@@ -1,10 +1,11 @@
 // server/routes/species.ts
 import { Router } from 'express'
 import { getSpeciesById, getSpeciesShortlist } from '../services/speciesService'
+import { checkJwt } from '../middleware/authMiddleware'
 
 const router = Router()
 
-router.get('/', async (req, res) => {
+router.get('/', checkJwt, async (req, res) => {
   try {
     const species = await getSpeciesShortlist()
     res.json(species)
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', checkJwt, async (req, res) => {
   try {
     const species = await getSpeciesById(req.params.id)
     if (!species) {
