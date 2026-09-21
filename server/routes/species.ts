@@ -5,7 +5,7 @@ import { checkJwt } from '../middleware/authMiddleware'
 
 const router = Router()
 
-router.get('/', checkJwt, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const species = await getSpeciesShortlist()
     res.json(species)
@@ -15,7 +15,7 @@ router.get('/', checkJwt, async (req, res) => {
   }
 })
 
-router.get('/:id', checkJwt, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const species = await getSpeciesById(req.params.id)
     if (!species) {
