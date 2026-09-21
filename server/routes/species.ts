@@ -1,7 +1,6 @@
 // server/routes/species.ts
 import { Router } from 'express'
 import { getSpeciesById, getSpeciesShortlist } from '../services/speciesService'
-import { checkJwt } from '../middleware/authMiddleware'
 
 const router = Router()
 

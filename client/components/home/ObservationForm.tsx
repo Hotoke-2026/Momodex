@@ -22,7 +22,7 @@ export function ObservationForm() {
   const speciesQuery = useQuery({
     queryKey: ['species', identifyMutation.data?.species_id],
     queryFn: () => getSpeciesById(identifyMutation.data!.species_id),
-    enabled: !!identifyMutation.data,
+    enabled: !!identifyMutation.data?.species_id,
   })
 
   const handleFileChange = (file: File | null) => {
