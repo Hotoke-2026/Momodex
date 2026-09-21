@@ -1,4 +1,4 @@
-import db from '../connection.js'
+import db from '../connection.ts'
 
 export async function seed() {
   // Use a non-destructive upsert approach or clear safely if needed
