@@ -19,6 +19,7 @@ export async function insertCard(cardData: {
         cardData.species_id,
         cardData.image_url,
         cardData.location ?? null,
+        cardData.card_name
       ],
     })
 
